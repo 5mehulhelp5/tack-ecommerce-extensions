@@ -37,12 +37,23 @@
     data-msg-unpriced="{{ 'tackquote.price.unpriced' | t | escape }}"
     data-msg-each="{{ 'tackquote.price.each' | t | escape }}"
     data-msg-list-note="{{ 'tackquote.price.list_note' | t | escape }}"
+    data-msg-quote-note="{{ 'tackquote.price.quote_note' | t | escape }}"
     data-msg-error="{{ 'tackquote.price.error' | t | escape }}"
+    {%- if request.design_mode %}
+    data-msg-diag-password="{{ 'tackquote.diagnostics.password' | t | escape }}"
+    data-msg-diag-not-json="{{ 'tackquote.diagnostics.not_json' | t | escape }}"
+    data-msg-diag-404="{{ 'tackquote.diagnostics.not_found' | t | escape }}"
+    data-msg-diag-auth="{{ 'tackquote.diagnostics.auth' | t | escape }}"
+    data-msg-diag-5xx="{{ 'tackquote.diagnostics.server' | t | escape }}"
+    data-msg-diag-timeout="{{ 'tackquote.diagnostics.timeout' | t | escape }}"
+    data-msg-diag-fail="{{ 'tackquote.diagnostics.failed' | t | escape }}"
+    data-msg-diag-not-connected="{{ 'tackquote.diagnostics.not_connected' | t | escape }}"
+    {%- endif %}
     {{ block.shopify_attributes }}
   >
     {% render 'tackquote-selection', product: product %}
     <h3 class="tackquote-price__heading">
-      {{ block.settings.heading | default: 'Your wholesale price' }}
+      {{ block.settings.heading | default: 'Your quoted wholesale price' }}
     </h3>
     <div class="tackquote-price__body" data-tackquote-price-body role="status" aria-live="polite">
       <p class="tackquote-price__loading">{{ 'tackquote.price.loading' | t }}</p>
@@ -66,7 +77,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "Shows the signed-in customer's B2B price. TackQuote resolves the price from the shopper's Shopify session, so it is never read from this page and a shopper cannot alter it."
+      "content": "Shows the signed-in customer's wholesale price so they can request it on a quote. TackQuote resolves the price from the shopper's Shopify session, so it is never read from this page and a shopper cannot alter it."
     },
     {
       "type": "text",
@@ -79,7 +90,7 @@
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "Your wholesale price"
+      "default": "Your quoted wholesale price"
     }
   ]
 }

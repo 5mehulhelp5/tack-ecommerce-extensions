@@ -40,7 +40,7 @@
   >
     {% render 'tackquote-selection', product: product %}
     <h3 class="tackquote-breaks__heading">
-      {{ block.settings.heading | default: 'Quantity pricing' }}
+      {{ block.settings.heading | default: 'Wholesale quantity pricing' }}
     </h3>
     <div class="tackquote-breaks__body" data-tackquote-breaks-body role="status" aria-live="polite">
       <p class="tackquote-breaks__loading">{{ 'tackquote.quantity_breaks.loading' | t }}</p>
@@ -64,7 +64,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "Shows the quantity-break ladder for this product. Every price comes from TackQuote's own pricing engine, so this table and the Wholesale Price block can never disagree."
+      "content": "Shows the wholesale quantity-break ladder for this product, so buyers can request those prices on a quote. Every price comes from TackQuote's own pricing engine, so this table and the Wholesale Price block can never disagree."
     },
     {
       "type": "paragraph",
@@ -81,7 +81,7 @@
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "Quantity pricing"
+      "default": "Wholesale quantity pricing"
     }
   ]
 }
