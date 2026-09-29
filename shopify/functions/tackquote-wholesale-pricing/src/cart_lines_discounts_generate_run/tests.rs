@@ -53,34 +53,24 @@ impl In {
     }
 }
 
-/// (cart line number, per-unit amount off) for every candidate.
+/// (cart line number, per-unit amount off) for every targeted line, in line
+/// order.
 fn amounts(out: &Output) -> Vec<(String, f64)> {
     let mut v = Vec::new();
     for op in &out.operations {
-        match op {
-            schema::CartOperation::ProductDiscountsAdd(add) => {
-                assert_eq!(add.selection_strategy, schema::ProductDiscountSelectionStrategy::All);
-                for c in &add.candidates {
-                    assert_eq!(c.message.as_deref(), Some(DISCOUNT_MESSAGE));
-                    let id = match &c.targets[0] {
-                        schema::ProductDiscountCandidateTarget::CartLine(t) => {
-                            t.id.trim_start_matches("gid://shopify/CartLine/").to_string()
-                        }
-                        _ => panic!("unexpected target"),
-                    };
-                    let amount = match &c.value {
-                        schema::ProductDiscountCandidateValue::FixedAmount(f) => {
-                            assert_eq!(f.applies_to_each_item, Some(true));
-                            f.amount.0
-                        }
-                        _ => panic!("unexpected value"),
-                    };
-                    v.push((id, amount));
-                }
+        let schema::CartOperation::ProductDiscountsAdd(add) = op else { panic!("unexpected operation") };
+        assert_eq!(add.selection_strategy, schema::ProductDiscountSelectionStrategy::All);
+        for c in &add.candidates {
+            assert_eq!(c.message, None);
+            let schema::ProductDiscountCandidateValue::FixedAmount(f) = &c.value else { panic!("unexpected value") };
+            assert_eq!(f.applies_to_each_item, Some(true));
+            // CartLine is the only variant of this oneOf in 2026-07.
+            for schema::ProductDiscountCandidateTarget::CartLine(t) in &c.targets {
+                v.push((t.id.trim_start_matches("gid://shopify/CartLine/").to_string(), f.amount.0));
             }
-            _ => panic!("unexpected operation"),
         }
     }
+    v.sort_by_key(|(id, _)| id.parse::<u64>().unwrap_or(u64::MAX));
     v
 }
 
@@ -321,7 +311,8 @@ fn a_malformed_buyer_is_treated_as_unpriced_and_logged() {
         (json!({ "v": 1, "g": ["*"] }), "buyer_groups"),
         (json!({ "v": 1, "g": ["GOLD", "GOLD"] }), "buyer_groups"),
         (json!({ "v": 1, "g": [], "p": { "11": [[1, 5]] } }), "buyer_currency"),
-        (json!({ "v": 1, "g": [], "c": "USD", "p": { "gid://shopify/ProductVariant/11": [[1, 5]] } }), "buyer_variant_key"),
+        (json!({ "v": 1, "g": [], "c": "USD", "p": [[1, 5]] }), "buyer_prices"),
+        (json!({ "v": 1, "g": [], "d": { "min": 0 } }), "buyer_limit_entry"),
         (json!({ "v": 1, "g": [], "z": true }), "buyer_unknown_key"),
     ];
     for (b, expected) in cases {
@@ -329,6 +320,51 @@ fn a_malformed_buyer_is_treated_as_unpriced_and_logged() {
         assert!(out.operations.is_empty());
         assert!(log(&omitted).contains(expected), "{}", log(&omitted));
     }
+}
+
+#[test]
+fn a_malformed_override_for_this_variant_prices_nothing_rather_than_falling_to_a_group() {
+    let b = json!({ "v": 1, "g": ["GOLD"], "c": "USD", "p": { "11": [[1, "7"]] } });
+    let (out, omitted) = single(10, gold_ladder(), b);
+    assert!(out.operations.is_empty());
+    assert!(log(&omitted).contains("buyer_tier_list=11"), "{}", log(&omitted));
+}
+
+#[test]
+fn a_malformed_group_ladder_prices_nothing_rather_than_falling_to_wildcard() {
+    let t = json!({ "v": 1, "c": "USD", "t": { "GOLD": [[1, "8"]], "*": [[1, 9.5]] } });
+    let (out, omitted) = single(1, t, gold_buyer());
+    assert!(out.operations.is_empty());
+    assert!(log(&omitted).contains("tiers_tier_list=11"));
+}
+
+#[test]
+fn the_reader_consults_only_the_buyers_audiences() {
+    // A broken ladder under an audience this buyer is not in is never read:
+    // the WRITER validates whole documents (encode.js), the reader what it uses.
+    let t = json!({ "v": 1, "c": "USD", "t": { "GOLD": [[1, 8]], "OTHER": "x" } });
+    let (out, omitted) = single(1, t, gold_buyer());
+    assert_eq!(amounts(&out), one("1", 2.0));
+    assert!(omitted.is_empty());
+}
+
+#[test]
+fn an_override_keyed_by_gid_is_not_a_match() {
+    let b = json!({ "v": 1, "g": ["GOLD"], "c": "USD", "p": { "gid://shopify/ProductVariant/11": [[1, 5]] } });
+    assert_eq!(amounts(&single(1, multi(), b).0), one("1", 2.0));
+}
+
+#[test]
+fn lines_with_the_same_amount_share_one_candidate() {
+    let t = gold_ladder();
+    let (out, _) = In::new(
+        gold_buyer(),
+        vec![usd(1, 11, 10, "10.0", &t), usd(2, 12, 10, "10.0", &t), usd(3, 13, 1, "10.0", &t)],
+    )
+    .run();
+    let schema::CartOperation::ProductDiscountsAdd(add) = &out.operations[0] else { panic!() };
+    assert_eq!(add.candidates.len(), 2);
+    assert_eq!(amounts(&out), vec![("1".into(), 2.0), ("2".into(), 2.0), ("3".into(), 1.0)]);
 }
 
 // ---- the 10,000-byte limit -----------------------------------------------------------
@@ -361,4 +397,47 @@ fn the_log_line_is_bounded() {
     let line = omitted.render("tackquote-wholesale-pricing");
     assert!(line.len() <= 900, "{}", line.len());
     assert!(line.ends_with("..."));
+}
+
+// ---- the size assumption ------------------------------------------------------------
+
+/// The budget METAFIELD_CONTRACT.md promises the push pipeline: 20 audiences
+/// (19 group codes of 12 characters plus "*"), 20 breaks each, quantities up
+/// to 7 digits and prices with 4 decimals up to 99,999.9999.
+fn documented_budget_price_tiers() -> Value {
+    let mut t = serde_json::Map::new();
+    for g in 0..20 {
+        let key = if g == 19 { "*".to_string() } else { format!("GROUPCODE{g:03}") };
+        let ladder: Vec<Value> = (0..20)
+            .map(|i| json!([1_000_000 + i * 100_000, 99_999.9999 - f64::from(i as u32)]))
+            .collect();
+        t.insert(key, Value::Array(ladder));
+    }
+    json!({ "v": 1, "c": "USD", "t": t })
+}
+
+#[test]
+fn the_documented_worst_case_fits_under_10000_bytes_and_still_prices() {
+    let t = documented_budget_price_tiers();
+    let bytes = t.to_string().len();
+    assert!(bytes <= crate::contract::FUNCTION_METAFIELD_MAX_BYTES, "{bytes} bytes");
+    let b = json!({ "v": 1, "g": ["GROUPCODE000"] });
+    let (out, omitted) = In::new(b, vec![usd(1, 11, 1_000_000, "100000.0", &t)]).run();
+    assert!(omitted.is_empty(), "{}", log(&omitted));
+    assert_eq!(amounts(&out), one("1", 0.0001));
+}
+
+#[test]
+fn the_parser_caps_alone_do_not_keep_a_value_under_the_limit() {
+    // 50 audiences x 50 breaks parses, but is far over 10,000 bytes, so
+    // Shopify would hand the function null. Only the writer's refusal
+    // (encode.js, ContractSizeError) prevents that silent retail fallback.
+    let mut t = serde_json::Map::new();
+    for g in 0..50 {
+        let ladder: Vec<Value> = (1..=50).map(|q| json!([q, 1.5])).collect();
+        t.insert(format!("G{g}"), Value::Array(ladder));
+    }
+    let v = json!({ "v": 1, "c": "USD", "t": t });
+    assert!(v.to_string().len() > crate::contract::FUNCTION_METAFIELD_MAX_BYTES);
+    assert!(matches!(crate::contract::read_price_tiers(None), crate::contract::Parsed::Absent));
 }

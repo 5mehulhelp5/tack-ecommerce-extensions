@@ -1,0 +1,113 @@
+{
+  "payload": {
+    "export": "cart_lines_discounts_generate_run",
+    "target": "cart.lines.discounts.generate.run",
+    "input": {
+      "presentmentCurrencyRate": "1.5",
+      "discount": {
+        "discountClasses": [
+          "PRODUCT"
+        ]
+      },
+      "cart": {
+        "buyerIdentity": {
+          "customer": {
+            "buyer": {
+              "jsonValue": {
+                "v": 1,
+                "g": [
+                  "GOLD"
+                ]
+              }
+            }
+          }
+        },
+        "lines": [
+          {
+            "id": "gid://shopify/CartLine/1",
+            "quantity": 10,
+            "cost": {
+              "amountPerQuantity": {
+                "amount": "15.0",
+                "currencyCode": "CAD"
+              }
+            },
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "id": "gid://shopify/ProductVariant/11",
+              "priceTiers": {
+                "jsonValue": {
+                  "v": 1,
+                  "c": "USD",
+                  "t": {
+                    "GOLD": [
+                      [
+                        1,
+                        9
+                      ],
+                      [
+                        10,
+                        8
+                      ],
+                      [
+                        50,
+                        7
+                      ]
+                    ],
+                    "*": [
+                      [
+                        1,
+                        9.5
+                      ]
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "id": "gid://shopify/CartLine/2",
+            "quantity": 1,
+            "cost": {
+              "amountPerQuantity": {
+                "amount": "15.0",
+                "currencyCode": "CAD"
+              }
+            },
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "id": "gid://shopify/ProductVariant/12",
+              "priceTiers": null
+            }
+          }
+        ]
+      }
+    },
+    "output": {
+      "operations": [
+        {
+          "productDiscountsAdd": {
+            "candidates": [
+              {
+                "targets": [
+                  {
+                    "cartLine": {
+                      "id": "gid://shopify/CartLine/1"
+                    }
+                  }
+                ],
+                "value": {
+                  "fixedAmount": {
+                    "amount": "3.0",
+                    "appliesToEachItem": true
+                  }
+                }
+              }
+            ],
+            "selectionStrategy": "ALL"
+          }
+        }
+      ]
+    }
+  }
+}

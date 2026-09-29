@@ -21,17 +21,20 @@
 
 use super::schema;
 use crate::contract::{
-    amount_to_units, parse_buyer, parse_price_tiers, resolve_unit_price, to_presentment,
+    amount_to_units, read_buyer, read_price_tiers, resolve_unit_price, to_presentment,
     units_to_f64, variant_key, Omissions, Parsed, PriceTiers,
 };
 use shopify_function::prelude::*;
 use shopify_function::Result;
 use std::collections::BTreeMap;
 
-pub const DISCOUNT_MESSAGE: &str = "Wholesale price";
+/// The automatic discount title TackQuote creates at install; see
+/// APP_TOML_AND_SCOPES.md.
+pub const DISCOUNT_TITLE: &str = "Wholesale price";
 
 type Input = schema::cart_lines_discounts_generate_run::Input;
 type Output = schema::CartLinesDiscountsGenerateRunResult;
+type Merchandise = schema::cart_lines_discounts_generate_run::input::cart::lines::Merchandise;
 
 #[shopify_function]
 fn cart_lines_discounts_generate_run(input: Input) -> Result<Output> {
@@ -64,7 +67,7 @@ pub fn compute(input: &Input) -> (Output, Omissions) {
         None => return (empty(), omitted),
     };
 
-    let buyer = match parse_buyer(customer.buyer().map(|m| m.json_value())) {
+    let buyer = match read_buyer(customer.buyer().map(|m| m.json_value())) {
         Parsed::Ok(b) => b,
         Parsed::Absent => return (empty(), omitted), // not a linked buyer
         Parsed::Malformed(reason) => {
@@ -81,28 +84,31 @@ pub fn compute(input: &Input) -> (Output, Omissions) {
 
     // Tiers are chosen on the variant's TOTAL quantity: one variant can sit on
     // two lines (different line attributes), and 6 + 6 is an order of 12.
-    let mut qty_by_variant: BTreeMap<&str, i64> = BTreeMap::new();
+    //
+    // Maps are keyed by the numeric variant id, not the gid string: every gid
+    // shares a 29-byte prefix, and comparing it dominated the instruction count
+    // on large carts (measured with function-runner --profile).
+    let mut variant_lines = Vec::new();
+    let mut qty_by_variant: BTreeMap<u64, i64> = BTreeMap::new();
     for line in input.cart().lines() {
-        if let schema::cart_lines_discounts_generate_run::input::cart::lines::Merchandise::ProductVariant(v) =
-            line.merchandise()
-        {
-            *qty_by_variant.entry(v.id().as_str()).or_insert(0) += i64::from(*line.quantity());
+        if let Merchandise::ProductVariant(v) = line.merchandise() {
+            let vkey = variant_key(v.id().as_str());
+            let Some(num) = vkey.and_then(|k| k.parse::<u64>().ok()) else {
+                omitted.add("variant_id", None);
+                continue;
+            };
+            *qty_by_variant.entry(num).or_insert(0) += i64::from(*line.quantity());
+            variant_lines.push((line, v, vkey, num));
         }
     }
 
-    let mut tiers_cache: BTreeMap<&str, Option<PriceTiers>> = BTreeMap::new();
-    let mut candidates = Vec::new();
+    let mut tiers_cache: BTreeMap<u64, Option<PriceTiers>> = BTreeMap::new();
+    let mut by_amount: BTreeMap<i64, Vec<schema::ProductDiscountCandidateTarget>> = BTreeMap::new();
 
-    for line in input.cart().lines() {
-        let variant = match line.merchandise() {
-            schema::cart_lines_discounts_generate_run::input::cart::lines::Merchandise::ProductVariant(v) => v,
-            _ => continue,
-        };
-        let vid = variant.id().as_str();
-        let vkey = variant_key(vid);
-
-        if !tiers_cache.contains_key(vid) {
-            let parsed = match parse_price_tiers(variant.price_tiers().map(|m| m.json_value())) {
+    for (line, variant, vkey, num) in variant_lines {
+        let tiers = tiers_cache
+            .entry(num)
+            .or_insert_with(|| match read_price_tiers(variant.price_tiers().map(|m| m.json_value())) {
                 Parsed::Ok(t) => Some(t),
                 // Absent is normal. A value over 10,000 bytes also arrives as
                 // null, which is why the push pipeline must refuse to write one.
@@ -111,15 +117,17 @@ pub fn compute(input: &Input) -> (Output, Omissions) {
                     omitted.add(&format!("tiers_{reason}"), vkey);
                     None
                 }
-            };
-            tiers_cache.insert(vid, parsed);
-        }
-        let tiers = tiers_cache.get(vid).and_then(|t| t.as_ref());
+            })
+            .as_ref();
 
-        let qty = *qty_by_variant.get(vid).unwrap_or(&0);
+        let qty = *qty_by_variant.get(&num).unwrap_or(&0);
         let price = match resolve_unit_price(&buyer, vkey, tiers, qty) {
-            Some(p) => p,
-            None => continue,
+            Ok(Some(p)) => p,
+            Ok(None) => continue,
+            Err(reason) => {
+                omitted.add(reason, vkey);
+                continue;
+            }
         };
 
         let money = line.cost().amount_per_quantity();
@@ -143,14 +151,22 @@ pub fn compute(input: &Input) -> (Output, Omissions) {
             continue; // not below retail: never raise a price
         }
 
-        candidates.push(schema::ProductDiscountCandidate {
-            targets: vec![schema::ProductDiscountCandidateTarget::CartLine(
-                schema::CartLineTarget {
-                    id: line.id().clone(),
-                    quantity: None,
-                },
-            )],
-            message: Some(DISCOUNT_MESSAGE.to_string()),
+        by_amount.entry(off).or_default().push(schema::ProductDiscountCandidateTarget::CartLine(
+            schema::CartLineTarget { id: line.id().clone(), quantity: None },
+        ));
+    }
+
+    // One candidate per distinct per-unit amount, targeting every line that
+    // gets it. Function output is capped at 20 kB for carts up to 200 lines
+    // (https://shopify.dev/docs/api/functions/2026-07), and one candidate per
+    // line would pass it on a large cart. No per-candidate `message` for the
+    // same reason: the automatic discount's title ("Wholesale price", set by
+    // discountAutomaticAppCreate) labels it at checkout.
+    let candidates: Vec<schema::ProductDiscountCandidate> = by_amount
+        .into_iter()
+        .map(|(off, targets)| schema::ProductDiscountCandidate {
+            targets,
+            message: None,
             value: schema::ProductDiscountCandidateValue::FixedAmount(
                 schema::ProductDiscountCandidateFixedAmount {
                     amount: Decimal(units_to_f64(off)),
@@ -159,8 +175,8 @@ pub fn compute(input: &Input) -> (Output, Omissions) {
             ),
             associated_discount_code: None,
             prerequisites: None,
-        });
-    }
+        })
+        .collect();
 
     if candidates.is_empty() {
         return (empty(), omitted);
@@ -169,7 +185,7 @@ pub fn compute(input: &Input) -> (Output, Omissions) {
         Output {
             operations: vec![schema::CartOperation::ProductDiscountsAdd(
                 schema::ProductDiscountsAddOperation {
-                    // Each candidate targets a different line; all should apply.
+                    // Candidates target disjoint lines; all of them apply.
                     selection_strategy: schema::ProductDiscountSelectionStrategy::All,
                     candidates,
                 },

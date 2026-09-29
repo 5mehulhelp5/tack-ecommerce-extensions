@@ -1,21 +1,19 @@
-// TackQuote checkout-pricing metafield contract, version 1.
+// TackQuote checkout-pricing metafield contract, version 1: WRITER-SIDE
+// validator.
 //
-// CANONICAL COPY. Each function extension carries a byte-identical copy at
-// `<extension>/src/contract.js`, because Shopify CLI bundles a function from its
-// own directory and resolving imports outside it is UNVERIFIED. The copies are
-// gated by `shared/contract-copies.test.mjs`: edit this file, then run
-// `node shopify/functions/scripts/sync-contract.mjs`.
+// This is the full-document validator the TackQuote push pipeline must be
+// equivalent to. It is not shipped in a function. The functions read with
+// `contract/contract.rs`, which validates only the envelope and the entries a
+// cart consults (reading everything cost too many instructions); this file
+// validates EVERY entry, so that nothing the reader might consult later is
+// ever written malformed. encode.js runs each encoded value back through it.
 //
 // The human-readable contract is `shopify/functions/METAFIELD_CONTRACT.md`.
-// This file is the executable one; where they disagree, fix the doc.
-//
-// Runtime constraints: this code runs inside Javy (ECMAScript 2020, no event
-// loop, no Node globals, no Intl guarantee). It must stay pure and synchronous.
+// Where this file and the doc disagree, fix the doc.
 //
 // Rule for every parser below: a value that is absent is "absent"; a value
-// that is present but does not match the contract is "malformed" and the
-// caller OMITS it and logs it. Nothing is ever defaulted. A malformed price
-// book must never turn into a price.
+// that is present but does not match the contract is "malformed". Nothing is
+// ever defaulted. A malformed price book must never turn into a price.
 
 export const CONTRACT_VERSION = 1;
 

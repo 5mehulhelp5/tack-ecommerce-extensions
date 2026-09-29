@@ -2,21 +2,27 @@
 //
 // CANONICAL COPY. Each function crate carries a byte-identical copy at
 // `<extension>/src/contract.rs`, because Shopify CLI builds each function from
-// its own directory (and the main repo reaches these directories through
-// symlinks, which a relative `path =` dependency would not survive). The copies
-// are gated by `contract/reference-writer/contract-copies.test.mjs`; after an
-// edit here run `node shopify/functions/scripts/sync-contract.mjs`.
+// its own directory. `node --test` (shopify/functions/package.json) fails when
+// a copy drifts; after an edit here run `node scripts/sync-contract.mjs`.
 //
-// The human-readable contract is `shopify/functions/METAFIELD_CONTRACT.md`,
-// and `contract/conformance/cases.json` is the cross-language test corpus that
-// both this parser and the reference writer must agree on.
+// The human-readable contract is `shopify/functions/METAFIELD_CONTRACT.md`.
 //
-// Rule for every parser: absent is Absent; present but not matching the
-// contract is Malformed and the caller OMITS it and logs it. Nothing is ever
-// defaulted. A malformed price book never becomes a price.
+// READ WHAT YOU CONSULT, VALIDATE WHAT YOU READ.
+// The values are read straight from the function's lazy input
+// (`shopify_function::wasm_api::Value`) instead of being materialised as a
+// `JsonValue` tree, and only the audience / variant keys this cart needs are
+// looked up. Materialising every metafield cost ~50,000 instructions per cart
+// line, which put a 200-line cart at 14.9M against the 11M limit
+// (https://shopify.dev/docs/api/functions/2026-07, "Resource limits").
+// The WRITER (contract/reference-writer) validates the whole document before
+// it is written; this reader validates the envelope and every entry it uses.
+//
+// Rule: absent is Absent; present but not matching the contract is Malformed,
+// and the caller OMITS it and logs it. Nothing is ever defaulted. A malformed
+// price book never becomes a price.
 
-use shopify_function::prelude::*;
-use std::collections::BTreeMap;
+/// The lazy input value a `jsonValue` field is overridden to in `main.rs`.
+pub type RawJson = shopify_function::wasm_api::Value;
 
 pub const CONTRACT_VERSION: f64 = 1.0;
 
@@ -64,58 +70,30 @@ impl CartLimits {
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct PriceTiers {
-    pub currency: String,
-    pub tiers: BTreeMap<String, Ladder>,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct OrderLimits {
-    pub limits: BTreeMap<String, LimitEntry>,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct Buyer {
-    pub groups: Vec<String>,
-    pub currency: Option<String>,
-    pub prices: Option<BTreeMap<String, Ladder>>,
-    pub quantities: Option<BTreeMap<String, LimitEntry>>,
-    pub defaults: Option<LimitEntry>,
-    pub cart: Option<CartLimits>,
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct ShopLimits {
-    pub currency: Option<String>,
-    pub cart: Option<CartLimits>,
-    pub defaults: Option<LimitEntry>,
-}
-
-#[derive(Debug, Clone, PartialEq)]
 pub enum Parsed<T> {
     Absent,
     Malformed(&'static str),
     Ok(T),
 }
 
-type Obj = BTreeMap<String, JsonValue>;
+// ---- primitive readers ---------------------------------------------------------
 
-fn as_object(v: &JsonValue) -> Option<&Obj> {
-    match v {
-        JsonValue::Object(o) => Some(o),
-        _ => None,
-    }
+fn present(v: &RawJson) -> bool {
+    !v.is_null()
 }
 
-fn only_keys(o: &Obj, allowed: &[&str]) -> bool {
-    o.keys().all(|k| allowed.contains(&k.as_str()))
+/// Every key of `o` is in `allowed`: the object has exactly as many keys as
+/// there are allowed keys present in it. One host call per allowed key, no
+/// string allocation.
+fn only_keys(o: &RawJson, allowed: &[&str]) -> bool {
+    let Some(len) = o.obj_len() else { return false };
+    let seen = allowed.iter().filter(|k| present(&o.get_obj_prop(k))).count();
+    seen == len
 }
 
-fn pos_int(v: &JsonValue) -> Option<i64> {
-    match v {
-        JsonValue::Number(n) if n.is_finite() && n.fract() == 0.0 && *n >= 1.0 && *n <= MAX_QTY => {
-            Some(*n as i64)
-        }
+fn pos_int(v: &RawJson) -> Option<i64> {
+    match v.as_number() {
+        Some(n) if n.is_finite() && n.fract() == 0.0 && (1.0..=MAX_QTY).contains(&n) => Some(n as i64),
         _ => None,
     }
 }
@@ -124,20 +102,18 @@ pub fn is_currency(s: &str) -> bool {
     s.len() == 3 && s.bytes().all(|b| b.is_ascii_uppercase())
 }
 
-fn currency_of(v: Option<&JsonValue>) -> Result<Option<String>, ()> {
-    match v {
-        None => Ok(None),
-        Some(JsonValue::String(s)) if is_currency(s) => Ok(Some(s.clone())),
-        Some(_) => Err(()),
+fn currency_of(v: &RawJson) -> Result<Option<String>, ()> {
+    if !present(v) {
+        return Ok(None);
+    }
+    match v.as_string() {
+        Some(s) if is_currency(&s) => Ok(Some(s)),
+        _ => Err(()),
     }
 }
 
 fn is_audience_key(k: &str) -> bool {
     !k.is_empty() && k.chars().count() <= MAX_KEY_LENGTH
-}
-
-fn is_variant_key(k: &str) -> bool {
-    !k.is_empty() && k.bytes().all(|b| b.is_ascii_digit())
 }
 
 /// "gid://shopify/ProductVariant/123" -> "123".
@@ -146,25 +122,28 @@ pub fn variant_key(gid: &str) -> Option<&str> {
         Some(i) => &gid[i + 1..],
         None => gid,
     };
-    if is_variant_key(k) {
+    if !k.is_empty() && k.bytes().all(|b| b.is_ascii_digit()) {
         Some(k)
     } else {
         None
     }
 }
 
-/// A contract price: a JSON number, >= 0, at most four decimal places.
-pub fn price_to_units(v: &JsonValue) -> Option<i64> {
-    let n = match v {
-        JsonValue::Number(n) if n.is_finite() && *n >= 0.0 => *n,
-        _ => return None,
-    };
+/// A contract price as f64: >= 0, at most four decimal places.
+pub fn price_f64_to_units(n: f64) -> Option<i64> {
+    if !n.is_finite() || n < 0.0 {
+        return None;
+    }
     let scaled = n * UNIT as f64;
     let units = scaled.round();
     if (scaled - units).abs() > 1e-6 || units > MAX_PRICE_UNITS {
         return None;
     }
     Some(units as i64)
+}
+
+fn price_to_units(v: &RawJson) -> Option<i64> {
+    price_f64_to_units(v.as_number()?)
 }
 
 /// A Shopify Decimal from function input. Shopify owns its precision, so this
@@ -183,64 +162,65 @@ pub fn units_to_f64(units: i64) -> f64 {
     units as f64 / UNIT as f64
 }
 
-pub fn parse_tier_list(v: &JsonValue) -> Option<Ladder> {
-    let list = match v {
-        JsonValue::Array(a) if !a.is_empty() && a.len() <= MAX_TIERS_PER_LIST => a,
-        _ => return None,
-    };
-    let mut out = Vec::with_capacity(list.len());
+// ---- entry readers ---------------------------------------------------------------
+
+/// `[[minQty, unitPrice], ...]`, minQty strictly ascending.
+pub fn read_tier_list(v: &RawJson) -> Option<Ladder> {
+    let len = v.array_len()?;
+    if len == 0 || len > MAX_TIERS_PER_LIST {
+        return None;
+    }
+    let mut out = Vec::with_capacity(len);
     let mut prev = 0i64;
-    for tier in list {
-        let pair = match tier {
-            JsonValue::Array(p) if p.len() == 2 => p,
-            _ => return None,
-        };
-        let qty = pos_int(&pair[0])?;
+    for i in 0..len {
+        let pair = v.get_at_index(i);
+        if pair.array_len() != Some(2) {
+            return None;
+        }
+        let qty = pos_int(&pair.get_at_index(0))?;
         if qty <= prev {
             return None;
         }
-        let units = price_to_units(&pair[1])?;
+        let units = price_to_units(&pair.get_at_index(1))?;
         out.push((qty, units));
         prev = qty;
     }
     Some(out)
 }
 
-pub fn parse_limit_entry(v: &JsonValue) -> Option<LimitEntry> {
-    let o = as_object(v)?;
-    if o.is_empty() || !only_keys(o, &["min", "max", "step"]) {
+/// `{ "min": 12, "max": 480, "step": 12 }`, at least one key.
+pub fn read_limit_entry(v: &RawJson) -> Option<LimitEntry> {
+    if !v.is_obj() || v.obj_len() == Some(0) || !only_keys(v, &["min", "max", "step"]) {
         return None;
     }
     let field = |k: &str| -> Result<Option<i64>, ()> {
-        match o.get(k) {
-            None => Ok(None),
-            Some(x) => pos_int(x).map(Some).ok_or(()),
+        let x = v.get_obj_prop(k);
+        if !present(&x) {
+            return Ok(None);
         }
+        pos_int(&x).map(Some).ok_or(())
     };
-    Some(LimitEntry {
-        min: field("min").ok()?,
-        max: field("max").ok()?,
-        step: field("step").ok()?,
-    })
+    Some(LimitEntry { min: field("min").ok()?, max: field("max").ok()?, step: field("step").ok()? })
 }
 
-pub fn parse_cart_limits(v: &JsonValue) -> Option<CartLimits> {
-    let o = as_object(v)?;
+pub fn read_cart_limits(v: &RawJson) -> Option<CartLimits> {
     let allowed = ["minTotal", "maxTotal", "minQty", "maxQty", "minUnique", "maxUnique"];
-    if o.is_empty() || !only_keys(o, &allowed) {
+    if !v.is_obj() || v.obj_len() == Some(0) || !only_keys(v, &allowed) {
         return None;
     }
     let money = |k: &str| -> Result<Option<i64>, ()> {
-        match o.get(k) {
-            None => Ok(None),
-            Some(x) => price_to_units(x).map(Some).ok_or(()),
+        let x = v.get_obj_prop(k);
+        if !present(&x) {
+            return Ok(None);
         }
+        price_to_units(&x).map(Some).ok_or(())
     };
     let count = |k: &str| -> Result<Option<i64>, ()> {
-        match o.get(k) {
-            None => Ok(None),
-            Some(x) => pos_int(x).map(Some).ok_or(()),
+        let x = v.get_obj_prop(k);
+        if !present(&x) {
+            return Ok(None);
         }
+        pos_int(&x).map(Some).ok_or(())
     };
     Some(CartLimits {
         min_total: money("minTotal").ok()?,
@@ -252,22 +232,55 @@ pub fn parse_cart_limits(v: &JsonValue) -> Option<CartLimits> {
     })
 }
 
-/// A present JSON value that is not an object with `"v": 1` is a version
-/// mismatch: either a future contract or not ours.
-fn versioned(v: Option<&JsonValue>) -> Result<Option<&Obj>, &'static str> {
+/// A present value that is not an object with `"v": 1` is a version mismatch:
+/// either a future contract or not ours.
+fn envelope(v: Option<&RawJson>) -> Result<Option<&RawJson>, &'static str> {
     match v {
-        None | Some(JsonValue::Null) => Ok(None),
-        Some(v) => match as_object(v) {
-            Some(o) if o.get("v") == Some(&JsonValue::Number(CONTRACT_VERSION)) => Ok(Some(o)),
-            _ => Err("version"),
-        },
+        None => Ok(None),
+        Some(v) if !present(v) => Ok(None),
+        Some(v) if v.is_obj() && v.get_obj_prop("v").as_number() == Some(CONTRACT_VERSION) => Ok(Some(v)),
+        Some(_) => Err("version"),
     }
 }
 
+/// A non-empty object, kept as a lazy handle for key lookups.
+fn keyed(v: &RawJson) -> Option<RawJson> {
+    match v.obj_len() {
+        Some(n) if n > 0 => Some(*v),
+        _ => None,
+    }
+}
+
+/// Look `key` up in a keyed map and read the entry with `read`.
+fn lookup<T>(map: &RawJson, key: &str, read: fn(&RawJson) -> Option<T>) -> Parsed<T> {
+    let e = map.get_obj_prop(key);
+    if !present(&e) {
+        return Parsed::Absent;
+    }
+    match read(&e) {
+        Some(t) => Parsed::Ok(t),
+        None => Parsed::Malformed("entry"),
+    }
+}
+
+// ---- documents ---------------------------------------------------------------------
+
 /// ProductVariant `$app:price_tiers`
 /// `{ "v":1, "c":"USD", "t": { "<groupCode>|*": [[minQty, unitPrice], ...] } }`
-pub fn parse_price_tiers(v: Option<&JsonValue>) -> Parsed<PriceTiers> {
-    let o = match versioned(v) {
+#[derive(Clone)] // wasm_api::Value is not Debug
+pub struct PriceTiers {
+    pub currency: String,
+    t: RawJson,
+}
+
+impl PriceTiers {
+    pub fn ladder(&self, audience: &str) -> Parsed<Ladder> {
+        lookup(&self.t, audience, read_tier_list)
+    }
+}
+
+pub fn read_price_tiers(v: Option<&RawJson>) -> Parsed<PriceTiers> {
+    let o = match envelope(v) {
         Ok(None) => return Parsed::Absent,
         Ok(Some(o)) => o,
         Err(r) => return Parsed::Malformed(r),
@@ -275,33 +288,31 @@ pub fn parse_price_tiers(v: Option<&JsonValue>) -> Parsed<PriceTiers> {
     if !only_keys(o, &["v", "c", "t"]) {
         return Parsed::Malformed("unknown_key");
     }
-    let currency = match o.get("c") {
-        Some(JsonValue::String(s)) if is_currency(s) => s.clone(),
+    let currency = match o.get_obj_prop("c").as_string() {
+        Some(s) if is_currency(&s) => s,
         _ => return Parsed::Malformed("currency"),
     };
-    let t = match o.get("t").and_then(as_object) {
-        Some(t) if !t.is_empty() => t,
-        _ => return Parsed::Malformed("tiers"),
-    };
-    let mut tiers = BTreeMap::new();
-    for (k, list) in t {
-        if !is_audience_key(k) {
-            return Parsed::Malformed("audience_key");
-        }
-        match parse_tier_list(list) {
-            Some(l) => {
-                tiers.insert(k.clone(), l);
-            }
-            None => return Parsed::Malformed("tier_list"),
-        }
+    match keyed(&o.get_obj_prop("t")) {
+        Some(t) => Parsed::Ok(PriceTiers { currency, t }),
+        None => Parsed::Malformed("tiers"),
     }
-    Parsed::Ok(PriceTiers { currency, tiers })
 }
 
 /// ProductVariant `$app:order_limits`
 /// `{ "v":1, "l": { "<groupCode>|*": { "min":12, "max":480, "step":12 } } }`
-pub fn parse_order_limits(v: Option<&JsonValue>) -> Parsed<OrderLimits> {
-    let o = match versioned(v) {
+#[derive(Clone)] // wasm_api::Value is not Debug
+pub struct OrderLimits {
+    l: RawJson,
+}
+
+impl OrderLimits {
+    pub fn entry(&self, audience: &str) -> Parsed<LimitEntry> {
+        lookup(&self.l, audience, read_limit_entry)
+    }
+}
+
+pub fn read_order_limits(v: Option<&RawJson>) -> Parsed<OrderLimits> {
+    let o = match envelope(v) {
         Ok(None) => return Parsed::Absent,
         Ok(Some(o)) => o,
         Err(r) => return Parsed::Malformed(r),
@@ -309,29 +320,62 @@ pub fn parse_order_limits(v: Option<&JsonValue>) -> Parsed<OrderLimits> {
     if !only_keys(o, &["v", "l"]) {
         return Parsed::Malformed("unknown_key");
     }
-    let l = match o.get("l").and_then(as_object) {
-        Some(l) if !l.is_empty() => l,
-        _ => return Parsed::Malformed("limits"),
-    };
-    let mut limits = BTreeMap::new();
-    for (k, e) in l {
-        if !is_audience_key(k) {
-            return Parsed::Malformed("audience_key");
-        }
-        match parse_limit_entry(e) {
-            Some(e) => {
-                limits.insert(k.clone(), e);
-            }
-            None => return Parsed::Malformed("limit_entry"),
-        }
+    match keyed(&o.get_obj_prop("l")) {
+        Some(l) => Parsed::Ok(OrderLimits { l }),
+        None => Parsed::Malformed("limits"),
     }
-    Parsed::Ok(OrderLimits { limits })
 }
 
 /// Customer `$app:buyer`. Its presence is what makes a Shopify customer a
-/// linked TackQuote buyer.
-pub fn parse_buyer(v: Option<&JsonValue>) -> Parsed<Buyer> {
-    let o = match versioned(v) {
+/// linked TackQuote buyer. `g`, `c`, `d` and `l` are read in full; `p` and `q`
+/// are keyed by numeric variant id and looked up per cart variant.
+#[derive(Clone)] // wasm_api::Value is not Debug
+pub struct Buyer {
+    pub groups: Vec<String>,
+    pub currency: Option<String>,
+    prices: Option<RawJson>,
+    quantities: Option<RawJson>,
+    pub defaults: Option<LimitEntry>,
+    pub cart: Option<CartLimits>,
+}
+
+impl Buyer {
+    /// The customer's own ladder for this variant (`p`).
+    pub fn price_ladder(&self, vkey: Option<&str>) -> Parsed<Ladder> {
+        match (&self.prices, vkey) {
+            (Some(p), Some(k)) => lookup(p, k, read_tier_list),
+            _ => Parsed::Absent,
+        }
+    }
+
+    /// The customer's own limit for this variant (`q`).
+    pub fn quantity_limit(&self, vkey: Option<&str>) -> Parsed<LimitEntry> {
+        match (&self.quantities, vkey) {
+            (Some(q), Some(k)) => lookup(q, k, read_limit_entry),
+            _ => Parsed::Absent,
+        }
+    }
+
+    /// The customer's groups in precedence order, then "*".
+    pub fn audiences(&self) -> impl Iterator<Item = &str> {
+        self.groups.iter().map(|g| g.as_str()).chain(std::iter::once(WILDCARD))
+    }
+}
+
+fn optional_map(o: &RawJson, key: &str) -> Result<Option<RawJson>, ()> {
+    let v = o.get_obj_prop(key);
+    if !present(&v) {
+        return Ok(None);
+    }
+    if v.is_obj() {
+        Ok(Some(v))
+    } else {
+        Err(())
+    }
+}
+
+pub fn read_buyer(v: Option<&RawJson>) -> Parsed<Buyer> {
+    let o = match envelope(v) {
         Ok(None) => return Parsed::Absent,
         Ok(Some(o)) => o,
         Err(r) => return Parsed::Malformed(r),
@@ -340,88 +384,43 @@ pub fn parse_buyer(v: Option<&JsonValue>) -> Parsed<Buyer> {
         return Parsed::Malformed("unknown_key");
     }
 
-    let mut groups: Vec<String> = Vec::new();
-    match o.get("g") {
-        Some(JsonValue::Array(a)) if a.len() <= MAX_GROUPS => {
-            for g in a {
-                match g {
-                    JsonValue::String(s)
-                        if is_audience_key(s) && s != WILDCARD && !groups.contains(s) =>
-                    {
-                        groups.push(s.clone())
-                    }
-                    _ => return Parsed::Malformed("groups"),
-                }
-            }
-        }
+    let g = o.get_obj_prop("g");
+    let n = match g.array_len() {
+        Some(n) if n <= MAX_GROUPS => n,
         _ => return Parsed::Malformed("groups"),
+    };
+    let mut groups: Vec<String> = Vec::with_capacity(n);
+    for i in 0..n {
+        match g.get_at_index(i).as_string() {
+            Some(s) if is_audience_key(&s) && s != WILDCARD && !groups.contains(&s) => groups.push(s),
+            _ => return Parsed::Malformed("groups"),
+        }
     }
 
-    let currency = match currency_of(o.get("c")) {
+    let currency = match currency_of(&o.get_obj_prop("c")) {
         Ok(c) => c,
         Err(()) => return Parsed::Malformed("currency"),
     };
+    let Ok(prices) = optional_map(o, "p") else { return Parsed::Malformed("prices") };
+    let Ok(quantities) = optional_map(o, "q") else { return Parsed::Malformed("quantities") };
 
-    let prices = match o.get("p") {
-        None => None,
-        Some(p) => {
-            let p = match as_object(p) {
-                Some(p) => p,
-                None => return Parsed::Malformed("prices"),
-            };
-            let mut out = BTreeMap::new();
-            for (k, list) in p {
-                if !is_variant_key(k) {
-                    return Parsed::Malformed("variant_key");
-                }
-                match parse_tier_list(list) {
-                    Some(l) => {
-                        out.insert(k.clone(), l);
-                    }
-                    None => return Parsed::Malformed("tier_list"),
-                }
-            }
-            Some(out)
-        }
-    };
-
-    let quantities = match o.get("q") {
-        None => None,
-        Some(q) => {
-            let q = match as_object(q) {
-                Some(q) => q,
-                None => return Parsed::Malformed("quantities"),
-            };
-            let mut out = BTreeMap::new();
-            for (k, e) in q {
-                if !is_variant_key(k) {
-                    return Parsed::Malformed("variant_key");
-                }
-                match parse_limit_entry(e) {
-                    Some(e) => {
-                        out.insert(k.clone(), e);
-                    }
-                    None => return Parsed::Malformed("limit_entry"),
-                }
-            }
-            Some(out)
-        }
-    };
-
-    let defaults = match o.get("d") {
-        None => None,
-        Some(d) => match parse_limit_entry(d) {
+    let d = o.get_obj_prop("d");
+    let defaults = if present(&d) {
+        match read_limit_entry(&d) {
             Some(d) => Some(d),
             None => return Parsed::Malformed("limit_entry"),
-        },
+        }
+    } else {
+        None
     };
-
-    let cart = match o.get("l") {
-        None => None,
-        Some(l) => match parse_cart_limits(l) {
+    let l = o.get_obj_prop("l");
+    let cart = if present(&l) {
+        match read_cart_limits(&l) {
             Some(l) => Some(l),
             None => return Parsed::Malformed("cart_limits"),
-        },
+        }
+    } else {
+        None
     };
 
     // Money without a currency cannot be converted, so it is not a price.
@@ -430,19 +429,19 @@ pub fn parse_buyer(v: Option<&JsonValue>) -> Parsed<Buyer> {
         return Parsed::Malformed("currency");
     }
 
-    Parsed::Ok(Buyer {
-        groups,
-        currency,
-        prices,
-        quantities,
-        defaults,
-        cart,
-    })
+    Parsed::Ok(Buyer { groups, currency, prices, quantities, defaults, cart })
 }
 
 /// Validation `$app:cart_limits`: shop-wide rules for every linked buyer.
-pub fn parse_shop_limits(v: Option<&JsonValue>) -> Parsed<ShopLimits> {
-    let o = match versioned(v) {
+#[derive(Debug, Clone, PartialEq)]
+pub struct ShopLimits {
+    pub currency: Option<String>,
+    pub cart: Option<CartLimits>,
+    pub defaults: Option<LimitEntry>,
+}
+
+pub fn read_shop_limits(v: Option<&RawJson>) -> Parsed<ShopLimits> {
+    let o = match envelope(v) {
         Ok(None) => return Parsed::Absent,
         Ok(Some(o)) => o,
         Err(r) => return Parsed::Malformed(r),
@@ -450,33 +449,35 @@ pub fn parse_shop_limits(v: Option<&JsonValue>) -> Parsed<ShopLimits> {
     if !only_keys(o, &["v", "c", "l", "d"]) {
         return Parsed::Malformed("unknown_key");
     }
-    let currency = match currency_of(o.get("c")) {
+    let currency = match currency_of(&o.get_obj_prop("c")) {
         Ok(c) => c,
         Err(()) => return Parsed::Malformed("currency"),
     };
-    let cart = match o.get("l") {
-        None => None,
-        Some(l) => match parse_cart_limits(l) {
+    let l = o.get_obj_prop("l");
+    let cart = if present(&l) {
+        match read_cart_limits(&l) {
             Some(l) => Some(l),
             None => return Parsed::Malformed("cart_limits"),
-        },
+        }
+    } else {
+        None
     };
-    let defaults = match o.get("d") {
-        None => None,
-        Some(d) => match parse_limit_entry(d) {
+    let d = o.get_obj_prop("d");
+    let defaults = if present(&d) {
+        match read_limit_entry(&d) {
             Some(d) => Some(d),
             None => return Parsed::Malformed("limit_entry"),
-        },
+        }
+    } else {
+        None
     };
     if cart.map(|c| c.has_money()).unwrap_or(false) && currency.is_none() {
         return Parsed::Malformed("currency");
     }
-    Parsed::Ok(ShopLimits {
-        currency,
-        cart,
-        defaults,
-    })
+    Parsed::Ok(ShopLimits { currency, cart, defaults })
 }
+
+// ---- resolution ----------------------------------------------------------------------
 
 /// Highest tier whose minQty <= qty; None below the first break.
 pub fn select_tier(ladder: &Ladder, qty: i64) -> Option<i64> {
@@ -501,59 +502,70 @@ pub struct UnitPrice<'a> {
 ///   1. the customer's own override `p` (buyer / company price books)
 ///   2. each of the customer's groups `g`, in the order TackQuote wrote them
 ///   3. the "*" blanket ladder
-/// A level whose ladder has no qualifying tier falls through to the next.
+/// A level whose ladder has no qualifying tier falls through to the next. A
+/// level whose ladder is MALFORMED stops resolution with its reason: falling
+/// through would silently price the line from a different book.
 pub fn resolve_unit_price<'a>(
     buyer: &'a Buyer,
     vkey: Option<&str>,
     tiers: Option<&'a PriceTiers>,
     qty: i64,
-) -> Option<UnitPrice<'a>> {
-    if let (Some(prices), Some(k), Some(cur)) = (&buyer.prices, vkey, &buyer.currency) {
-        if let Some(ladder) = prices.get(k) {
-            if let Some(units) = select_tier(ladder, qty) {
-                return Some(UnitPrice { units, currency: cur });
+) -> Result<Option<UnitPrice<'a>>, &'static str> {
+    match buyer.price_ladder(vkey) {
+        Parsed::Malformed(_) => return Err("buyer_tier_list"),
+        Parsed::Ok(ladder) => {
+            // read_buyer guarantees a currency whenever `p` is present.
+            if let (Some(units), Some(cur)) = (select_tier(&ladder, qty), &buyer.currency) {
+                return Ok(Some(UnitPrice { units, currency: cur }));
             }
         }
+        Parsed::Absent => {}
     }
     if let Some(t) = tiers {
-        for key in buyer.groups.iter().map(|g| g.as_str()).chain(std::iter::once(WILDCARD)) {
-            if let Some(ladder) = t.tiers.get(key) {
-                if let Some(units) = select_tier(ladder, qty) {
-                    return Some(UnitPrice { units, currency: &t.currency });
+        for key in buyer.audiences() {
+            match t.ladder(key) {
+                Parsed::Malformed(_) => return Err("tiers_tier_list"),
+                Parsed::Ok(ladder) => {
+                    if let Some(units) = select_tier(&ladder, qty) {
+                        return Ok(Some(UnitPrice { units, currency: &t.currency }));
+                    }
                 }
+                Parsed::Absent => {}
             }
         }
     }
-    None
+    Ok(None)
 }
 
 /// Product dimension: first of the customer's groups with an entry, then "*",
-/// then the shop-wide per-variant default.
+/// then the shop-wide per-variant default. A malformed entry is an error, not
+/// a reason to fall back to the default.
 pub fn resolve_product_limit(
     buyer: &Buyer,
     variant: Option<&OrderLimits>,
     shop_default: Option<LimitEntry>,
-) -> Option<LimitEntry> {
+) -> Result<Option<LimitEntry>, &'static str> {
     if let Some(v) = variant {
-        for key in buyer.groups.iter().map(|g| g.as_str()).chain(std::iter::once(WILDCARD)) {
-            if let Some(e) = v.limits.get(key) {
-                return Some(*e);
+        for key in buyer.audiences() {
+            match v.entry(key) {
+                Parsed::Ok(e) => return Ok(Some(e)),
+                Parsed::Malformed(_) => return Err("limits_limit_entry"),
+                Parsed::Absent => {}
             }
         }
     }
-    shop_default
+    Ok(shop_default)
 }
 
 /// Customer dimension: the customer's own per-variant entry, else the
 /// customer's default. Enforced IN ADDITION to the product dimension, which is
 /// how TackQuote's order-limits service evaluates rules (every applicable one).
-pub fn resolve_customer_limit(buyer: &Buyer, vkey: Option<&str>) -> Option<LimitEntry> {
-    if let (Some(q), Some(k)) = (&buyer.quantities, vkey) {
-        if let Some(e) = q.get(k) {
-            return Some(*e);
-        }
+pub fn resolve_customer_limit(buyer: &Buyer, vkey: Option<&str>) -> Result<Option<LimitEntry>, &'static str> {
+    match buyer.quantity_limit(vkey) {
+        Parsed::Ok(e) => Ok(Some(e)),
+        Parsed::Malformed(_) => Err("buyer_limit_entry"),
+        Parsed::Absent => Ok(buyer.defaults),
     }
-    buyer.defaults
 }
 
 /// Shop-currency units into the presentment currency.
