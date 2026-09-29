@@ -25,31 +25,13 @@
   const ns = {};
   window.TackQuote = ns;
 
-  // `safeApiBase` was removed with the last two blocks that took a merchant-typed
-  // API URL (GH-423). Every block now reaches TackQuote through the App Proxy on
-  // the merchant's own domain, so no block needs an absolute URL and none should
-  // grow one back: an unused validator for a caller-supplied API base is an
-  // invitation to re-add the pattern it was guarding.
-
   /** The proxy path must stay same-origin and relative, so it cannot be pointed off-store. */
   ns.safeProxyPath = (raw) => {
     if (!raw || raw.charAt(0) !== '/' || raw.indexOf('//') === 0) return null;
     return raw.replace(/\/+$/, '');
   };
 
-  /**
-   * A fetch with a hard deadline.
-   *
-   * Without one, a slow TackQuote leaves "Checking your price" on a merchant's
-   * product page for as long as the browser is willing to wait. The whole
-   * availability argument for this architecture is that our latency must not
-   * become the storefront's latency, and a request with no ceiling is exactly
-   * that coupling.
-   *
-   * AbortController is available in every browser Shopify's OS 2.0 themes
-   * support, but the guard costs nothing and a missing one would turn a
-   * degraded price into a broken page.
-   */
+  /** A fetch with a hard deadline, so TackQuote latency never becomes storefront latency. */
   ns.fetchJson = (url, options) => {
     const opts = options || {};
     const timeoutMs = opts.timeoutMs || 2500;
@@ -64,29 +46,13 @@
       signal: controller ? controller.signal : undefined,
     })
       .then((res) => {
-        /*
-         * THE PASSWORD PAGE, WHICH IS NOT AN HTTP ERROR.
-         *
-         * A dev store is always password protected — Shopify's own docs say so
-         * plainly, and it cannot be turned off until the store is transferred or
-         * moved to a paid plan. A storefront request that has not cleared that
-         * gate is REDIRECTED to /password, and `fetch` follows redirects by
-         * default, so what comes back is a 200 carrying an HTML page.
-         *
-         * Without this check `res.ok` is true, `res.json()` throws a bare
-         * SyntaxError about unexpected token '<', and every block reports a
-         * generic failure for what is really "you are not past the password
-         * page". It is the likeliest thing to hit a merchant testing in the theme
-         * editor, where the preview runs in an iframe that may not carry the
-         * storefront cookie.
-         */
+        // A dev store's password gate REDIRECTS and fetch follows it, so it arrives as a 200 HTML page, not an HTTP error.
         if (res.redirected && /\/password(\?|$)/.test(res.url)) {
           throw new Error('STOREFRONT_PASSWORD');
         }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-        // Belt and braces: a store can serve the gate without a redirect fetch
-        // can see, and an HTML body is never a valid answer from this API.
+        // An HTML body is never a valid answer from this API.
         const type = res.headers.get('content-type') || '';
         if (type && type.indexOf('json') === -1) {
           throw new Error('NOT_JSON');
@@ -99,16 +65,9 @@
   };
 
   /**
-   * A tiny per-tab cache, so repeat views do not each cost a round trip.
-   *
-   * sessionStorage rather than localStorage on purpose: a B2B price belongs to
-   * the session that was authenticated to see it, and a tab close should end it.
-   * Every access is wrapped — a browser set to block site data THROWS on the
-   * accessor itself rather than returning null, and a price block that explodes
-   * on a privacy-hardened browser is worse than one that simply does not cache.
-   *
-   * Keys must carry the customer marker. Without it a shopper who logs out in
-   * the same tab keeps reading the price they saw while signed in.
+   * Per-tab cache (sessionStorage: a price belongs to the authenticated session).
+   * Every access is wrapped because blocked site data throws on the accessor.
+   * Keys must carry the customer marker so a logout in the same tab cannot reuse a price.
    */
   ns.cache = {
     read: (key) => {
@@ -181,15 +140,40 @@
 
   ns.findVariant = (list, id) => list.filter((v) => String(v.id) === String(id))[0] || null;
 
-  /* No cross-theme variant-change event exists, so watch what is standard: the
-   * product form, and history changes (variant selection pushes `?variant=`). */
+  /*
+   * Variant changes. No single cross-theme event exists, so combine: form
+   * change/input, popstate, a MutationObserver on the form's input[name="id"]
+   * `value` attribute (setAttribute only; a `.value =` assignment is invisible
+   * to it), and Horizon's `shopify:product:select` (StandardEvents.productSelect,
+   * dispatched before its section fetch resolves, so wait on `event.promise`).
+   * Dawn's own variant-change is an in-memory pub/sub, not a DOM event, so Dawn
+   * is covered by its bubbling `change` on input[name="id"]. Bursts coalesce.
+   */
   ns.onChange = (root, handler) => {
+    let timer = null;
+    const fire = () => {
+      clearTimeout(timer);
+      timer = setTimeout(handler, 50);
+    };
     const form = ns.form(root);
     if (form) {
-      form.addEventListener('change', handler);
-      form.addEventListener('input', handler);
+      form.addEventListener('change', fire);
+      form.addEventListener('input', fire);
+      const idField = form.querySelector('input[name="id"]');
+      if (idField && typeof MutationObserver === 'function') {
+        new MutationObserver(fire).observe(idField, { attributes: true, attributeFilter: ['value'] });
+      }
     }
-    window.addEventListener('popstate', handler);
+    window.addEventListener('popstate', fire);
+    document.addEventListener(
+      'shopify:product:select',
+      (e) => {
+        const p = e && e.promise;
+        if (p && typeof p.then === 'function') p.then(fire, fire);
+        else fire();
+      },
+      true,
+    );
   };
 
   ns.label = (root, variant) => {

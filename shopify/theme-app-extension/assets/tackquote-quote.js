@@ -123,6 +123,8 @@
         items: ctx.items.map((i) => ({
           name: i.name,
           sku: i.sku || undefined,
+          // Numeric Shopify variant id. Only a hint for the server; omitted if it is not a safe integer.
+          variantId: /^\d+$/.test(String(i.variantId)) && Number.isSafeInteger(Number(i.variantId)) ? Number(i.variantId) : undefined,
           quantity: i.quantity,
         })),
       }),

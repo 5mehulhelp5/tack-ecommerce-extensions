@@ -81,75 +81,22 @@
       }
     }
 
-    /**
-     * Turn a fetch failure into something the merchant can act on.
-     *
-     * Every branch names the ONE thing to go and check. `fetchJson` already throws
-     * `HTTP <status>`, and that detail was being discarded by an empty catch — which
-     * is the whole reason this block could only ever say "something went wrong".
-     */
+    /** Merchant-only diagnosis. Copy lives in Liquid (`data-msg-diag-*`, design mode only). */
     function explain(err, proxyPath) {
       const msg = err && err.message ? String(err.message) : '';
-      if (msg === 'STOREFRONT_PASSWORD') {
-        return (
-          'This store is password protected, and the request was sent to the password ' +
-          'page instead of TackQuote. Development stores are always password protected ' +
-          'and it cannot be switched off. Preview the real storefront and enter the ' +
-          'password (Online Store → Preferences) — prices resolve normally there.'
-        );
-      }
-      if (msg === 'NOT_JSON') {
-        return (
-          'Something other than TackQuote answered ' + proxyPath + ' — an HTML page ' +
-          'rather than data. Usually the storefront password gate, occasionally a theme ' +
-          'or another app claiming that path.'
-        );
-      }
-      if (msg === 'HTTP 404') {
-        return (
-          'Shopify returned 404 for ' + proxyPath + '. The app proxy subpath does not ' +
-          "match this block's \"App proxy path\" setting — check Settings → Apps and " +
-          'sales channels → TackQuote → App proxy.'
-        );
-      }
-      if (msg === 'HTTP 401' || msg === 'HTTP 403') {
-        return (
-          'Shopify forwarded the request but TackQuote rejected the signature. That ' +
-          'usually means the app was reinstalled and the stored secret is stale — ' +
-          'reconnect the store.'
-        );
-      }
-      if (/^HTTP 5/.test(msg)) {
-        return 'TackQuote answered ' + msg + '. Nothing is wrong with this block; try again shortly.';
-      }
-      if (err && err.name === 'AbortError') {
-        return 'TackQuote did not answer within 2.5 seconds, so the price was skipped rather than delaying the page.';
-      }
-      return msg
-        ? 'The request to ' + proxyPath + ' failed: ' + msg
-        : 'The request to ' + proxyPath + ' failed before it reached TackQuote.';
+      const d = root.dataset;
+      let key = 'msgDiagFail';
+      if (msg === 'STOREFRONT_PASSWORD') key = 'msgDiagPassword';
+      else if (msg === 'NOT_JSON') key = 'msgDiagNotJson';
+      else if (msg === 'HTTP 404') key = 'msgDiag404';
+      else if (msg === 'HTTP 401' || msg === 'HTTP 403') key = 'msgDiagAuth';
+      else if (/^HTTP 5/.test(msg)) key = 'msgDiag5xx';
+      else if (err && err.name === 'AbortError') key = 'msgDiagTimeout';
+      return ns.format(d[key], { path: proxyPath, status: msg });
     }
 
-    /**
-     * Rule 2. We could not get an answer, so we get out of the way.
-     *
-     * Hiding rather than emptying, because an empty block still occupies its
-     * heading and its spacing, which reads as a broken widget rather than as an
-     * absent one.
-     */
-    /**
-     * @param {string} [why] What actually failed — merchant only.
-     *
-     * Rendered ONLY in the theme editor. Shopify's own theme-editor guidance
-     * names this as a use for `Shopify.designMode`: "working with a third-party
-     * API that returns and outputs any errors to the theme editor but never to
-     * the live store". A shopper still sees nothing at all.
-     *
-     * It exists because the old message could not be acted on. A wrong app proxy
-     * path, an unsigned request, a 5xx, a timeout and a store that is simply not
-     * connected all produced one sentence — "We could not load your price just
-     * now" — which tells the only person who can fix it nothing about which.
-     */
+    /** Rule 2: no answer, so get out of the way (hide, do not empty: an empty block still reads as broken). */
+    /** `why` is rendered ONLY in the theme editor (`Shopify.designMode` guidance); shoppers see nothing. */
     function standDown(why) {
       if (designMode) {
         const frag = document.createDocumentFragment();
@@ -197,10 +144,7 @@
         // live storefront it hides. So the person who can fix a broken install
         // is the one who is told about it, which is what the issue asked for.
         if (data.reason === 'shop_not_installed') {
-          standDown(
-            'This store is not connected to a TackQuote account. Connect it from ' +
-              'TackQuote → Connections → Shopify, then reload the editor.',
-          );
+          standDown(root.dataset.msgDiagNotConnected);
           return;
         }
         show(line(root.dataset.msgUnlinked));
@@ -221,6 +165,7 @@
         if (!data.accountSpecific) {
           box.appendChild(line(root.dataset.msgListNote, 'tackquote-price__note'));
         }
+        box.appendChild(line(root.dataset.msgQuoteNote, 'tackquote-price__note'));
         show(box);
         return;
       }
