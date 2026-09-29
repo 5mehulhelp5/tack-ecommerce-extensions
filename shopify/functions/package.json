@@ -1,0 +1,12 @@
+{
+  "name": "@tack/shopify-functions",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "TackQuote Shopify Functions (wholesale pricing discount, order-limit validation) and their shared metafield contract. Tests need only Node's built-in runner.",
+  "scripts": {
+    "test": "node --test \"shared/*.test.mjs\" \"tackquote-*/tests/*.test.mjs\"",
+    "sync-contract": "node scripts/sync-contract.mjs"
+  }
+}

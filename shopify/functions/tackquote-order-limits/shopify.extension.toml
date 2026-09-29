@@ -1,0 +1,25 @@
+# TackQuote order limits: Cart and Checkout Validation Function (Rust).
+#
+# Layout copied from Shopify's official template, which is what
+# `shopify app generate extension --template cart_checkout_validation --flavor rust`
+# emits (Shopify/extensions-templates functions-cart-checkout-validation-rs,
+# commit 9cae73f). No `uid` yet: Shopify CLI writes it on the first deploy.
+# https://shopify.dev/docs/api/functions/2026-07/cart-and-checkout-validation
+
+api_version = "2026-07"
+
+[[extensions]]
+name = "t:name"
+handle = "tackquote-order-limits"
+type = "function"
+description = "t:description"
+
+  [[extensions.targeting]]
+  target = "cart.validations.generate.run"
+  input_query = "src/cart_validations_generate_run.graphql"
+  export = "cart_validations_generate_run"
+
+  [extensions.build]
+  command = "cargo build --target=wasm32-unknown-unknown --release"
+  path = "target/wasm32-unknown-unknown/release/tackquote-order-limits.wasm"
+  watch = ["src/**/*.rs"]

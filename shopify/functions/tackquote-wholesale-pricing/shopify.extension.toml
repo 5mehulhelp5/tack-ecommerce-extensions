@@ -1,0 +1,28 @@
+# TackQuote wholesale pricing: Discount Function (Rust).
+#
+# Layout copied from Shopify's official template, which is what
+# `shopify app generate extension --template discount --flavor rust` emits
+# (Shopify/extensions-templates functions-discount-rs, commit 9cae73f).
+# Differences from the template, each deliberate:
+#   - one target only. This function prices products; it does not discount
+#     delivery, so cart.delivery-options.discounts.generate.run is not declared.
+#   - no `uid` yet. Shopify CLI writes it on the first `shopify app deploy`.
+# https://shopify.dev/docs/api/functions/2026-07/discount
+
+api_version = "2026-07"
+
+[[extensions]]
+name = "t:name"
+handle = "tackquote-wholesale-pricing"
+type = "function"
+description = "t:description"
+
+  [[extensions.targeting]]
+  target = "cart.lines.discounts.generate.run"
+  input_query = "src/cart_lines_discounts_generate_run.graphql"
+  export = "cart_lines_discounts_generate_run"
+
+  [extensions.build]
+  command = "cargo build --target=wasm32-unknown-unknown --release"
+  path = "target/wasm32-unknown-unknown/release/tackquote-wholesale-pricing.wasm"
+  watch = [ "src/**/*.rs" ]

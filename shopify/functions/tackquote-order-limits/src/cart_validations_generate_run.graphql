@@ -1,0 +1,49 @@
+# Validated against the functions_cart_checkout_validation schema, API version
+# 2026-07, with the shopify-dev MCP validate_graphql_codeblocks tool (2026-09-30).
+# Rust requires the operation to be named `Input`.
+#
+# Input query limits (https://shopify.dev/docs/api/functions/2026-07):
+#   cost <= 30:   three metafield selections x 3, plus 9 leaves x 1 = 18
+#   size <= 3,000 bytes excluding comments
+query Input {
+  presentmentCurrencyRate
+  buyerJourney {
+    step
+  }
+  validation {
+    cartLimits: metafield(namespace: "$app", key: "cart_limits") {
+      jsonValue
+    }
+  }
+  cart {
+    cost {
+      subtotalAmount {
+        amount
+        currencyCode
+      }
+    }
+    buyerIdentity {
+      customer {
+        buyer: metafield(namespace: "$app", key: "buyer") {
+          jsonValue
+        }
+      }
+    }
+    lines {
+      quantity
+      merchandise {
+        __typename
+        ... on ProductVariant {
+          id
+          title
+          product {
+            title
+          }
+          orderLimits: metafield(namespace: "$app", key: "order_limits") {
+            jsonValue
+          }
+        }
+      }
+    }
+  }
+}
