@@ -77,6 +77,12 @@ Variants: the line is the variant selected at click time (the form's `id` field 
 adds quantity. A sold-out variant is quotable by default and labelled "Out of stock — quote
 request"; the "When the variant is sold out" setting can disable the button instead.
 
+Money is formatted with the store's own `shop.money_format` (Shopify placeholders,
+HTML stripped), passed escaped on the drawer, the variant table and Quick Order, so a
+price reads like the theme's ("Rs. 699.95"). `Intl.NumberFormat` is the fallback when
+the format is missing or unusable, or the presentment currency is not the shop currency.
+Liquid comment pointers read `README notes: <file> (n)` and refer to "Liquid design notes".
+
 Drawer snippet parameters: `proxy` (the app proxy path), `inline` (render in the page),
 `attrs` (style attributes, markers stripped), `target_price`, `message`, `files` (the three
 optional drawer features), `id` (for a trigger's aria-controls).

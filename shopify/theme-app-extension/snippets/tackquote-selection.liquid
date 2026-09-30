@@ -1,9 +1,9 @@
 {%- comment -%}
-  README.md, Liquid design notes: tackquote-selection.liquid (1). `price` (cents,
+  README notes: tackquote-selection (1). `price` (cents,
   presentment currency) is for DISPLAY in the drawer only; it is never sent.
   @param {product} product
 {%- endcomment -%}
-<script type="application/json" class="tackquote-variants">
+<script type="application/json" class="tackquote-variants" data-tackquote-money-format="{{ shop.money_format | escape }}" data-tackquote-shop-currency="{{ shop.currency }}">
   [
     {%- for variant in product.variants -%}
       {

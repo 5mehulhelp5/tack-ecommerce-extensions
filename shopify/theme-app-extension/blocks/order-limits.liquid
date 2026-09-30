@@ -3,7 +3,7 @@
   assign variant = product.selected_or_first_available_variant
 -%}
 
-{%- # README.md, Liquid design notes: order-limits.liquid (1) -%}
+{%- # README notes: order-limits (1) -%}
 {%- capture tackquote_access -%}{% render 'tackquote-visibility', product: product %}{%- endcapture -%}
 {%- assign tackquote_access = tackquote_access | strip -%}
 {%- unless tackquote_access == 'hidden' -%}
@@ -11,7 +11,7 @@
 {%- if proxy_path == blank -%}
   {% render 'tackquote-setup', attrs: block.shopify_attributes %}
 {%- else -%}
-  {%- # README.md, Liquid design notes: order-limits.liquid (2) -%}
+  {%- # README notes: order-limits (2) -%}
   {%- capture tackquote_diagnostics -%}{% render 'tackquote-diagnostics' %}{%- endcapture -%}
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}

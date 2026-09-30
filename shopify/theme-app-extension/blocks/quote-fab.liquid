@@ -35,7 +35,7 @@
   endif
 -%}
 
-{%- # README.md, Liquid design notes: quote-fab.liquid (1) -%}
+{%- # README notes: quote-fab (1) -%}
 {%- if show -%}
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}

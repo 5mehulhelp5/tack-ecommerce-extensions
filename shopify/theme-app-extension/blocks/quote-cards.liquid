@@ -28,7 +28,7 @@
   endif
 -%}
 
-{%- # README.md, Liquid design notes: quote-cards.liquid (1) -%}
+{%- # README notes: quote-cards (1) -%}
 {%- if show -%}
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
