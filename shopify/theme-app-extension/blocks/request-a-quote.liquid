@@ -13,41 +13,51 @@
 {%- else -%}
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
+  {%- liquid
+  assign tq_disabled = ''
+  if block.settings.sold_out == 'disable' and variant.available == false
+  assign tq_disabled = 'disabled'
+  endif
+  -%}
   <div
-    class="tackquote-block tackquote-request"
+  class="tackquote-block tackquote-request"
   data-tackquote-mode="request"
   data-tackquote-proxy="{{ proxy_path | escape }}"
   data-tackquote-product="{{ product.title | escape }}"
   data-tackquote-variant="{{ variant.id }}"
   data-tackquote-currency="{{ cart.currency.iso_code | default: shop.currency }}"
-    {%- if customer %}
+  {%- if customer %}
   data-tackquote-customer-name="{{ customer.name | escape }}"
   data-tackquote-customer-email="{{ customer.email | escape }}"
-    {%- endif %}
+  {%- endif %}
+  data-tackquote-sold-out="{{ block.settings.sold_out | escape }}"
+  data-msg-unavailable="{{ 'tackquote.quote.unavailable' | t | escape }}"
+  data-msg-out-of-stock="{{ 'tackquote.quote.out_of_stock' | t | escape }}"
   {{ tq_attrs }}
   {{ block.shopify_attributes }}
   >
-    {% render 'tackquote-selection', product: product %}
-    <button
-      type="button"
-      class="tackquote-button tackquote-button--{{ block.settings.button_style }}{% if block.settings.button_style == 'theme' %} button button--primary btn{% endif %}"
+  {% render 'tackquote-selection', product: product %}
+  <button
+  type="button"
+  class="tackquote-button tackquote-button--{{ block.settings.button_style }}{% if block.settings.button_style == 'theme' %} button button--primary btn{% endif %}"
+  {{ tq_disabled }}
   data-tackquote-action="request"
-    >
-      {%- # README.md, Liquid design notes: request-a-quote.liquid (2) -%}
-      {%- assign tackquote_label = block.settings.button_label | strip -%}
-      {%- if tackquote_label == blank or tackquote_label == 'Request a Quote' -%}
-        {%- assign tackquote_label = 'tackquote.quote.request_button' | t -%}
-      {%- endif -%}
+  >
+  {%- # README.md, Liquid design notes: request-a-quote.liquid (2) -%}
+  {%- assign tackquote_label = block.settings.button_label | strip -%}
+  {%- if tackquote_label == blank or tackquote_label == 'Request a Quote' -%}
+  {%- assign tackquote_label = 'tackquote.quote.request_button' | t -%}
+  {%- endif -%}
   {{ tackquote_label }}
-    </button>
-    {%- assign tackquote_helper = block.settings.helper_text | strip -%}
-    {%- if tackquote_helper == 'Buying in volume? Ask us for a price.' -%}
-      {%- assign tackquote_helper = 'tackquote.quote.helper' | t -%}
-    {%- endif -%}
-    {%- if tackquote_helper != blank -%}
-      <p class="tackquote-helper">{{ tackquote_helper }}</p>
-    {%- endif -%}
-    <p class="tackquote-status" data-tackquote-status role="status" aria-live="polite"></p>
+  </button>
+  {%- assign tackquote_helper = block.settings.helper_text | strip -%}
+  {%- if tackquote_helper == 'Buying in volume? Ask us for a price.' -%}
+  {%- assign tackquote_helper = 'tackquote.quote.helper' | t -%}
+  {%- endif -%}
+  {%- if tackquote_helper != blank -%}
+  <p class="tackquote-helper">{{ tackquote_helper }}</p>
+  {%- endif -%}
+  <p class="tackquote-status" data-tackquote-status role="status" aria-live="polite"></p>
   </div>
 
   {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs, target_price: block.settings.target_price, message: block.settings.allow_message, files: block.settings.allow_files %}
@@ -62,6 +72,7 @@
     {"type":"text","id":"button_label","label":"Button text","default":"Request a Quote"},
     {"type":"text","id":"helper_text","label":"Helper text","default":"Buying in volume? Ask us for a price."},
     {"type":"select","id":"button_style","label":"Button style","options":[{"value":"theme","label":"Match my theme's buttons"},{"value":"solid","label":"Solid"},{"value":"outline","label":"Outline"}],"default":"theme"},
+    {"type":"select","id":"sold_out","label":"t:tq.c.soldout","options":[{"value":"allow","label":"t:tq.c.soldout_allow"},{"value":"disable","label":"t:tq.c.soldout_disable"}],"default":"allow"},
     {"type":"checkbox","id":"target_price","label":"t:tq.c.target","info":"t:tq.c.target_info","default":false},
     {"type":"checkbox","id":"allow_message","label":"t:tq.c.message","default":false},
     {"type":"checkbox","id":"allow_files","label":"t:tq.c.files","info":"t:tq.c.files_info","default":false},

@@ -24,13 +24,16 @@
     "c": {
       "proxy": "Erweitert: App-URL-Präfix",
       "proxy_info": "Bitte unverändert lassen. Ändern Sie es nur, wenn Sie den TackQuote-App-Proxy in Shopify umbenannt haben (Einstellungen, Apps und Vertriebskanäle, TackQuote, App-Proxy).",
-      "target": "Nach einem Wunschpreis fragen",
+      "target": "Käufer ihren Wunschpreis eingeben lassen",
       "target_info": "Fügt jeder Position ein optionales Feld Ihr Wunschpreis hinzu. Gesendet wird nur, was der Käufer eingibt, nie Ihr Shop-Preis.",
       "message": "Käufern eine Nachricht erlauben",
       "files": "Käufern Dateianhänge erlauben",
       "files_info": "Bis zu 3 PDF-, JPEG- oder PNG-Dateien mit je 5 MB.",
       "quote_page": "Angebotsseite (optional)",
-      "quote_page_info": "Wählen Sie die Seite mit dem Block Angebotsseite, um sie statt des Pop-ups zu öffnen."
+      "quote_page_info": "Wählen Sie die Seite mit dem Block Angebotsseite, um sie statt des Pop-ups zu öffnen.",
+      "soldout": "Wenn die Variante ausverkauft ist",
+      "soldout_allow": "Angebotsanfragen erlauben",
+      "soldout_disable": "Schaltfläche deaktivieren"
     },
     "p": {
       "buyer_group_badge_1": "Zeigt die TackQuote-Käufergruppe des angemeldeten Kunden, zum Beispiel „Stufe 2“. Wer abgemeldet ist, mit keinem TackQuote-Käufer verknüpft ist oder keiner Gruppe angehört, sieht nichts.",

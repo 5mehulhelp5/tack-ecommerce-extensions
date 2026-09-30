@@ -9,17 +9,17 @@
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
-    class="tackquote-block tackquote-badge"
+  class="tackquote-block tackquote-badge"
   data-tackquote-mode="badge"
   data-tackquote-proxy="{{ proxy_path | escape }}"
   data-tackquote-design="{% if request.design_mode %}true{% else %}false{% endif %}"
   data-msg-label="{{ 'tackquote.badge.label' | t | escape }}"
   data-msg-empty="{{ 'tackquote.badge.empty' | t | escape }}"
-    hidden
+  hidden
   {{ tq_attrs }}
   {{ block.shopify_attributes }}
   >
-    <div class="tackquote-badge__body" data-tackquote-badge-body role="status" aria-live="polite"></div>
+  <div class="tackquote-badge__body" data-tackquote-badge-body role="status" aria-live="polite"></div>
   </div>
 
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>

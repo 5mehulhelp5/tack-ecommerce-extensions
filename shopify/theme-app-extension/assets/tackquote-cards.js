@@ -52,17 +52,20 @@
         return r.json();
       })
       .then((p) => {
-        const vs = (p.variants || []).filter((v) => v.available !== false);
         if ((p.variants || []).length > 1) {
           window.location.href = link.href;
           return;
         }
-        const v = vs[0];
-        if (!v) {
+        const v = (p.variants || [])[0];
+        // Sold out: quotable by default, refused only when the merchant chose so.
+        const state = ns.soldOut ? ns.soldOut(v, d.soldOut) : 'ok';
+        if (!v || state === 'disable') {
           say(d.msgUnavailable);
           return;
         }
-        const line = { variantId: String(v.id), name: p.title, sku: v.sku || '', quantity: 1 };
+        const name = ns.soldOutName ? ns.soldOutName(p.title, state, d.msgOutOfStock) : p.title;
+        // Display price only (cents -> major units); never sent with the request.
+        const line = { variantId: String(v.id), name, sku: v.sku || '', quantity: 1, unit: v.price / 100, cur: d.currency };
         const ok = typeof ns.quoteAdd === 'function' && ns.quoteAdd([line], { from: btn.closest('[data-tq-root]') });
         say(ok ? d.msgAdded : d.msgFull);
       })

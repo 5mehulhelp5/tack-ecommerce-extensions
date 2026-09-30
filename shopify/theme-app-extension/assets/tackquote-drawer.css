@@ -15,8 +15,6 @@
   border: 0;
   border-radius: var(--tqm-radius, var(--popup-corner-radius, 0.75em));
   box-shadow: 0 0.75em 2.5em rgb(0 0 0 / 22%);
-  /* No theme token here: Dawn and Horizon both name it --color-background, in two
-     formats, so only the detected value (or Canvas) is safe. */
   background: var(--tqm-bg, var(--tqd-bg, Canvas));
   color: var(--tqm-text, var(--tqd-fg, CanvasText));
   font-family: var(--tqm-font, inherit);
@@ -53,7 +51,7 @@
   text-transform: var(--tqd-htt);
   font-size: calc(var(--font-heading-scale, 1) * 1.3em);
   line-height: 1.25;
-  color: inherit;
+  color: var(--tqm-text, var(--tqd-hcolor));
 }
 .tackquote-icon-button {
   display: inline-flex;
@@ -96,6 +94,15 @@
 .tackquote-line__name {
   grid-column: 1 / -1;
   overflow-wrap: anywhere;
+}
+.tackquote-line__price {
+  grid-column: 1 / -1;
+  opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+}
+.tackquote-drawer__subtotal {
+  margin: 0 0 1em;
+  font-weight: 600;
 }
 .tackquote-line__controls {
   display: flex;
@@ -298,8 +305,9 @@
   inline-size: 1.35em;
   block-size: 1.35em;
 }
+/* Inverted pair. Not currentColor: on the badge that is its own text colour (invisible count, QA). */
 .tackquote-fab > .tackquote-count {
-  --tq-count-bg: currentColor;
+  --tq-count-bg: var(--tq-accent-text);
   --tq-count-fg: var(--tq-accent);
 }
 .tackquote-fab[data-icon-only] > .tackquote-count,

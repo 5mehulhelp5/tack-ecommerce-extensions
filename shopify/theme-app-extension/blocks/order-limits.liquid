@@ -16,7 +16,7 @@
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
-    class="tackquote-block tackquote-limits"
+  class="tackquote-block tackquote-limits"
   data-tackquote-mode="order-limits"
   data-tackquote-proxy="{{ proxy_path | escape }}"
   data-tackquote-variant="{{ variant.id }}"
@@ -40,12 +40,12 @@
   {{ tq_attrs }}
   {{ block.shopify_attributes }}
   >
-    {% render 'tackquote-selection', product: product %}
-    <div class="tackquote-limits__body" data-tackquote-limits-body role="status" aria-live="polite">
-      {%- if request.design_mode -%}
-        <p class="tackquote-limits__error">{{ 'tackquote.order_limits.loading' | t }}</p>
-      {%- endif -%}
-    </div>
+  {% render 'tackquote-selection', product: product %}
+  <div class="tackquote-limits__body" data-tackquote-limits-body role="status" aria-live="polite">
+  {%- if request.design_mode -%}
+  <p class="tackquote-limits__error">{{ 'tackquote.order_limits.loading' | t }}</p>
+  {%- endif -%}
+  </div>
   </div>
 
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>

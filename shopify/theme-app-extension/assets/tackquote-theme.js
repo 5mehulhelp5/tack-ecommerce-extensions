@@ -48,17 +48,24 @@
 
     const h = s.heading;
     if (h && h.fontFamily) {
+      const hc = T.parse(h.color);
+      // The heading's own colour (QA: the drawer title wore the muted body colour).
+      if (hc && T.contrast(over(hc, bg), bg) >= 3) put('hcolor', rgb(over(hc, bg)));
       put('hfont', h.fontFamily);
       put('hweight', h.fontWeight);
       put('hls', h.letterSpacing);
       put('htt', h.textTransform);
     }
 
-    // Prefer an opaque candidate (Dawn's ATC is secondary beside dynamic checkout).
+    // Prefer a candidate whose fill STANDS OUT from the section: Dawn's ATC
+    // beside dynamic checkout is secondary with a fill equal to the page
+    // background, which is an outline in effect (QA 2026-10-01). Paint AND
+    // typography AND height then all come from this one candidate.
+    const fills = (c) => opaque(c.backgroundColor) && T.contrast(over(T.parse(c.backgroundColor), bg), bg) >= 1.2;
     const cands = (s.buttons || []).filter(Boolean);
-    const b = cands.find((c) => opaque(c.backgroundColor) || /gradient/.test(c.backgroundImage || '')) || cands[0];
+    const b = cands.find((c) => fills(c) || /gradient/.test(c.backgroundImage || '')) || cands[0];
     if (b) {
-      const solid = opaque(b.backgroundColor);
+      const solid = fills(b);
       const bordered = px(b.borderTopWidth) > 0 && b.borderTopStyle !== 'none';
       let accent;
       let text;
@@ -90,6 +97,8 @@
       const r = px(b.borderTopLeftRadius);
       const hgt = px(b.height);
       put('btn-radius', hgt && r >= hgt / 2 ? '999px' : b.borderTopLeftRadius);
+      // A min-height only, floored at 44px in CSS (QA: 44 beside a 47px theme button).
+      if (hgt >= 30 && hgt <= 80) put('btn-h', `${Math.round(hgt)}px`);
       put('btn-font', b.fontFamily);
       put('btn-weight', b.fontWeight);
       put('btn-ls', b.letterSpacing);

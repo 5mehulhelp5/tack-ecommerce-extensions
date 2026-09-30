@@ -63,12 +63,16 @@
       "cart_empty": "カートは空です。",
       "cart_failed": "カートを読み込めませんでした。もう一度お試しください。",
       "fab_label": "見積",
-      "target_price": "希望単価",
+      "target_price": "ご希望の単価",
       "editor_view": "見積に商品が入ると、ここに見積を見るボタンが表示されます。",
       "card_failed": "商品を追加できませんでした。もう一度お試しください。",
       "files": "ファイルを添付（任意）",
       "files_help": "PDF・JPEG・PNG、最大3件、各5 MBまで。",
-      "files_max": "添付できるファイルは3件までです。"
+      "files_max": "添付できるファイルは3件までです。",
+      "out_of_stock": "在庫切れ — 見積依頼",
+      "price": "価格",
+      "your_price": "お客様の価格",
+      "subtotal": "小計（概算）：{amount}。最終価格は見積で確定します。"
     },
     "signup": {
       "loading": "申請フォームを読み込んでいます",
@@ -109,7 +113,8 @@
       "heading_applied": "数量別の卸売価格（チェックアウトで適用）",
       "caption_applied": "数量別の1点あたり卸売価格（チェックアウトで適用）",
       "price_applied": "お客様の単価",
-      "applied_note": "チェックアウトで適用されます。"
+      "applied_note": "チェックアウトで適用されます。",
+      "heading": "卸売の数量別価格"
     },
     "badge": {
       "label": "お客様の価格ランク",

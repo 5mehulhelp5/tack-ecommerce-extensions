@@ -64,6 +64,23 @@ message and files) and the long help paragraphs are schema translations
 (`locales/*.schema.json`, `t:tq.*`), because Shopify enforces 100 KB of Liquid across the
 extension. All of it is translated in the eight languages.
 
+**Prices in the quote drawer (display only).** Each line shows its unit price and line
+total, and the drawer an estimated subtotal, in the presentment currency the line was
+added in: the buyer's TackQuote quantity-break rung for the quantity, else their TackQuote
+wholesale price ("Your price"; both only when the price blocks on the page answered with an
+account-specific price for that SKU), else the variant's storefront price ("Price", from
+`tackquote-selection.liquid`, cart.js or products/{handle}.js). None of it is sent: the
+request's line fields are name, sku, variantId, quantity and, only when the buyer typed one,
+`price` (the price they are asking for). TackQuote prices every line server-side.
+Variants: the line is the variant selected at click time (the form's `id` field first, then
+`?variant=`); two variants make two lines named with their variant, the same variant again
+adds quantity. A sold-out variant is quotable by default and labelled "Out of stock — quote
+request"; the "When the variant is sold out" setting can disable the button instead.
+
+Drawer snippet parameters: `proxy` (the app proxy path), `inline` (render in the page),
+`attrs` (style attributes, markers stripped), `target_price`, `message`, `files` (the three
+optional drawer features), `id` (for a trigger's aria-controls).
+
 **Buyer message and attachments** (settings "Let buyers add a message" / "Let buyers attach
 files", off by default): `assets/tackquote-attach.js` uploads each file first to
 `POST {proxy}/quote-upload?name=…` as raw bytes, keeps a guest's `uploadToken` for the next

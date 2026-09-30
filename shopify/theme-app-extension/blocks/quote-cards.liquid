@@ -2,29 +2,29 @@
   assign proxy_path = block.settings.proxy_path | strip | split: '/' | join: '/'
   assign show = false
   case block.settings.pages
-    when 'grids'
-      if template.name == 'collection' or template.name == 'search' or template.name == 'index' or template.name == 'list-collections'
-        assign show = true
-      endif
-    when 'collection'
-      if template.name == 'collection'
-        assign show = true
-      endif
-    when 'all'
-      assign show = true
+  when 'grids'
+  if template.name == 'collection' or template.name == 'search' or template.name == 'index' or template.name == 'list-collections'
+  assign show = true
+  endif
+  when 'collection'
+  if template.name == 'collection'
+  assign show = true
+  endif
+  when 'all'
+  assign show = true
   endcase
   if proxy_path == blank
-    assign show = false
+  assign show = false
   endif
 
   assign label = block.settings.label | strip
   if label == blank or label == 'Add to Quote'
-    assign label = 'tackquote.quote.add_button' | t
+  assign label = 'tackquote.quote.add_button' | t
   endif
 
   assign selector = block.settings.card_selector | strip
   if selector contains '{' or selector contains '}' or selector contains '<' or selector contains ';' or selector contains '@'
-    assign selector = ''
+  assign selector = ''
   endif
 -%}
 
@@ -35,22 +35,25 @@
   {{ 'tackquote.css' | asset_url | stylesheet_tag }}
   {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs, target_price: block.settings.target_price, message: block.settings.allow_message, files: block.settings.allow_files %}
   <div
-    hidden
+  hidden
   data-tackquote-cards
   data-selector="{{ selector | escape }}"
   data-msg-added="{{ 'tackquote.quote.added' | t | escape }}"
   data-msg-full="{{ 'tackquote.quote.full' | t | escape }}"
   data-msg-unavailable="{{ 'tackquote.quote.unavailable' | t | escape }}"
+  data-sold-out="{{ block.settings.sold_out | escape }}"
+  data-currency="{{ cart.currency.iso_code }}"
+  data-msg-out-of-stock="{{ 'tackquote.quote.out_of_stock' | t | escape }}"
   data-msg-failure="{{ 'tackquote.quote.card_failed' | t | escape }}"
   >
-    <template>
-      <div class="tackquote-card-add" data-tq-root {{ tq_attrs }}>
-        <button type="button" class="tackquote-button tackquote-button--theme button button--primary btn" data-label="{{ label | escape }}">
-          {{- label -}}
-        </button>
-        <span class="tackquote-vh" role="status" data-tackquote-card-status></span>
-      </div>
-    </template>
+  <template>
+  <div class="tackquote-card-add" data-tq-root {{ tq_attrs }}>
+  <button type="button" class="tackquote-button tackquote-button--theme button button--primary btn" data-label="{{ label | escape }}">
+  {{- label -}}
+  </button>
+  <span class="tackquote-vh" role="status" data-tackquote-card-status></span>
+  </div>
+  </template>
   </div>
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
   <script src="{{ 'tackquote-theme.js' | asset_url }}" async></script>
@@ -64,6 +67,7 @@
     {"type":"paragraph","content":"t:tq.p.quote_cards_1"},
     {"type":"select","id":"pages","label":"Show on","options":[{"value":"grids","label":"Collection, search and home pages"},{"value":"collection","label":"Collection pages only"},{"value":"all","label":"All pages"}],"default":"grids"},
     {"type":"text","id":"label","label":"Button text","default":"Add to Quote"},
+    {"type":"select","id":"sold_out","label":"t:tq.c.soldout","options":[{"value":"allow","label":"t:tq.c.soldout_allow"},{"value":"disable","label":"t:tq.c.soldout_disable"}],"default":"allow"},
     {"type":"checkbox","id":"target_price","label":"t:tq.c.target","info":"t:tq.c.target_info","default":false},
     {"type":"checkbox","id":"allow_message","label":"t:tq.c.message","default":false},
     {"type":"checkbox","id":"allow_files","label":"t:tq.c.files","info":"t:tq.c.files_info","default":false},

@@ -63,12 +63,16 @@
       "cart_empty": "Il tuo carrello è vuoto.",
       "cart_failed": "Non siamo riusciti a leggere il tuo carrello. Riprova.",
       "fab_label": "Preventivo",
-      "target_price": "Il tuo prezzo target (cad.)",
+      "target_price": "Prezzo che chiedi (cad.)",
       "editor_view": "Vedi preventivo compare qui quando il preventivo contiene articoli.",
       "card_failed": "Non siamo riusciti ad aggiungere l’articolo. Riprova.",
       "files": "Allega file (facoltativo)",
       "files_help": "Fino a 3 file PDF, JPEG o PNG, 5 MB ciascuno.",
-      "files_max": "Allega al massimo 3 file."
+      "files_max": "Allega al massimo 3 file.",
+      "out_of_stock": "Esaurito — richiesta di preventivo",
+      "price": "Prezzo",
+      "your_price": "Il tuo prezzo",
+      "subtotal": "Subtotale stimato: {amount}. Il preventivo conferma il prezzo finale."
     },
     "signup": {
       "loading": "Caricamento del modulo di richiesta",
@@ -109,7 +113,8 @@
       "heading_applied": "Prezzi all’ingrosso per quantità, applicati al checkout",
       "caption_applied": "Prezzo all’ingrosso per unità in base alla quantità, applicato al checkout",
       "price_applied": "Il tuo prezzo unitario",
-      "applied_note": "Applicato al checkout."
+      "applied_note": "Applicato al checkout.",
+      "heading": "Prezzi all’ingrosso per quantità"
     },
     "badge": {
       "label": "La tua fascia di prezzo",

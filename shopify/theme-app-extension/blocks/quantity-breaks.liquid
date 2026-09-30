@@ -3,7 +3,7 @@
   assign variant = product.selected_or_first_available_variant
   assign auto_heading = false
   if block.settings.heading == blank or block.settings.heading == 'Wholesale quantity pricing'
-    assign auto_heading = true
+  assign auto_heading = true
   endif
 -%}
 
@@ -20,7 +20,7 @@
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
-    class="tackquote-block tackquote-breaks"
+  class="tackquote-block tackquote-breaks"
   data-tackquote-mode="quantity-breaks"
   data-tackquote-proxy="{{ proxy_path | escape }}"
   data-tackquote-variant="{{ variant.id }}"
@@ -36,6 +36,7 @@
   data-msg-applied-note="{{ 'tackquote.quantity_breaks.applied_note' | t | escape }}"
   data-msg-heading-quote="{{ 'tackquote.quantity_breaks.heading_quote' | t | escape }}"
   data-msg-heading-applied="{{ 'tackquote.quantity_breaks.heading_applied' | t | escape }}"
+  data-msg-heading-neutral="{{ 'tackquote.quantity_breaks.heading' | t | escape }}"
   data-tackquote-auto-heading="{{ auto_heading }}"
   data-msg-quantity="{{ 'tackquote.quantity_breaks.quantity' | t | escape }}"
   data-msg-price="{{ 'tackquote.quantity_breaks.price' | t | escape }}"
@@ -49,17 +50,19 @@
   {{ tq_attrs }}
   {{ block.shopify_attributes }}
   >
-    {% render 'tackquote-selection', product: product %}
-    <h3 class="tackquote-breaks__heading">
-      {%- if auto_heading -%}
+  {% render 'tackquote-selection', product: product %}
+  <h3 class="tackquote-breaks__heading">
+  {%- if auto_heading and customer == blank -%}
+  {{ 'tackquote.quantity_breaks.heading' | t }}
+  {%- elsif auto_heading -%}
   {{ 'tackquote.quantity_breaks.heading_quote' | t }}
-      {%- else -%}
+  {%- else -%}
   {{ block.settings.heading }}
-      {%- endif -%}
-    </h3>
-    <div class="tackquote-breaks__body" data-tackquote-breaks-body role="status" aria-live="polite">
-      <p class="tackquote-breaks__loading">{{ 'tackquote.quantity_breaks.loading' | t }}</p>
-    </div>
+  {%- endif -%}
+  </h3>
+  <div class="tackquote-breaks__body" data-tackquote-breaks-body role="status" aria-live="polite">
+  <p class="tackquote-breaks__loading">{{ 'tackquote.quantity_breaks.loading' | t }}</p>
+  </div>
   </div>
 
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>

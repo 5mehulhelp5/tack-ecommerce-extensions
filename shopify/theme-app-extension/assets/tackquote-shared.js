@@ -106,13 +106,12 @@
     return Number.isFinite(n) && n > 0 ? n : 1;
   };
 
-  /* Priority: `?variant=` param, then the form's `id` field, then what Liquid rendered. */
+  /* The LIVE selection first: the form's `id` field (every variant picker writes it), then `?variant=`, then Liquid's. */
   ns.variantId = (root) => {
+    const field = ns.form(root)?.querySelector('[name="id"]');
+    if (field?.value) return String(field.value);
     const fromUrl = new URLSearchParams(window.location.search).get('variant');
-    if (fromUrl) return String(fromUrl);
-    const form = ns.form(root);
-    const field = form?.querySelector('[name="id"]');
-    return String(field?.value || root.dataset.tackquoteVariant || '');
+    return String(fromUrl || root.dataset.tackquoteVariant || '');
   };
 
   /* Merchant-only diagnosis of a FAILED request; copy is emitted in the theme editor only. */
@@ -244,8 +243,12 @@
     });
   };
   const queue = window.TackQuoteQ || [];
+  // One runtime failing must not stop the others (the floating cart's counter
+  // queued behind it would never register).
   queue.forEach((fn) => {
-    fn(ns);
+    try {
+      fn(ns);
+    } catch (_err) {}
   });
   // Anything that loads after this runs straight away.
   window.TackQuoteQ = {

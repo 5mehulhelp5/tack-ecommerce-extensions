@@ -63,12 +63,16 @@
       "cart_empty": "Je winkelwagen is leeg.",
       "cart_failed": "We konden je winkelwagen niet lezen. Probeer het opnieuw.",
       "fab_label": "Offerte",
-      "target_price": "Je richtprijs (per stuk)",
+      "target_price": "Prijs die je vraagt (per stuk)",
       "editor_view": "Offerte bekijken verschijnt hier zodra de offerte artikelen bevat.",
       "card_failed": "We konden dat artikel niet toevoegen. Probeer het opnieuw.",
       "files": "Bestanden bijvoegen (optioneel)",
       "files_help": "Maximaal 3 PDF-, JPEG- of PNG-bestanden, elk 5 MB.",
-      "files_max": "Voeg maximaal 3 bestanden toe."
+      "files_max": "Voeg maximaal 3 bestanden toe.",
+      "out_of_stock": "Niet op voorraad — offerteaanvraag",
+      "price": "Prijs",
+      "your_price": "Jouw prijs",
+      "subtotal": "Geschat subtotaal: {amount}. Je offerte bevestigt de definitieve prijs."
     },
     "signup": {
       "loading": "Aanvraagformulier wordt geladen",
@@ -109,7 +113,8 @@
       "heading_applied": "Staffelprijzen voor de groothandel, toegepast bij het afrekenen",
       "caption_applied": "Groothandelsprijs per stuk naar aantal, toegepast bij het afrekenen",
       "price_applied": "Je prijs per stuk",
-      "applied_note": "Toegepast bij het afrekenen."
+      "applied_note": "Toegepast bij het afrekenen.",
+      "heading": "Groothandelsprijzen per aantal"
     },
     "badge": {
       "label": "Je prijsniveau",

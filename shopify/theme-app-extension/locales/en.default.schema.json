@@ -24,13 +24,16 @@
     "c": {
       "proxy": "Advanced: app URL prefix",
       "proxy_info": "Leave this as it is. Change it only if you renamed the TackQuote app proxy in Shopify (Settings, Apps and sales channels, TackQuote, App proxy).",
-      "target": "Ask for a target price",
+      "target": "Let buyers enter the price they are asking for",
       "target_info": "Adds an optional Your target price field to each line. Only what the buyer types is sent, never your storefront price.",
       "message": "Let buyers add a message",
       "files": "Let buyers attach files",
       "files_info": "Up to 3 PDF, JPEG or PNG files of 5 MB each.",
       "quote_page": "Quote page (optional)",
-      "quote_page_info": "Pick the page that holds the Quote page block to open it instead of the pop-up."
+      "quote_page_info": "Pick the page that holds the Quote page block to open it instead of the pop-up.",
+      "soldout": "When the variant is sold out",
+      "soldout_allow": "Allow quote requests",
+      "soldout_disable": "Disable the button"
     },
     "p": {
       "buyer_group_badge_1": "Shows the signed-in customer’s TackQuote buyer group, for example “Tier 2”. A shopper who is signed out, is not linked to a TackQuote buyer, or belongs to no group sees nothing at all.",

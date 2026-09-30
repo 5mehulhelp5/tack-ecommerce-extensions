@@ -33,6 +33,7 @@
     const customerMarker = root.dataset.tackquoteCustomer || 'anon';
     const pageCurrency = ns.pageCurrency(root);
     let inFlight = 0;
+    let lastSku = '';
 
     function show(node) {
       root.hidden = false;
@@ -101,6 +102,8 @@
       }
 
       if (data.status === 'priced') {
+        // For the quote drawer's DISPLAY price (tackquote-quote-lines.js).
+        if (lastSku && data.accountSpecific) (ns.wholesale = ns.wholesale || {})[lastSku] = { amount: data.unitPrice, currency: data.currency };
         const box = document.createElement('div');
         box.appendChild(
           line(`${ns.money(data.unitPrice, data.currency)} ${d.msgEach}`, 'tackquote-price__amount'),
@@ -120,6 +123,7 @@
     function refresh() {
       const variant = ns.findVariant(variants, ns.variantId(root));
       const sku = variant ? variant.sku : '';
+      lastSku = sku;
       if (!sku) {
         // Shoppers get "no price set"; the merchant is told the fix (add a SKU).
         const frag = document.createDocumentFragment();

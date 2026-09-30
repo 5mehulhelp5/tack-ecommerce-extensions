@@ -92,3 +92,10 @@ test('every storefront asset stays under 10,000 bytes (the theme-check threshold
     assert.ok(size < 10_000, `${f} is ${size} B, over 10,000 B`);
   }
 });
+
+test('quantity breaks: a guest gets the NEUTRAL heading, never "applied at checkout"', () => {
+  const m = { msgHeadingNeutral: 'neutral', msgHeadingApplied: 'applied', msgHeadingQuote: 'quote' };
+  assert.equal(ns.breaksHeading('login', true, m), 'neutral');
+  assert.equal(ns.breaksHeading('table', true, m), 'applied');
+  assert.equal(ns.breaksHeading('table', false, m), 'quote');
+});

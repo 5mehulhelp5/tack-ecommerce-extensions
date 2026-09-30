@@ -1,7 +1,7 @@
 {%- comment -%}
   README.md, Liquid design notes: tackquote-visibility.liquid (1). Mirrors is_entitled
   in shopify/functions/contract/contract.rs.
-  @param {product} product - The product the calling block is rendered for.
+  @param {product} product
 {%- endcomment -%}
 {%- liquid
   assign vis = product.metafields['$app'].visibility.value

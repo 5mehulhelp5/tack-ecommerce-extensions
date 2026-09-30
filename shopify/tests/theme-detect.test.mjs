@@ -209,3 +209,33 @@ test('a low-contrast body colour is replaced by black or white', () => {
   const v = T.derive({ ...DARK, fg: 'rgb(40, 40, 40)', buttons: [] });
   assert.equal(v['--tqd-fg'], 'rgb(255 255 255)');
 });
+
+// Live Dawn (storefront QA 2026-10-01): the secondary add-to-cart has a FILL equal to
+// the page background, so it is an outline in effect. Paint, typography and height
+// must all come from the Buy it now button that actually paints.
+test('live Dawn: a fill equal to the page is an outline; typography and height follow the paint', () => {
+  const live = {
+    bgs: ['rgb(250, 250, 249)'],
+    fg: 'rgba(0, 0, 0, 0.75)',
+    bodySize: '16px',
+    heading: { fontFamily: 'Helvetica, Arial, sans-serif', fontWeight: '700', color: 'rgb(0, 0, 0)', letterSpacing: '0.6px', textTransform: 'none' },
+    buttons: [
+      btn({ backgroundColor: 'rgb(250, 250, 249)', color: 'rgb(18, 18, 18)', fontWeight: '400', letterSpacing: '1px', borderTopLeftRadius: '3px', height: '47px' }),
+      btn({ backgroundColor: 'rgb(18, 18, 18)', color: 'rgb(255, 255, 255)', fontWeight: '500', letterSpacing: '1px', borderTopLeftRadius: '3px', height: '47px' }),
+      null,
+    ],
+    input: null,
+    theme: null,
+  };
+  const v = T.derive(live);
+  assert.equal(v['--tqd-accent'], 'rgb(18 18 18)');
+  assert.equal(v['--tqd-accent-text'], 'rgb(255 255 255)');
+  assert.equal(v['--tqd-btn-weight'], '500', 'weight from the painting candidate');
+  assert.equal(v['--tqd-btn-h'], '47px');
+  assert.equal(v['--tqd-hcolor'], 'rgb(0 0 0)', 'the drawer title uses the heading colour');
+});
+
+test('the button min-height is floored at 44px and follows the detected height', () => {
+  const css = readFileSync(join(ASSETS, 'tackquote.css'), 'utf8');
+  assert.match(css, /min-block-size: max\(44px, var\(--tqd-btn-h, 44px\)\);/);
+});

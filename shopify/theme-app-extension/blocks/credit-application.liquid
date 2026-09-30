@@ -9,7 +9,7 @@
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
-    class="tackquote-block tackquote-credit"
+  class="tackquote-block tackquote-credit"
   data-tackquote-mode="credit-application"
   data-tackquote-proxy="{{ proxy_path | escape }}"
   data-tackquote-signed-in="{% if customer %}true{% else %}false{% endif %}"
@@ -30,15 +30,15 @@
   {{ tq_attrs }}
   {{ block.shopify_attributes }}
   >
-    <h3 class="tackquote-credit__heading">
-      {%- # README.md, Liquid design notes: credit-application.liquid (2) -%}
-      {%- assign tackquote_label = block.settings.heading | strip -%}
-      {%- if tackquote_label == blank or tackquote_label == 'Apply for net terms' -%}
-        {%- assign tackquote_label = 'tackquote.credit.heading' | t -%}
-      {%- endif -%}
+  <h3 class="tackquote-credit__heading">
+  {%- # README.md, Liquid design notes: credit-application.liquid (2) -%}
+  {%- assign tackquote_label = block.settings.heading | strip -%}
+  {%- if tackquote_label == blank or tackquote_label == 'Apply for net terms' -%}
+  {%- assign tackquote_label = 'tackquote.credit.heading' | t -%}
+  {%- endif -%}
   {{ tackquote_label }}
-    </h3>
-    <div class="tackquote-credit__body" data-tackquote-credit-body></div>
+  </h3>
+  <div class="tackquote-credit__body" data-tackquote-credit-body></div>
   </div>
 
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>

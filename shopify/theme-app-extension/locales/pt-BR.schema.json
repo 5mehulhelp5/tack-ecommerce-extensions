@@ -24,13 +24,16 @@
     "c": {
       "proxy": "Avançado: prefixo de URL do app",
       "proxy_info": "Deixe como está. Altere apenas se você renomeou o proxy do app TackQuote no Shopify (Configurações, Apps e canais de vendas, TackQuote, Proxy do app).",
-      "target": "Pedir um preço-alvo",
+      "target": "Permitir que o comprador informe o preço que pede",
       "target_info": "Adiciona um campo opcional Seu preço-alvo a cada linha. Só é enviado o que o comprador digitar, nunca o preço da loja.",
       "message": "Permitir que compradores adicionem uma mensagem",
       "files": "Permitir que compradores anexem arquivos",
       "files_info": "Até 3 arquivos PDF, JPEG ou PNG de 5 MB cada.",
       "quote_page": "Página de orçamento (opcional)",
-      "quote_page_info": "Escolha a página com o bloco Página de orçamento para abri-la em vez do pop-up."
+      "quote_page_info": "Escolha a página com o bloco Página de orçamento para abri-la em vez do pop-up.",
+      "soldout": "Quando a variante estiver esgotada",
+      "soldout_allow": "Permitir solicitações de orçamento",
+      "soldout_disable": "Desativar o botão"
     },
     "p": {
       "buyer_group_badge_1": "Mostra o grupo de compradores TackQuote do cliente conectado, por exemplo “Nível 2”. Quem não está conectado, não está vinculado a um comprador TackQuote ou não pertence a nenhum grupo não vê nada.",
