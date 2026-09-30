@@ -56,7 +56,7 @@ export function schemaBodyOf(file) {
  * Comments and trailing commas are reported BY NAME, because "Unexpected token"
  * from JSON.parse does not tell a theme developer which habit bit them.
  */
-export function validateSchemaBody(raw) {
+export function validateSchemaBody(raw, { embedTarget } = {}) {
   const errors = [];
 
   // Both checks run on a copy with string literals blanked, so a `//` inside a
@@ -81,9 +81,15 @@ export function validateSchemaBody(raw) {
     if (parsed[key] === undefined) errors.push(`is missing the required key "${key}"`);
   }
 
-  // `head`, `compliance_head` and `body` are the app EMBED targets. A
-  // product-page block is always `section`.
-  if (parsed.target !== undefined && parsed.target !== 'section') {
+  // `head`, `compliance_head` and `body` are the app EMBED targets. A block is
+  // always `section`; a file is an embed only when EXPECTED_EMBEDS names it, so
+  // a block cannot silently turn into an embed (or the reverse).
+  // https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/configuration
+  if (embedTarget) {
+    if (parsed.target !== embedTarget) {
+      errors.push(`has target "${String(parsed.target)}" — this app embed must target "${embedTarget}"`);
+    }
+  } else if (parsed.target !== undefined && parsed.target !== 'section') {
     errors.push(`has target "${String(parsed.target)}" — app blocks must target "section"`);
   }
 
@@ -123,6 +129,16 @@ describe('the validator itself detects breakage', () => {
   test('rejects a missing required key', () => {
     assert.ok(hasError('{ "target": "section" }', '"name"'));
     assert.ok(hasError('{ "name": "X" }', '"target"'));
+  });
+
+  test('accepts the declared embed target, and only it, for an embed', () => {
+    const body = '{ "name": "Gate", "target": "body" }';
+    assert.deepStrictEqual(validateSchemaBody(body, { embedTarget: 'body' }), []);
+    assert.ok(
+      validateSchemaBody('{ "name": "Gate", "target": "section" }', { embedTarget: 'body' }).some(
+        (e) => e.includes('this app embed must target'),
+      ),
+    );
   });
 
   test('rejects an app-embed target on a block', () => {
@@ -172,18 +188,36 @@ export const EXPECTED_TEMPLATES = {
   'credit-application.liquid': ['page'],
 };
 
+/**
+ * App EMBEDS (Wave 3), by file and the one target each may use. An embed is
+ * injected before </body> on every page and has only the global Liquid scope,
+ * which is exactly what the price gate needs (`customer`, `customer.tags`).
+ * It is not template-gated, so it must carry no `enabled_on`.
+ */
+export const EXPECTED_EMBEDS = {
+  'price-gate.liquid': 'body',
+};
+
 describe('the shipped blocks', () => {
-  test('ships exactly the blocks the extension is meant to provide', () => {
-    assert.deepStrictEqual(blockFiles().sort(), Object.keys(EXPECTED_TEMPLATES).sort());
+  test('ships exactly the blocks and embeds the extension is meant to provide', () => {
+    assert.deepStrictEqual(
+      blockFiles().sort(),
+      [...Object.keys(EXPECTED_TEMPLATES), ...Object.keys(EXPECTED_EMBEDS)].sort(),
+    );
   });
 
   for (const file of blockFiles()) {
+    const embedTarget = EXPECTED_EMBEDS[file];
     test(`${file} has a valid schema`, () => {
-      assert.deepStrictEqual(validateSchemaBody(schemaBodyOf(file)), []);
+      assert.deepStrictEqual(validateSchemaBody(schemaBodyOf(file), { embedTarget }), []);
     });
 
     test(`${file} is enabled only on its expected templates`, () => {
       const schema = JSON.parse(schemaBodyOf(file));
+      if (embedTarget) {
+        assert.equal(schema.enabled_on, undefined, `${file} is an embed and applies on every page`);
+        return;
+      }
       assert.deepStrictEqual(schema.enabled_on?.templates, EXPECTED_TEMPLATES[file]);
     });
 

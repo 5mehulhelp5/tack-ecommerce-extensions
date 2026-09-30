@@ -119,6 +119,13 @@
     "currency": {
       "applied": "Your wholesale price is applied at checkout.",
       "quote": "Your wholesale price in your currency is available on a quote."
+    },
+    "gate": {
+      "login": "Log in to see prices",
+      "editor_title": "TackQuote Price Gate is on",
+      "editor_guests": "Shoppers who are not signed in will not see prices. The theme editor always shows them.",
+      "editor_tag": "Shoppers without this customer tag will not see prices:",
+      "editor_bad_selectors": "The extra price selectors were ignored because they contain braces, semicolons or @."
     }
   }
 }
