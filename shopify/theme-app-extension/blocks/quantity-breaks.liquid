@@ -61,7 +61,7 @@
     data-tackquote-currency="{{ cart.currency.iso_code }}"
     data-msg-currency-applied="{{ 'tackquote.currency.applied' | t | escape }}"
     data-msg-currency-quote="{{ 'tackquote.currency.quote' | t | escape }}"
-    {{ tackquote_diagnostics }}
+    {{ tackquote_diagnostics | split: '-->' | last | split: '<!--' | first }}
     {{ block.shopify_attributes }}
   >
     {% render 'tackquote-selection', product: product %}

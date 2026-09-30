@@ -4,6 +4,13 @@
   never carries them. `ns.explain` in tackquote-shared.js picks one by the
   failure it saw; the price, quantity-breaks and order-limits blocks share it.
 
+  In the theme editor Shopify wraps every rendered snippet in
+  <!-- BEGIN app snippet --> / <!-- END app snippet --> comments. Placed inside an
+  attribute list, the first "-->" closes the block's tag and every attribute after
+  it prints as page text. So each block captures this snippet and outputs it
+  through  split: '-->' | last | split: '<!--' | first , which leaves the bare
+  attributes and is a no-op on the storefront, where there are no markers.
+
   @example
   <div {% render 'tackquote-diagnostics' %}></div>
 {%- endcomment -%}

@@ -44,7 +44,7 @@
     data-msg-added-cart="{{ 'tackquote.quick_order.added_cart' | t | escape }}"
     data-msg-cart-failed="{{ 'tackquote.quick_order.cart_failed' | t | escape }}"
     data-msg-quote-failed="{{ 'tackquote.quick_order.quote_failed' | t | escape }}"
-    {{ tackquote_diagnostics }}
+    {{ tackquote_diagnostics | split: '-->' | last | split: '<!--' | first }}
     {{ block.shopify_attributes }}
   >
     <h3 class="tackquote-qo__heading">{{ block.settings.heading | default: 'Quick order' | escape }}</h3>

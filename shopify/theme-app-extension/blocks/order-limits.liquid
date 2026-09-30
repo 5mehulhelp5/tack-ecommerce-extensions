@@ -52,7 +52,7 @@
     data-msg-enforced-note="{{ 'tackquote.order_limits.enforced_note' | t | escape }}"
     data-msg-empty="{{ 'tackquote.order_limits.empty' | t | escape }}"
     data-msg-error="{{ 'tackquote.order_limits.error' | t | escape }}"
-    {{ tackquote_diagnostics }}
+    {{ tackquote_diagnostics | split: '-->' | last | split: '<!--' | first }}
     {{ block.shopify_attributes }}
   >
     {% render 'tackquote-selection', product: product %}
