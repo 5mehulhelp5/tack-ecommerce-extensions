@@ -48,6 +48,41 @@
     }
   }
 
+  /**
+   * Merge lines into the persisted draft by variant. Returns null when the draft
+   * is full: the API caps a request at 100 lines and rejects the whole body
+   * past that, so nothing is added rather than building a refused payload.
+   */
+  function mergeIntoDraft(lines) {
+    const items = loadDraft();
+    let already = false;
+    const fresh = lines.filter((l) => !items.some((i) => i.variantId === l.variantId));
+    if (items.length + fresh.length > MAX_ITEMS) return null;
+    for (const line of lines) {
+      const existing = items.filter((i) => i.variantId === line.variantId)[0];
+      if (existing) {
+        existing.quantity += line.quantity;
+        already = true;
+      } else {
+        items.push(line);
+      }
+    }
+    saveDraft(items);
+    return { items, already };
+  }
+
+  /**
+   * For other blocks (Quick Order): add many lines to the quote and open the
+   * drawer. Returns false when the draft would exceed its cap.
+   */
+  ns.quoteAdd = (lines, ctx) => {
+    if (!drawer()) return false;
+    const merged = mergeIntoDraft(lines);
+    if (!merged) return false;
+    open(Object.assign({}, ctx, { items: merged.items, persist: true }));
+    return true;
+  };
+
   function drawer() {
     return document.querySelector('[data-tackquote-drawer]');
   }
@@ -201,22 +236,10 @@
         };
 
         if (root.dataset.tackquoteMode === 'add') {
-          const items = loadDraft();
-          const existing = items.filter((i) => i.variantId === item.variantId)[0];
-
-          if (existing) {
-            existing.quantity += item.quantity;
-          } else if (items.length >= MAX_ITEMS) {
-            // The API caps a request at 100 lines and rejects the whole body past
-            // that, so stop here rather than building a payload it will refuse.
-            return;
-          } else {
-            items.push(item);
-          }
-
-          saveDraft(items);
-          status.textContent = existing ? el.dataset.msgAlready : el.dataset.msgAdded;
-          ctx.items = items;
+          const merged = mergeIntoDraft([item]);
+          if (!merged) return;
+          status.textContent = merged.already ? el.dataset.msgAlready : el.dataset.msgAdded;
+          ctx.items = merged.items;
           ctx.persist = true;
         } else {
           // "Request a Quote" is about THIS product, so it never picks up whatever

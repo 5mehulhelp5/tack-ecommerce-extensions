@@ -1,22 +1,8 @@
 /*
- * Shared selection helpers for the TackQuote blocks.
- *
- * Loaded from Liquid via `asset_url`, because a block's `javascript` schema key
- * allows exactly one file and each block already spends it on its own runtime.
- * Shopify supports both routes.
- *
- * ---------------------------------------------------------------------------
- * Why the runtimes queue instead of calling into this directly
- * ---------------------------------------------------------------------------
- * Schema-declared JavaScript is injected as `<script async>`, so nothing
- * guarantees this file executes before a block runtime that depends on it — and
- * an ordering bug here would surface as a block that works on a fast connection
- * and silently does nothing on a slow one. So each runtime PUSHES its
- * initialiser onto `window.TackQuoteQ` and this file drains the queue, replacing
- * `push` so later arrivals run immediately. Load order stops mattering in both
- * directions.
- *
- * Design notes for everything else in here live in the extension README.
+ * Shared helpers for the TackQuote blocks, loaded from Liquid via `asset_url`
+ * (a block's `javascript` key allows one file). Schema JavaScript is injected
+ * `async`, so runtimes PUSH initialisers onto `window.TackQuoteQ` and this file
+ * drains the queue; load order stops mattering. Design notes: extension README.
  */
 (() => {
   // A merchant can place several blocks on one page, each emitting this tag.
@@ -103,12 +89,7 @@
     }
   };
 
-  /*
-   * App blocks can see their parent section's `id` and nothing else, so there is
-   * no supported way to ask the theme which form belongs to this product.
-   * `form[action*="/cart/add"]` is the one selector every Online Store 2.0 theme
-   * shares; widening the search keeps blocks working outside the product form.
-   */
+  /* App blocks see only their section's `id`; `form[action*="/cart/add"]` is the selector every OS 2.0 theme shares. */
   ns.form = (root) => {
     const section = root.closest('.shopify-section') || document;
     return (
@@ -125,11 +106,7 @@
     return Number.isFinite(n) && n > 0 ? n : 1;
   };
 
-  /*
-   * Priority: the `?variant=` search param (kept in sync by every theme, and
-   * survives back/forward), then the product form's own `id` field, then whatever
-   * Liquid rendered initially.
-   */
+  /* Priority: `?variant=` param, then the form's `id` field, then what Liquid rendered. */
   ns.variantId = (root) => {
     const fromUrl = new URLSearchParams(window.location.search).get('variant');
     if (fromUrl) return String(fromUrl);
@@ -138,12 +115,7 @@
     return String(field?.value || root.dataset.tackquoteVariant || '');
   };
 
-  /*
-   * Merchant-only diagnosis of a FAILED request, shared by every read block.
-   * Copy lives in Liquid (`data-msg-diag-*`, emitted in the theme editor only),
-   * so a shopper never receives it. An expected answer (anonymous, unlinked,
-   * none) is never routed here: those are states, not failures.
-   */
+  /* Merchant-only diagnosis of a FAILED request; copy is emitted in the theme editor only. */
   ns.explain = (root, err, path) => {
     const m = err && err.message ? String(err.message) : '';
     let key = 'msgDiagFail';
@@ -154,6 +126,47 @@
     else if (/^HTTP 5/.test(m)) key = 'msgDiag5xx';
     else if (err && err.name === 'AbortError') key = 'msgDiagTimeout';
     return ns.format(root.dataset[key], { path, status: m });
+  };
+
+  /** Intl money in the given ISO currency; a plain fallback if Intl refuses the code. */
+  ns.money = (amount, currency) => {
+    try {
+      return new Intl.NumberFormat(document.documentElement.lang || 'en', {
+        style: 'currency',
+        currency: currency || 'USD',
+      }).format(amount);
+    } catch (_err) {
+      return `${String(amount)} ${String(currency || '')}`;
+    }
+  };
+
+  /*
+   * Presentment currency: Liquid `cart.currency.iso_code`, the customer's local
+   * currency (https://shopify.dev/docs/api/liquid/objects/cart). Sent with every
+   * price read so the server can refuse to price in another currency.
+   */
+  ns.pageCurrency = (root) => {
+    const c = String(root.dataset.tackquoteCurrency || '').toUpperCase();
+    return /^[A-Z]{3}$/.test(c) ? c : '';
+  };
+  ns.currencyQuery = (root) => {
+    const c = ns.pageCurrency(root);
+    return c ? `&currency=${c}` : '';
+  };
+
+  /*
+   * Pure. 'mismatch' when the server refused to price in the page currency, or
+   * when a priced answer carries a currency the page is not showing: a USD
+   * figure beside a EUR product is never rendered, whatever the server says.
+   */
+  ns.currencyView = (data, pageCurrency) => {
+    if (!data) return 'ok';
+    if (data.reason === 'currency_mismatch') return 'mismatch';
+    const priced = data.status === 'priced' || data.status === 'ok';
+    if (priced && pageCurrency && data.currency && String(data.currency).toUpperCase() !== pageCurrency) {
+      return 'mismatch';
+    }
+    return 'ok';
   };
 
   ns.findVariant = (list, id) => list.filter((v) => String(v.id) === String(id))[0] || null;
@@ -201,19 +214,7 @@
       : title;
   };
 
-  /**
-   * Fill `{name}` placeholders in a localized string.
-   *
-   * Localized copy has to keep its numbers inside the sentence — "Minimum order
-   * 10 units" is one word order in English and another in most other
-   * languages, so a block cannot concatenate the number onto a fragment and
-   * stay translatable. The locale file owns the whole sentence and names its
-   * holes; this fills them.
-   *
-   * Returns '' for a missing template rather than printing `undefined` beside a
-   * product, and leaves an unknown placeholder untouched so a typo in a
-   * translation is visible to whoever added it instead of silently blanking.
-   */
+  /* Fill `{name}` holes in a localized sentence; unknown holes stay visible, a missing template is empty. */
   ns.format = (template, values) => {
     if (!template) return '';
     return String(template).replace(/\{(\w+)\}/g, (match, key) =>

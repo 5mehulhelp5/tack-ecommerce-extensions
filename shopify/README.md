@@ -1,15 +1,21 @@
 # TackQuote for Shopify — Theme App Extension
 
-Six app blocks a merchant drags onto a page from the theme editor:
+Nine app blocks a merchant drags onto a page from the theme editor, one app embed switched on
+under *Theme settings, App embeds*, and one customer-account extension:
 
 | Block | Where | What it does |
 | --- | --- | --- |
 | **Add to Quote** | product | Adds the selected variant and quantity to a running quote request, then opens the drawer. |
 | **Request a Quote** | product | Opens the quote request form for this product alone. |
-| **Wholesale Price** | product | Shows the signed-in customer's B2B price, resolved server-side by TackQuote. |
-| **Quantity Breaks** | product | The quantity-break ladder for this product. |
-| **Buyer Group Badge** | product, cart, page | "Your pricing tier — Tier 2", when the shopper is in a TackQuote buyer group. |
-| **Wholesale Application** | page, home | The merchant's wholesale account application form. |
+| **Wholesale Price** | product | Shows the signed-in customer's B2B price, resolved server-side by TackQuote, in the page currency. |
+| **Quantity Breaks** | product | The quantity-break ladder for this product, in the page currency. |
+| **Order Minimums** | product | The minimum and maximum order quantities, stated up front. |
+| **Buyer Group Badge** | product, collection, home, cart, page | "Your pricing tier: Tier 2", when the shopper is in a TackQuote buyer group. |
+| **Quick Order** | product, page | A signed-in buyer pastes SKUs and quantities, then adds them all to the cart or to a quote. |
+| **Wholesale Application** | page, home | The merchant's application form: text, email, phone, number, choice, checkbox, long text, file upload, address and tax ID fields, with show-if conditions. |
+| **Net Terms Application** | page | A form for buyers to apply for net payment terms. |
+| **Price Gate** (app embed) | every page | Hides prices and add to cart from guests, or from customers without the wholesale tag, with a Log in to see prices link. |
+| **Net terms** (customer account) | Profile page | A signed-in customer on new customer accounts applies for net terms and sees the status. Lives in `customer-account-net-terms/`. |
 
 The first five are product-page furniture; the application form is not about a product at
 all, which is why it is pinned to different templates. The badge is the only one that is a
@@ -116,6 +122,59 @@ customer sync that records those identities is the remaining piece; the endpoint
 verification and block are complete and fail closed until it lands.
 
 ---
+
+## Price Gate: what it does and does not do
+
+The embed decides in Liquid, from the global `customer` and `customer.tags` objects, whether
+this shopper may see prices (embeds only get the global scope:
+<https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/configuration>). For a
+gated shopper it emits a `<style>` that hides the theme's price and add-to-cart elements, and
+`tackquote-price-gate.js` puts a *Log in to see prices* link where each price was.
+
+- **It degrades safely.** Without JavaScript the prices stay hidden, just without the link.
+  Switched off, or with the app uninstalled, Shopify removes the embed and nothing is left in
+  the theme (<https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/ux>).
+- **It is display gating, not a checkout rule.** Product JSON such as `/products/x.js` and the
+  checkout itself are not blocked by it. Say so to a merchant who needs prices to be secret.
+- **Theme coverage is by selector.** Common Online Store 2.0 price and buy-button classes are
+  built in; a theme that prints prices elsewhere takes extra selectors in the embed settings.
+  Braces, semicolons, `@` and `<` are refused so a setting cannot inject CSS.
+- The theme editor never hides anything; it shows a notice saying the gate is on.
+
+## Presentment currency
+
+Every price read sends `cart.currency.iso_code`, the customer's local (presentment) currency
+(<https://shopify.dev/docs/api/liquid/objects/cart>). When it differs from the currency TackQuote
+prices in, the server answers `reason: "currency_mismatch"` and the blocks show *Your wholesale
+price is applied at checkout* (or *available on a quote*) instead of a number. A priced answer in
+a currency other than the page's is never rendered, whatever the server says.
+
+## Quick Order
+
+`GET {proxy}/quick-order?skus=A,B&currency=EUR` returns, per SKU, whether it exists on this
+store, its Shopify variant id, the buyer's price and any order limits. Found lines go to the cart
+in one `POST cart/add.js` with an `items` array (<https://shopify.dev/docs/api/ajax/reference/cart>),
+or to the quote drawer through `ns.quoteAdd`. A line over its per-item limit disables both add
+buttons; order-level limits are still enforced by the checkout validation. SKUs containing
+spaces or commas cannot be pasted (one SKU per line, then the quantity).
+
+## Wholesale Application: files and conditions
+
+A file field uploads the raw bytes to `{proxy}/wholesale-upload` first, and the application then
+carries only `{ uploadId }`. The server sniffs the type (PDF, JPEG, PNG only) and enforces the
+size; the block's own checks just save a wasted upload. A field with `showIf` is shown only while
+an earlier field holds the chosen value; a hidden field is disabled, never validated, and never
+sent. The rules mirror the API's `wholesale-form-schema.ts`.
+
+## Net terms on the customer's Profile page
+
+`customer-account-net-terms/` is a customer-account UI extension for new customer accounts
+(target `customer-account.profile.block.render`). It calls
+`https://api.tackquote.com/v1/shopify-app/customer-account/net-terms` with a session token, whose
+`sub` is the signed-in customer; it sends no customer id of its own. It needs `network_access`,
+which Shopify must approve in the Partner Dashboard before the extension can be published
+(<https://shopify.dev/docs/apps/build/customer-accounts/capabilities>). It runs alongside the Net
+Terms Application page block, for stores still on a storefront account page.
 
 ## Server side
 

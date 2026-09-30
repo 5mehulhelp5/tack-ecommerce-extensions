@@ -56,7 +56,7 @@ export function schemaBodyOf(file) {
  * Comments and trailing commas are reported BY NAME, because "Unexpected token"
  * from JSON.parse does not tell a theme developer which habit bit them.
  */
-export function validateSchemaBody(raw) {
+export function validateSchemaBody(raw, { embedTarget } = {}) {
   const errors = [];
 
   // Both checks run on a copy with string literals blanked, so a `//` inside a
@@ -81,9 +81,15 @@ export function validateSchemaBody(raw) {
     if (parsed[key] === undefined) errors.push(`is missing the required key "${key}"`);
   }
 
-  // `head`, `compliance_head` and `body` are the app EMBED targets. A
-  // product-page block is always `section`.
-  if (parsed.target !== undefined && parsed.target !== 'section') {
+  // `head`, `compliance_head` and `body` are the app EMBED targets. A block is
+  // always `section`; a file is an embed only when EXPECTED_EMBEDS names it, so
+  // a block cannot silently turn into an embed (or the reverse).
+  // https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/configuration
+  if (embedTarget) {
+    if (parsed.target !== embedTarget) {
+      errors.push(`has target "${String(parsed.target)}" — this app embed must target "${embedTarget}"`);
+    }
+  } else if (parsed.target !== undefined && parsed.target !== 'section') {
     errors.push(`has target "${String(parsed.target)}" — app blocks must target "section"`);
   }
 
@@ -125,6 +131,16 @@ describe('the validator itself detects breakage', () => {
     assert.ok(hasError('{ "name": "X" }', '"target"'));
   });
 
+  test('accepts the declared embed target, and only it, for an embed', () => {
+    const body = '{ "name": "Gate", "target": "body" }';
+    assert.deepStrictEqual(validateSchemaBody(body, { embedTarget: 'body' }), []);
+    assert.ok(
+      validateSchemaBody('{ "name": "Gate", "target": "section" }', { embedTarget: 'body' }).some(
+        (e) => e.includes('this app embed must target'),
+      ),
+    );
+  });
+
   test('rejects an app-embed target on a block', () => {
     assert.ok(hasError('{ "name": "X", "target": "head" }', 'must target'));
   });
@@ -156,7 +172,8 @@ export const EXPECTED_TEMPLATES = {
   // The only block that is not about the item being viewed. A buyer's group is
   // a fact about their ACCOUNT, so it is equally meaningful beside a product,
   // in the cart, and on a wholesale landing page.
-  'buyer-group-badge.liquid': ['product', 'cart', 'page'],
+  // Wave 1 widened it to collection and home pages as well (234302c).
+  'buyer-group-badge.liquid': ['product', 'collection', 'index', 'cart', 'page'],
   // Added 2026-09-05 with the block itself. `product` only: an order MINIMUM is
   // a statement about ordering THIS item, and the API route it calls takes a
   // sku/productId pair. On a cart template it would have nothing to ask about.
@@ -165,21 +182,44 @@ export const EXPECTED_TEMPLATES = {
   // about the ACCOUNT, not the item being viewed — merchants put it on a
   // dedicated page, and `customers/account` is where a signed-in wholesale
   // buyer would look for it. Same reasoning as wholesale-signup.
-  'credit-application.liquid': ['page', 'customers/account'],
+  // Wave 1 (234302c) narrowed it to `page`; signed-in customers on NEW
+  // customer accounts get the net-terms customer-account extension instead
+  // (shopify/customer-account-net-terms), which runs alongside this block.
+  'credit-application.liquid': ['page'],
+  // Wave 3. A buyer orders by SKU from a product page or a dedicated page.
+  'quick-order.liquid': ['product', 'page'],
+};
+
+/**
+ * App EMBEDS (Wave 3), by file and the one target each may use. An embed is
+ * injected before </body> on every page and has only the global Liquid scope,
+ * which is exactly what the price gate needs (`customer`, `customer.tags`).
+ * It is not template-gated, so it must carry no `enabled_on`.
+ */
+export const EXPECTED_EMBEDS = {
+  'price-gate.liquid': 'body',
 };
 
 describe('the shipped blocks', () => {
-  test('ships exactly the blocks the extension is meant to provide', () => {
-    assert.deepStrictEqual(blockFiles().sort(), Object.keys(EXPECTED_TEMPLATES).sort());
+  test('ships exactly the blocks and embeds the extension is meant to provide', () => {
+    assert.deepStrictEqual(
+      blockFiles().sort(),
+      [...Object.keys(EXPECTED_TEMPLATES), ...Object.keys(EXPECTED_EMBEDS)].sort(),
+    );
   });
 
   for (const file of blockFiles()) {
+    const embedTarget = EXPECTED_EMBEDS[file];
     test(`${file} has a valid schema`, () => {
-      assert.deepStrictEqual(validateSchemaBody(schemaBodyOf(file)), []);
+      assert.deepStrictEqual(validateSchemaBody(schemaBodyOf(file), { embedTarget }), []);
     });
 
     test(`${file} is enabled only on its expected templates`, () => {
       const schema = JSON.parse(schemaBodyOf(file));
+      if (embedTarget) {
+        assert.equal(schema.enabled_on, undefined, `${file} is an embed and applies on every page`);
+        return;
+      }
       assert.deepStrictEqual(schema.enabled_on?.templates, EXPECTED_TEMPLATES[file]);
     });
 
@@ -255,16 +295,20 @@ describe('storefront translations', () => {
  * submission of every form containing a checkbox failed, and no test anywhere
  * could have seen it.
  *
- * The API-side contract these mirror (`wholesale-forms.service.ts`):
- *   ALLOWED_FIELD_TYPES = text | email | tel | textarea | number | select | checkbox
+ * The API-side contract these mirror (`wholesale-form-schema.ts`, Wave 3):
+ *   types     text | email | tel | textarea | number | select | checkbox |
+ *             file | address | tax_id
  *   checkbox  -> must be a JSON boolean
+ *   address   -> { line1, line2?, city, region?, postalCode, country }
+ *   file      -> { uploadId }, after a raw-bytes POST to {proxy}/wholesale-upload
+ *   showIf    -> hidden fields are not sent and not required
  *   all other -> must be a string (including `number`, validated by regex)
+ * The rendering half lives in tackquote-signup-fields.js; both files are read.
  */
 describe('the signup block matches the API wire contract', () => {
-  const signupSource = fs.readFileSync(
-    path.join(EXTENSION_DIR, 'assets', 'tackquote-signup.js'),
-    'utf8',
-  );
+  const signupSource = ['tackquote-signup.js', 'tackquote-signup-fields.js']
+    .map((f) => fs.readFileSync(path.join(EXTENSION_DIR, 'assets', f), 'utf8'))
+    .join('\n');
   // Comments stripped before matching. The first run of these assertions failed
   // on the file's OWN PROSE: the docblock explains why this route skips
   // Turnstile, and a bare /turnstile/i read that explanation as the defect —
@@ -273,7 +317,7 @@ describe('the signup block matches the API wire contract', () => {
 
   test('renders a real checkbox for a checkbox field', () => {
     assert.match(signup, /field\.type === 'checkbox'/);
-    assert.match(signup, /control\.type = 'checkbox'/);
+    assert.match(signup, /control = el\('input', \{ type: 'checkbox' \}\)/);
   });
 
   test('sends a checkbox as a boolean, never as control.value', () => {
@@ -286,8 +330,23 @@ describe('the signup block matches the API wire contract', () => {
     // main.ts runs ValidationPipe with forbidNonWhitelisted, so any extra
     // top-level key is a 400 — including a Turnstile token, which this route
     // deliberately does not accept.
-    assert.match(signup, /body: JSON\.stringify\(\{ values \}\)/);
+    assert.match(signup, /f\.post\(target, JSON\.stringify\(\{ values \}\), 'application\/json'\)/);
     assert.doesNotMatch(signup, /turnstile/i);
+  });
+
+  test('uploads a file as raw bytes to the upload route, then sends only its id', () => {
+    assert.match(signup, /\$\{proxy\}\/wholesale-upload\?\$\{q\}/);
+    assert.match(signup, /'application\/octet-stream'/);
+    assert.match(signup, /values\[field\.key\] = \{ uploadId: r\.uploadId \};/);
+  });
+
+  test('a field hidden by its condition is neither sent nor validated', () => {
+    assert.match(signup, /if \(wraps\[i\]\.hidden\) continue;/);
+    assert.match(signup, /c\.disabled = !visible;/);
+  });
+
+  test('an address travels as an object of named parts', () => {
+    assert.match(signup, /\['line1', 'line2', 'city', 'region', 'postalCode', 'country'\]/);
   });
 });
 
@@ -328,7 +387,9 @@ describe('the order-limits block matches the API wire contract', () => {
     // survived deletion of the guard — because the same comparison appears in
     // the design-mode branch a few lines below. An assertion that a string
     // exists somewhere in a file is not an assertion about control flow.
-    assert.match(limits, /if \(data\.status !== 'limited' \|\| !Array\.isArray\(data\.limits\)/);
+    // Wave 1 moved the guard into the pure `ns.limitsView`; the list view is
+    // reached ONLY for status 'limited' with a non-empty array.
+    assert.match(limits, /if \(s === 'limited' && Array\.isArray\(data\.limits\) && data\.limits\.length\) return 'list';/);
   });
 
   test('claims "based on your account" only when the server says accountSpecific', () => {

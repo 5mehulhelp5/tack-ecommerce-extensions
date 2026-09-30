@@ -1,0 +1,33 @@
+{
+  "heading": "Net payment terms",
+  "loading": "Loading your payment terms",
+  "notConnected": "Payment terms are not available for this store yet.",
+  "loadFailed": "We could not load your payment terms just now. Please try again later.",
+  "required": "Add your legal business name and a contact email.",
+  "sendFailed": "We could not send your application. Please try again.",
+  "state": {
+    "approved": "Net terms approved",
+    "pending": "Application under review",
+    "declined": "Application not approved"
+  },
+  "termsDays": "You can pay invoices within {{days}} days.",
+  "limit": "Credit limit: {{amount}}",
+  "pendingBody": "We are reviewing your application and will be in touch by email.",
+  "submittedOn": "Submitted {{date}}",
+  "declinedBody": "Your last application was not approved. You can apply again if your circumstances have changed.",
+  "intro": "Buy now and pay by invoice later. Apply for net payment terms and we will review your application.",
+  "apply": "Apply for net terms",
+  "applyAgain": "Apply again",
+  "field": {
+    "business": "Legal business name",
+    "email": "Accounts contact email",
+    "phone": "Accounts contact phone",
+    "taxId": "Tax ID or company number",
+    "limit": "Credit limit you would like",
+    "terms": "Payment terms you would like",
+    "notes": "Anything else we should know"
+  },
+  "days": "{{days}} days",
+  "send": "Send application",
+  "sending": "Sending"
+}

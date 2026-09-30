@@ -37,20 +37,8 @@
   cursor: pointer;
   transition: opacity 0.15s ease;
 
-  /*
-   * TYPOGRAPHY AND SHAPE COME FROM THE THEME, NOT FROM HERE.
-   *
-   * Shopify's guidance is explicit that app blocks "inherit styling properties
-   * from the theme, such as typography and colors", and the previous version did
-   * not: it hardcoded 0.75rem/1.25rem padding, a 0.4rem radius and weight 600, so
-   * the button was a different shape and weight from every other button on the
-   * page in every theme.
-   *
-   * Each value reads the theme's own custom property first and only falls back to
-   * a neutral default when the theme does not publish one. Dawn and the OS 2.0
-   * themes derived from it expose `--buttons-radius`, `--buttons-border-width`
-   * and the font scale; a theme that exposes none still gets something sane.
-   */
+  /* Typography and shape come from the theme (Shopify app-block guidance):
+     no font, radius or colour is set here beyond what layout needs. */
   font-family: var(--font-body-family, inherit);
   font-style: var(--font-body-style, inherit);
   font-weight: var(--font-body-weight-bold, 600);
@@ -76,22 +64,8 @@
   opacity: 0.55;
 }
 
-/*
- * ── THE SOLID VARIANT PAINTED ITS LABEL INVISIBLE ──────────────────────────
- *
- * It was:
- *     background: currentColor;   -- resolves to the element's own color
- *     color: inherit;             -- the same value
- * so the label and the background were the SAME COLOUR and the text could not be
- * read. The comment above it described the opposite intent, which is how it
- * survived review.
- *
- * Now it asks the theme for its button colours — the same pair Dawn's own
- * `.button` uses — and only falls back to the inverted-text approximation when a
- * theme publishes neither. The fallback sets the label to the PAGE background,
- * which is the one value guaranteed to contrast with the page text being used as
- * the fill.
- */
+/* Solid variant: background and text use the theme's button tokens as a
+   PAIR, never currentColor for the fill (that painted the label invisible). */
 .tackquote-button--solid {
   background: rgb(var(--color-button, var(--color-base-accent-1, 0 0 0)));
   color: rgb(var(--color-button-text, var(--color-base-solid-button-labels, 255 255 255)));
