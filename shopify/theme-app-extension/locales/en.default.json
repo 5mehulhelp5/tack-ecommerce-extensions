@@ -2,8 +2,7 @@
   "tackquote": {
     "setup": {
       "title": "TackQuote is not configured yet",
-      "proxy": "Set the app proxy path in this block's settings so this block can reach TackQuote. Until then it is hidden from shoppers.",
-      "form_slug": "Set the wholesale application form in this block's settings — it is the form's slug as named in TackQuote."
+      "proxy": "Set the app proxy path in this block's settings so this block can reach TackQuote. Until then it is hidden from shoppers."
     },
     "price": {
       "loading": "Checking your wholesale price",
@@ -24,7 +23,9 @@
       "server": "TackQuote answered {status}. Nothing is wrong with this block; try again shortly.",
       "timeout": "TackQuote did not answer within 2.5 seconds, so the price was skipped rather than delaying the page.",
       "failed": "The request to {path} failed before it reached TackQuote.",
-      "not_connected": "This store is not connected to a TackQuote account. Connect it from TackQuote > Connections > Shopify, then reload the editor."
+      "not_connected": "This store is not connected to a TackQuote account. Connect it from TackQuote > Connections > Shopify, then reload the editor.",
+      "no_sku": "This variant has no SKU. TackQuote prices and applies rules by SKU, so add one in Shopify admin > Products > this product > Variants. Shoppers see nothing here until then.",
+      "no_limits": "No order limits apply to this product. Set them in TackQuote > Order Limits. Shoppers see nothing here until a rule applies."
     },
     "quote": {
       "added": "Added to your quote request.",
@@ -48,6 +49,7 @@
     "signup": {
       "loading": "Loading the application form",
       "unavailable": "The wholesale application form is not available right now.",
+      "no_form": "No wholesale form is switched on yet. Create or enable a wholesale form in TackQuote > Settings > Wholesale > Forms, then reload the editor. Until then shoppers see a short note that applications are not open.",
       "submit": "Submit application",
       "submitting": "Sending your application",
       "success": "Thanks. Your wholesale application is with us and we will be in touch.",
@@ -61,6 +63,9 @@
       "price": "Quoted price each",
       "list_note": "List prices, not a negotiated rate.",
       "empty": "No wholesale quantity pricing is published for this item.",
+      "anonymous": "Sign in to see your wholesale quantity pricing.",
+      "login": "Sign in",
+      "unlinked": "Your account is not linked to wholesale pricing yet. Request a quote and we will set it up.",
       "error": "We could not load wholesale quantity pricing just now."
     },
     "badge": {
@@ -78,6 +83,7 @@
       "items_max": "Maximum {max} items per order",
       "items_range": "Between {min} and {max} items per order",
       "account_note": "Based on your account.",
+      "loading": "Checking order limits for this product",
       "empty": "No order minimums apply to this product.",
       "error": "Order minimums are unavailable right now."
     },

@@ -11,31 +11,35 @@
     </div>
   {%- endif -%}
 {%- else -%}
+  {%- comment -%}
+    Kept OUTSIDE the tag's attribute list (see b5a4158: a Liquid tag between
+    attributes failed `shopify app deploy`'s theme check).
+
+    `data-tackquote-customer` is NOT identity: it only partitions the per-tab
+    cache. The identity that decides the ladder is `logged_in_customer_id`,
+    which Shopify injects into the proxy request and signs.
+    `data-tackquote-design` suspends the fail-quiet behaviour so a merchant in
+    the theme editor sees every state; a shopper sees only the useful ones.
+  {%- endcomment -%}
+  {%- capture tackquote_diagnostics -%}{% render 'tackquote-diagnostics' %}{%- endcapture -%}
   <div
     class="tackquote-block tackquote-breaks"
     data-tackquote-mode="quantity-breaks"
     data-tackquote-proxy="{{ proxy_path | escape }}"
     data-tackquote-variant="{{ variant.id }}"
-    {%- comment -%}
-      Two attributes that are NOT identity and must never be read as such.
-
-      `customer` only partitions the per-tab cache, so that logging out in the
-      same tab cannot surface a ladder the previous session was entitled to see.
-      The identity that decides the ladder is `logged_in_customer_id`, which
-      Shopify injects into the proxy request and signs; anything emitted here is
-      just markup a shopper can edit.
-
-      `design` suspends the fail-quiet behaviour: a merchant placing the block in
-      the theme editor needs to see it failing, a shopper does not.
-    {%- endcomment -%}
+    data-tackquote-login-url="{{ routes.account_login_url }}"
     data-tackquote-customer="{{ customer.id }}"
     data-tackquote-design="{% if request.design_mode %}true{% else %}false{% endif %}"
+    data-msg-anonymous="{{ 'tackquote.quantity_breaks.anonymous' | t | escape }}"
+    data-msg-login="{{ 'tackquote.quantity_breaks.login' | t | escape }}"
+    data-msg-unlinked="{{ 'tackquote.quantity_breaks.unlinked' | t | escape }}"
     data-msg-caption="{{ 'tackquote.quantity_breaks.caption' | t | escape }}"
     data-msg-quantity="{{ 'tackquote.quantity_breaks.quantity' | t | escape }}"
     data-msg-price="{{ 'tackquote.quantity_breaks.price' | t | escape }}"
     data-msg-list-note="{{ 'tackquote.quantity_breaks.list_note' | t | escape }}"
     data-msg-empty="{{ 'tackquote.quantity_breaks.empty' | t | escape }}"
     data-msg-error="{{ 'tackquote.quantity_breaks.error' | t | escape }}"
+    {{ tackquote_diagnostics }}
     {{ block.shopify_attributes }}
   >
     {% render 'tackquote-selection', product: product %}
@@ -68,7 +72,7 @@
     },
     {
       "type": "paragraph",
-      "content": "Signed-in wholesale customers see their own ladder. Logged-out visitors see nothing unless you have published a public ladder in TackQuote \u2014 see the Shopify connector guide."
+      "content": "Signed-in wholesale customers see their own ladder. Signed-out visitors see a sign-in prompt, or your public ladder if you have published one in TackQuote \u2014 see the Shopify connector guide."
     },
     {
       "type": "text",

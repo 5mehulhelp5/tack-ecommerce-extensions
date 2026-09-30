@@ -81,20 +81,6 @@
       }
     }
 
-    /** Merchant-only diagnosis. Copy lives in Liquid (`data-msg-diag-*`, design mode only). */
-    function explain(err, proxyPath) {
-      const msg = err && err.message ? String(err.message) : '';
-      const d = root.dataset;
-      let key = 'msgDiagFail';
-      if (msg === 'STOREFRONT_PASSWORD') key = 'msgDiagPassword';
-      else if (msg === 'NOT_JSON') key = 'msgDiagNotJson';
-      else if (msg === 'HTTP 404') key = 'msgDiag404';
-      else if (msg === 'HTTP 401' || msg === 'HTTP 403') key = 'msgDiagAuth';
-      else if (/^HTTP 5/.test(msg)) key = 'msgDiag5xx';
-      else if (err && err.name === 'AbortError') key = 'msgDiagTimeout';
-      return ns.format(d[key], { path: proxyPath, status: msg });
-    }
-
     /** Rule 2: no answer, so get out of the way (hide, do not empty: an empty block still reads as broken). */
     /** `why` is rendered ONLY in the theme editor (`Shopify.designMode` guidance); shoppers see nothing. */
     function standDown(why) {
@@ -177,7 +163,12 @@
       const variant = ns.findVariant(variants, ns.variantId(root));
       const sku = variant ? variant.sku : '';
       if (!sku) {
-        show(line(root.dataset.msgUnpriced));
+        // Shoppers get the plain "no price set" line; the merchant is told WHY
+        // (no SKU on this variant), since that is the fix and it is theirs.
+        const frag = document.createDocumentFragment();
+        frag.appendChild(line(root.dataset.msgUnpriced));
+        if (designMode) frag.appendChild(line(root.dataset.msgDiagNoSku, 'tackquote-price__error-detail'));
+        show(frag);
         return;
       }
 
@@ -212,7 +203,7 @@
           // Rule 3, second half. A stale price already on screen survives an
           // outage, and there is nothing better to replace it with.
           if (cached) return;
-          standDown(explain(err, proxy));
+          standDown(ns.explain(root, err, proxy));
         });
     }
 

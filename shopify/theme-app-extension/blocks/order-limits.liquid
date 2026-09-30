@@ -11,18 +11,22 @@
     </div>
   {%- endif -%}
 {%- else -%}
+  {%- comment -%}
+    Kept OUTSIDE the tag's attribute list (see b5a4158: a Liquid tag between
+    attributes failed `shopify app deploy`'s theme check).
+
+    The product ID is sent alongside the SKU because an order-limit rule may
+    name either one. `data-tackquote-product-id`, deliberately distinct from
+    `data-tackquote-product`, which is the product TITLE that `ns.label`
+    reads — sending a title where the API expects an id would match no rule
+    and look exactly like "this product has no minimum".
+  {%- endcomment -%}
+  {%- capture tackquote_diagnostics -%}{% render 'tackquote-diagnostics' %}{%- endcapture -%}
   <div
     class="tackquote-block tackquote-limits"
     data-tackquote-mode="order-limits"
     data-tackquote-proxy="{{ proxy_path | escape }}"
     data-tackquote-variant="{{ variant.id }}"
-    {%- comment -%}
-      The product ID, sent alongside the SKU because an order-limit rule may
-      name either one. `data-tackquote-product-id`, deliberately distinct from
-      `data-tackquote-product`, which is the product TITLE that `ns.label`
-      reads — sending a title where the API expects an id would match no rule
-      and look exactly like "this product has no minimum".
-    {%- endcomment -%}
     data-tackquote-product-id="{{ product.id }}"
     data-tackquote-customer="{{ customer.id }}"
     data-tackquote-design="{% if request.design_mode %}true{% else %}false{% endif %}"
@@ -38,10 +42,15 @@
     data-msg-account-note="{{ 'tackquote.order_limits.account_note' | t | escape }}"
     data-msg-empty="{{ 'tackquote.order_limits.empty' | t | escape }}"
     data-msg-error="{{ 'tackquote.order_limits.error' | t | escape }}"
+    {{ tackquote_diagnostics }}
     {{ block.shopify_attributes }}
   >
     {% render 'tackquote-selection', product: product %}
-    <div class="tackquote-limits__body" data-tackquote-limits-body role="status" aria-live="polite"></div>
+    <div class="tackquote-limits__body" data-tackquote-limits-body role="status" aria-live="polite">
+      {%- if request.design_mode -%}
+        <p class="tackquote-limits__error">{{ 'tackquote.order_limits.loading' | t }}</p>
+      {%- endif -%}
+    </div>
   </div>
 
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>

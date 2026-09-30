@@ -32,6 +32,23 @@
   /** Matches the price block. B2B contract prices change on the order of weeks. */
   const CACHE_TTL_MS = 5 * 60 * 1000;
 
+  /*
+   * The state machine, pure so it is tested on its own (test/blocks-state.test.mjs).
+   * An EXPECTED answer is never a failure: `anonymous` is a guest (sign-in
+   * prompt), `unlinked` a customer with no wholesale link (a quote CTA). Only a
+   * real fetch failure reaches `standDown`, and only the merchant sees why.
+   */
+  ns.breaksView = (data, designMode) => {
+    const s = data && data.status;
+    if (s === 'priced') return 'table';
+    if (s === 'anonymous') return 'login';
+    if (s === 'unlinked') {
+      if (data.reason === 'shop_not_installed') return designMode ? 'not-connected' : 'hide';
+      return 'unlinked';
+    }
+    return designMode ? 'empty' : 'hide';
+  };
+
   ns.boot('.tackquote-block[data-tackquote-mode="quantity-breaks"]', (root) => {
     const proxy = ns.safeProxyPath(root.dataset.tackquoteProxy);
     const body = root.querySelector('[data-tackquote-breaks-body]');
@@ -72,9 +89,12 @@
     /* Rule 2. No answer, so get out of the way — hiding rather than emptying,
      * because an empty block still occupies its heading and its spacing, which
      * reads as a broken widget rather than an absent one. */
-    function standDown() {
+    function standDown(why) {
       if (designMode) {
-        show(line(root.dataset.msgError, 'tackquote-breaks__error'));
+        const frag = document.createDocumentFragment();
+        frag.appendChild(line(root.dataset.msgError, 'tackquote-breaks__error'));
+        if (why) frag.appendChild(line(why, 'tackquote-price__error-detail'));
+        show(frag);
         return;
       }
       root.hidden = true;
@@ -118,16 +138,34 @@
     }
 
     function render(data) {
-      // `anonymous` here means "logged out AND this merchant has not published a
-      // public ladder". There is nothing useful to say about a ladder that does
-      // not exist for this viewer, and a login prompt would promise one — so the
-      // block hides, exactly as it does for `unpriced`.
-      if (data.status !== 'priced') {
-        if (designMode) {
-          show(line(root.dataset.msgEmpty, 'tackquote-breaks__error'));
-          return;
-        }
+      const view = ns.breaksView(data, designMode);
+      if (view === 'hide') {
         root.hidden = true;
+        return;
+      }
+      if (view === 'login') {
+        // A guest, and the merchant has not published a public ladder. Like the
+        // price block and every benchmark app: invite them to sign in.
+        const wrap = document.createElement('div');
+        wrap.appendChild(line(root.dataset.msgAnonymous));
+        const link = document.createElement('a');
+        link.className = 'tackquote-price__login';
+        link.href = root.dataset.tackquoteLoginUrl || '/account/login';
+        link.textContent = root.dataset.msgLogin;
+        wrap.appendChild(link);
+        show(wrap);
+        return;
+      }
+      if (view === 'unlinked') {
+        show(line(root.dataset.msgUnlinked));
+        return;
+      }
+      if (view === 'not-connected') {
+        standDown(root.dataset.msgDiagNotConnected);
+        return;
+      }
+      if (view === 'empty') {
+        show(line(root.dataset.msgEmpty, 'tackquote-breaks__error'));
         return;
       }
 
@@ -146,7 +184,9 @@
       const variant = ns.findVariant(variants, ns.variantId(root));
       const sku = variant ? variant.sku : '';
       if (!sku) {
-        standDown();
+        // Not a failure: the variant has no SKU to price. Merchant hint only.
+        if (designMode) show(line(root.dataset.msgDiagNoSku, 'tackquote-breaks__error'));
+        else root.hidden = true;
         return;
       }
 
@@ -172,12 +212,12 @@
           }
           render(data);
         })
-        .catch(() => {
+        .catch((err) => {
           if (token !== inFlight) return;
           // Rule 3, second half. A stale ladder already on screen survives an
           // outage, and there is nothing better to replace it with.
           if (cached) return;
-          standDown();
+          standDown(ns.explain(root, err, proxy));
         });
     }
 

@@ -3,33 +3,33 @@
   assign form_slug = block.settings.form_slug | strip
 -%}
 
-{%- if proxy_path == blank or form_slug == blank -%}
-  {%- comment -%}
-    Setup guidance is shown ONLY in the theme editor. A merchant who has not
-    finished configuring the block should see what is missing while they are
-    editing; a shopper should see nothing at all rather than a broken widget.
-  {%- endcomment -%}
+{%- comment -%}
+  Works with ZERO configuration. With the form setting blank (the default) the
+  server resolves the store's default wholesale form at request time: the form
+  the seller marked as default in TackQuote, else the oldest form that is
+  switched on. Every install creates a standard application form, so a
+  merchant can drop this block onto a page and it shows a real form.
+
+  The tenant is NOT carried in this markup, deliberately. Shopify signs `shop`
+  on every App Proxy request and the server resolves that signed value to a
+  tenant, so there is nothing tenant-shaped for a merchant to type or mistype.
+  https://shopify.dev/docs/apps/build/online-store/app-proxies/authenticate-app-proxies
+{%- endcomment -%}
+
+{%- if proxy_path == blank -%}
   {%- if request.design_mode -%}
     <div class="tackquote-setup" {{ block.shopify_attributes }}>
       <strong>{{ 'tackquote.setup.title' | t }}</strong>
-      {%- if proxy_path == blank -%}
-        <p>{{ 'tackquote.setup.proxy' | t }}</p>
-      {%- endif -%}
-      {%- if form_slug == blank -%}
-        <p>{{ 'tackquote.setup.form_slug' | t }}</p>
-      {%- endif -%}
+      <p>{{ 'tackquote.setup.proxy' | t }}</p>
     </div>
   {%- endif -%}
 {%- else -%}
-  {%- comment -%}
-    The tenant is NOT carried in this markup, deliberately.
-
-    Shopify signs `shop` on every App Proxy request, and the server resolves that
-    signed value to a tenant. Putting a tenant slug in a block setting would mean
-    a merchant could mistype it, or point the block at somebody else's tenant —
-    the class of defect this project tracks as "tenant from a caller-supplied
-    value". The proxy path plus the form slug is all this block needs to know.
-  {%- endcomment -%}
+  {%- liquid
+    assign no_form_message = ''
+    if request.design_mode
+      assign no_form_message = 'tackquote.signup.no_form' | t
+    endif
+  -%}
   <div
     class="tackquote-block tackquote-signup"
     data-tackquote-mode="signup"
@@ -37,6 +37,7 @@
     data-tackquote-form="{{ form_slug | escape }}"
     data-msg-loading="{{ 'tackquote.signup.loading' | t | escape }}"
     data-msg-unavailable="{{ 'tackquote.signup.unavailable' | t | escape }}"
+    data-msg-no-form="{{ no_form_message | escape }}"
     data-msg-submitting="{{ 'tackquote.signup.submitting' | t | escape }}"
     data-msg-success="{{ 'tackquote.signup.success' | t | escape }}"
     data-msg-error="{{ 'tackquote.signup.error' | t | escape }}"
@@ -78,8 +79,8 @@
     {
       "type": "text",
       "id": "form_slug",
-      "label": "Application form",
-      "info": "The slug of the wholesale application form to show, as named in TackQuote."
+      "label": "Specific form (optional)",
+      "info": "Leave blank to show your default wholesale application form from TackQuote. To show a different form, paste the last part of its store link from TackQuote > Settings > Wholesale > Forms."
     },
     {
       "type": "text",

@@ -18,8 +18,12 @@
   ns.boot('.tackquote-block[data-tackquote-mode="signup"]', (root) => {
     const proxy = ns.safeProxyPath(root.dataset.tackquoteProxy);
     const body = root.querySelector('[data-tackquote-signup-body]');
-    const formSlug = root.dataset.tackquoteForm;
-    if (!proxy || !body || !formSlug) return;
+    // Blank is the normal case: the server then serves the store's DEFAULT form.
+    const formSlug = (root.dataset.tackquoteForm || '').trim();
+    if (!proxy || !body) return;
+    const url = formSlug
+      ? `${proxy}/wholesale-signup/${encodeURIComponent(formSlug)}`
+      : `${proxy}/wholesale-signup`;
 
     const msg = (name) => root.dataset[name] || '';
 
@@ -44,7 +48,7 @@
      * plainly.
      */
     function fieldControl(field) {
-      const id = `tq-${formSlug}-${field.key}`;
+      const id = `tq-${formSlug || 'default'}-${field.key}`;
       let control;
 
       if (field.type === 'textarea') {
@@ -160,7 +164,12 @@
           if (control) values[field.key] = readValue(field, control);
         }
 
-        ns.fetchJson(`${proxy}/wholesale-signup/${encodeURIComponent(formSlug)}`, {
+        // Post to the form that was RENDERED: the default form's slug comes back
+        // with its definition, so a default changed mid-typing cannot redirect it.
+        const target = definition.slug
+          ? `${proxy}/wholesale-signup/${encodeURIComponent(definition.slug)}`
+          : url;
+        ns.fetchJson(target, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           body: JSON.stringify({ values }),
@@ -192,12 +201,15 @@
       show(form);
     }
 
-    ns.fetchJson(`${proxy}/wholesale-signup/${encodeURIComponent(formSlug)}`)
+    ns.fetchJson(url)
       .then(renderForm)
-      .catch(() => {
-        // A form that cannot load is reported plainly. It is not an error the
-        // shopper can act on, so it does not pretend to be one.
-        show(line(msg('msgUnavailable'), 'tackquote-signup__error'));
+      .catch((err) => {
+        // 404 = no form switched on. In the theme editor only (the attribute is
+        // empty for shoppers), say where to fix it; everyone else sees the plain
+        // "not available" line, which is not an error a shopper can act on.
+        const noForm = msg('msgNoForm');
+        const text = noForm && err && err.message === 'HTTP 404' ? noForm : msg('msgUnavailable');
+        show(line(text, 'tackquote-signup__error'));
       });
   });
 });

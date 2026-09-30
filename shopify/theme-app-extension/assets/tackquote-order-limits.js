@@ -41,6 +41,19 @@
    */
   const CACHE_TTL_MS = 60 * 1000;
 
+  /*
+   * The state machine, pure so it is tested on its own (test/blocks-state.test.mjs).
+   * `none` is the healthy common answer: hidden for shoppers, and in the theme
+   * editor a hint saying where to set rules — never an error.
+   */
+  ns.limitsView = (data, designMode) => {
+    const s = data && data.status;
+    if (s === 'limited' && Array.isArray(data.limits) && data.limits.length) return 'list';
+    if (!designMode) return 'hide';
+    if (s === 'unlinked' && data.reason === 'shop_not_installed') return 'not-connected';
+    return 'none';
+  };
+
   ns.boot('.tackquote-block[data-tackquote-mode="order-limits"]', (root) => {
     const proxy = ns.safeProxyPath(root.dataset.tackquoteProxy);
     const body = root.querySelector('[data-tackquote-limits-body]');
@@ -71,9 +84,12 @@
       return p;
     }
 
-    function standDown() {
+    function standDown(why) {
       if (designMode) {
-        show(line(root.dataset.msgError, 'tackquote-limits__error'));
+        const frag = document.createDocumentFragment();
+        frag.appendChild(line(root.dataset.msgError, 'tackquote-limits__error'));
+        if (why) frag.appendChild(line(why, 'tackquote-price__error-detail'));
+        show(frag);
         return;
       }
       root.hidden = true;
@@ -126,15 +142,20 @@
     }
 
     function render(data) {
-      if (data.status !== 'limited' || !Array.isArray(data.limits) || data.limits.length === 0) {
-        // `none` is the common, healthy answer: most products have no minimum.
-        // `unlinked` means the shop is not connected, which is the merchant's
-        // problem and not something to narrate on a product page.
-        if (designMode && data.status !== 'limited') {
-          show(line(root.dataset.msgEmpty, 'tackquote-limits__error'));
-          return;
-        }
+      const view = ns.limitsView(data, designMode);
+      // `none` is the common, healthy answer: most products have no minimum.
+      // `unlinked` means the shop is not connected — the merchant's problem,
+      // not something to narrate on a product page.
+      if (view === 'hide') {
         root.hidden = true;
+        return;
+      }
+      if (view === 'not-connected') {
+        standDown(root.dataset.msgDiagNotConnected);
+        return;
+      }
+      if (view === 'none') {
+        show(line(root.dataset.msgDiagNoLimits || root.dataset.msgEmpty, 'tackquote-limits__error'));
         return;
       }
 
@@ -168,7 +189,8 @@
       // A product with neither a SKU nor an id cannot be asked about. Both are
       // sent when present: a rule may name either.
       if (!sku && !productId) {
-        standDown();
+        if (designMode) show(line(root.dataset.msgDiagNoSku, 'tackquote-limits__error'));
+        else root.hidden = true;
         return;
       }
 
@@ -193,13 +215,13 @@
           }
           render(data);
         })
-        .catch(() => {
+        .catch((err) => {
           if (token !== inFlight) return;
           // A stale minimum already on screen is better than none: it is the
           // conservative direction, since the shopper is warned rather than
           // surprised at checkout.
           if (cached) return;
-          standDown();
+          standDown(ns.explain(root, err, proxy));
         });
     }
 

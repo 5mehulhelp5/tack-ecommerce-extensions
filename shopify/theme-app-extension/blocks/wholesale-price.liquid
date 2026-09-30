@@ -11,24 +11,26 @@
     </div>
   {%- endif -%}
 {%- else -%}
+  {%- comment -%}
+    Kept OUTSIDE the tag's attribute list: a Liquid tag between attributes
+    failed `shopify app deploy`'s theme check on another block (b5a4158).
+
+    Two attributes below are NOT identity and must never be read as such.
+    `data-tackquote-customer` only partitions the per-tab price cache, so that
+    logging out in the same tab cannot surface the price the previous session
+    was entitled to see. The identity that decides the price is
+    `logged_in_customer_id`, which Shopify injects into the proxy request and
+    signs; anything emitted here is just markup a shopper can edit.
+    `data-tackquote-design` suspends the fail-quiet behaviour: a merchant placing
+    the block in the theme editor needs to see every state, a shopper does not.
+  {%- endcomment -%}
+  {%- capture tackquote_diagnostics -%}{% render 'tackquote-diagnostics' %}{%- endcapture -%}
   <div
     class="tackquote-block tackquote-price"
     data-tackquote-mode="price"
     data-tackquote-proxy="{{ proxy_path | escape }}"
     data-tackquote-variant="{{ variant.id }}"
     data-tackquote-login-url="{{ routes.account_login_url }}"
-    {%- comment -%}
-      Two attributes that are NOT identity and must never be read as such.
-
-      `customer` only partitions the per-tab price cache, so that logging out in
-      the same tab cannot surface the price the previous session was entitled to
-      see. The identity that decides the price is `logged_in_customer_id`, which
-      Shopify injects into the proxy request and signs; anything emitted here is
-      just markup a shopper can edit.
-
-      `design` suspends the fail-quiet behaviour: a merchant placing the block in
-      the theme editor needs to see it failing, a shopper does not.
-    {%- endcomment -%}
     data-tackquote-customer="{{ customer.id }}"
     data-tackquote-design="{% if request.design_mode %}true{% else %}false{% endif %}"
     data-msg-anonymous="{{ 'tackquote.price.anonymous' | t | escape }}"
@@ -39,16 +41,7 @@
     data-msg-list-note="{{ 'tackquote.price.list_note' | t | escape }}"
     data-msg-quote-note="{{ 'tackquote.price.quote_note' | t | escape }}"
     data-msg-error="{{ 'tackquote.price.error' | t | escape }}"
-    {%- if request.design_mode %}
-    data-msg-diag-password="{{ 'tackquote.diagnostics.password' | t | escape }}"
-    data-msg-diag-not-json="{{ 'tackquote.diagnostics.not_json' | t | escape }}"
-    data-msg-diag-404="{{ 'tackquote.diagnostics.not_found' | t | escape }}"
-    data-msg-diag-auth="{{ 'tackquote.diagnostics.auth' | t | escape }}"
-    data-msg-diag-5xx="{{ 'tackquote.diagnostics.server' | t | escape }}"
-    data-msg-diag-timeout="{{ 'tackquote.diagnostics.timeout' | t | escape }}"
-    data-msg-diag-fail="{{ 'tackquote.diagnostics.failed' | t | escape }}"
-    data-msg-diag-not-connected="{{ 'tackquote.diagnostics.not_connected' | t | escape }}"
-    {%- endif %}
+    {{ tackquote_diagnostics }}
     {{ block.shopify_attributes }}
   >
     {% render 'tackquote-selection', product: product %}

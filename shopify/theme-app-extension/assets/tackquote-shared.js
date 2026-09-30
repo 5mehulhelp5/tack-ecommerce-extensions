@@ -138,6 +138,24 @@
     return String(field?.value || root.dataset.tackquoteVariant || '');
   };
 
+  /*
+   * Merchant-only diagnosis of a FAILED request, shared by every read block.
+   * Copy lives in Liquid (`data-msg-diag-*`, emitted in the theme editor only),
+   * so a shopper never receives it. An expected answer (anonymous, unlinked,
+   * none) is never routed here: those are states, not failures.
+   */
+  ns.explain = (root, err, path) => {
+    const m = err && err.message ? String(err.message) : '';
+    let key = 'msgDiagFail';
+    if (m === 'STOREFRONT_PASSWORD') key = 'msgDiagPassword';
+    else if (m === 'NOT_JSON') key = 'msgDiagNotJson';
+    else if (m === 'HTTP 404') key = 'msgDiag404';
+    else if (m === 'HTTP 401' || m === 'HTTP 403') key = 'msgDiagAuth';
+    else if (/^HTTP 5/.test(m)) key = 'msgDiag5xx';
+    else if (err && err.name === 'AbortError') key = 'msgDiagTimeout';
+    return ns.format(root.dataset[key], { path, status: m });
+  };
+
   ns.findVariant = (list, id) => list.filter((v) => String(v.id) === String(id))[0] || null;
 
   /*
