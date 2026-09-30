@@ -65,7 +65,10 @@
       "fab_label": "Devis",
       "target_price": "Votre prix cible (à l’unité)",
       "editor_view": "Voir le devis s’affiche ici dès que le devis contient des articles.",
-      "card_failed": "Cet article n’a pas pu être ajouté. Veuillez réessayer."
+      "card_failed": "Cet article n’a pas pu être ajouté. Veuillez réessayer.",
+      "files": "Joindre des fichiers (facultatif)",
+      "files_help": "Jusqu’à 3 fichiers PDF, JPEG ou PNG, 5 Mo chacun.",
+      "files_max": "Veuillez joindre 3 fichiers au maximum."
     },
     "signup": {
       "loading": "Chargement du formulaire de demande",

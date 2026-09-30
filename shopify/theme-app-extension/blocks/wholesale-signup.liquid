@@ -3,32 +3,11 @@
   assign form_slug = block.settings.form_slug | strip
 -%}
 
-{%- comment -%}
-  Works with ZERO configuration. With the form setting blank (the default) the
-  server resolves the store's default wholesale form at request time: the form
-  the seller marked as default in TackQuote, else the oldest form that is
-  switched on. Every install creates a standard application form, so a
-  merchant can drop this block onto a page and it shows a real form.
+{%- # README.md, Liquid design notes: wholesale-signup.liquid (1) -%}
 
-  The tenant is NOT carried in this markup, deliberately. Shopify signs `shop`
-  on every App Proxy request and the server resolves that signed value to a
-  tenant, so there is nothing tenant-shaped for a merchant to type or mistype.
-  https://shopify.dev/docs/apps/build/online-store/app-proxies/authenticate-app-proxies
-{%- endcomment -%}
-
-{%- comment -%}
-  Login-first: a signed-out shopper is asked to sign in (or create an account)
-  before applying, so the application carries Shopify's signed customer id and
-  approval can link the account without reading any customer data. The theme
-  editor still shows the form, so the merchant can see it.
-{%- endcomment -%}
+{%- # README.md, Liquid design notes: wholesale-signup.liquid (2) -%}
 {%- if proxy_path == blank -%}
-  {%- if request.design_mode -%}
-    <div class="tackquote-setup" {{ block.shopify_attributes }}>
-      <strong>{{ 'tackquote.setup.title' | t }}</strong>
-      <p>{{ 'tackquote.setup.proxy' | t }}</p>
-    </div>
-  {%- endif -%}
+  {% render 'tackquote-setup', attrs: block.shopify_attributes %}
 {%- else -%}
   {%- liquid
     assign no_form_message = ''
@@ -40,38 +19,37 @@
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
     class="tackquote-block tackquote-signup"
-    data-tackquote-mode="signup"
-    data-tackquote-proxy="{{ proxy_path | escape }}"
-    data-tackquote-form="{{ form_slug | escape }}"
-    data-msg-loading="{{ 'tackquote.signup.loading' | t | escape }}"
-    data-msg-unavailable="{{ 'tackquote.signup.unavailable' | t | escape }}"
-    data-msg-no-form="{{ no_form_message | escape }}"
-    data-msg-submitting="{{ 'tackquote.signup.submitting' | t | escape }}"
-    data-msg-success="{{ 'tackquote.signup.success' | t | escape }}"
-    data-msg-error="{{ 'tackquote.signup.error' | t | escape }}"
-    data-msg-required="{{ 'tackquote.signup.required' | t | escape }}"
-    data-msg-submit="{{ 'tackquote.signup.submit' | t | escape }}"
-    data-msg-choose="{{ 'tackquote.signup.choose' | t | escape }}"
-    data-msg-file-type="{{ 'tackquote.signup.file_type' | t | escape }}"
-    data-msg-file-size="{{ 'tackquote.signup.file_size' | t | escape }}"
-    data-msg-uploading="{{ 'tackquote.signup.uploading' | t | escape }}"
-    data-msg-addr_line1="{{ 'tackquote.signup.addr_line1' | t | escape }}"
-    data-msg-addr_line2="{{ 'tackquote.signup.addr_line2' | t | escape }}"
-    data-msg-addr_city="{{ 'tackquote.signup.addr_city' | t | escape }}"
-    data-msg-addr_region="{{ 'tackquote.signup.addr_region' | t | escape }}"
-    data-msg-addr_postal-code="{{ 'tackquote.signup.addr_postal_code' | t | escape }}"
-    data-msg-addr_country="{{ 'tackquote.signup.addr_country' | t | escape }}"
-    {{ tq_attrs }}
-    {{ block.shopify_attributes }}
+  data-tackquote-mode="signup"
+  data-tackquote-proxy="{{ proxy_path | escape }}"
+  data-tackquote-form="{{ form_slug | escape }}"
+  data-msg-loading="{{ 'tackquote.signup.loading' | t | escape }}"
+  data-msg-unavailable="{{ 'tackquote.signup.unavailable' | t | escape }}"
+  data-msg-no-form="{{ no_form_message | escape }}"
+  data-msg-submitting="{{ 'tackquote.signup.submitting' | t | escape }}"
+  data-msg-success="{{ 'tackquote.signup.success' | t | escape }}"
+  data-msg-error="{{ 'tackquote.signup.error' | t | escape }}"
+  data-msg-required="{{ 'tackquote.signup.required' | t | escape }}"
+  data-msg-submit="{{ 'tackquote.signup.submit' | t | escape }}"
+  data-msg-choose="{{ 'tackquote.signup.choose' | t | escape }}"
+  data-msg-file-type="{{ 'tackquote.signup.file_type' | t | escape }}"
+  data-msg-file-size="{{ 'tackquote.signup.file_size' | t | escape }}"
+  data-msg-uploading="{{ 'tackquote.signup.uploading' | t | escape }}"
+  data-msg-addr_line1="{{ 'tackquote.signup.addr_line1' | t | escape }}"
+  data-msg-addr_line2="{{ 'tackquote.signup.addr_line2' | t | escape }}"
+  data-msg-addr_city="{{ 'tackquote.signup.addr_city' | t | escape }}"
+  data-msg-addr_region="{{ 'tackquote.signup.addr_region' | t | escape }}"
+  data-msg-addr_postal-code="{{ 'tackquote.signup.addr_postal_code' | t | escape }}"
+  data-msg-addr_country="{{ 'tackquote.signup.addr_country' | t | escape }}"
+  {{ tq_attrs }}
+  {{ block.shopify_attributes }}
   >
     <h3 class="tackquote-signup__heading">
-      {%- comment -%}The schema default is English. Left as it is (or blank), the
-      shopper's language is used instead; a merchant's own wording is kept.{%- endcomment -%}
+      {%- # README.md, Liquid design notes: wholesale-signup.liquid (3) -%}
       {%- assign tackquote_label = block.settings.heading | strip -%}
       {%- if tackquote_label == blank or tackquote_label == 'Apply for a wholesale account' -%}
         {%- assign tackquote_label = 'tackquote.signup.heading' | t -%}
       {%- endif -%}
-      {{ tackquote_label }}
+  {{ tackquote_label }}
     </h3>
 
     {%- if block.settings.intro != blank -%}
@@ -101,45 +79,18 @@
 {%- endif -%}
 
 {% schema %}
-{
-  "name": "Wholesale signup",
-  "target": "section",
-  "enabled_on": { "templates": ["page", "index"] },
-  "stylesheet": "tackquote.css",
-  "javascript": "tackquote-signup.js",
-  "settings": [
-    {
-      "type": "text",
-      "id": "proxy_path",
-      "label": "Advanced: app URL prefix",
-      "default": "/apps/tackquote",
-      "info": "Leave this as it is. Change it only if you renamed the TackQuote app proxy in Shopify (Settings, Apps and sales channels, TackQuote, App proxy)."
-    },
-    {
-      "type": "text",
-      "id": "form_slug",
-      "label": "Specific form (optional)",
-      "info": "Leave blank to show your default wholesale application form from TackQuote. To show a different form, paste the last part of its store link from TackQuote > Settings > Wholesale > Forms."
-    },
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading",
-      "default": "Apply for a wholesale account"
-    },
-    {
-      "type": "richtext",
-      "id": "intro",
-      "label": "Introduction"
-    },
-    {"type":"header","content":"Style","info":"Match theme (or empty) uses your theme's fonts, colors, corners and buttons."},
-    {"type":"select","id":"tq_size","label":"Text size","options":[{"value":"0.875","label":"Smaller"},{"value":"1","label":"Match theme"},{"value":"1.125","label":"Larger"},{"value":"1.25","label":"Largest"}],"default":"1"},
-    {"type":"select","id":"tq_font","label":"Font","options":[{"value":"theme","label":"Match theme"},{"value":"system","label":"System font"}],"default":"theme"},
-    {"type":"color","id":"tq_text","label":"Text color"},
-    {"type":"color","id":"tq_bg","label":"Background color"},
-    {"type":"color","id":"tq_accent","label":"Button color"},
-    {"type":"color","id":"tq_accent_text","label":"Button text color"},
-    {"type":"select","id":"tq_radius","label":"Corner radius","options":[{"value":"theme","label":"Match theme"},{"value":"0","label":"Square"},{"value":"4","label":"Slight"},{"value":"8","label":"Rounded"},{"value":"12","label":"More rounded"},{"value":"999","label":"Pill"}],"default":"theme"}
-  ]
-}
+{"name": "Wholesale signup", "target": "section", "enabled_on": {"templates": ["page", "index"]}, "stylesheet": "tackquote.css", "javascript": "tackquote-signup.js","settings":[
+    {"type":"text","id":"form_slug","label":"Specific form (optional)","info":"t:tq.p.wholesale_signup_1"},
+    {"type":"text","id":"heading","label":"Heading","default":"Apply for a wholesale account"},
+    {"type":"richtext","id":"intro","label":"Introduction"},
+    {"type":"text","id":"proxy_path","label":"t:tq.c.proxy","default":"/apps/tackquote","info":"t:tq.c.proxy_info"},
+    {"type":"header","content":"t:tq.s.header","info":"t:tq.s.info"},
+    {"type":"select","id":"tq_size","label":"t:tq.s.size","options":[{"value":"0.875","label":"t:tq.s.smaller"},{"value":"1","label":"t:tq.s.match"},{"value":"1.125","label":"t:tq.s.larger"},{"value":"1.25","label":"t:tq.s.largest"}],"default":"1"},
+    {"type":"select","id":"tq_font","label":"t:tq.s.font","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"system","label":"t:tq.s.system"}],"default":"theme"},
+    {"type":"color","id":"tq_text","label":"t:tq.s.text"},
+    {"type":"color","id":"tq_bg","label":"t:tq.s.bg"},
+    {"type":"color","id":"tq_accent","label":"t:tq.s.accent"},
+    {"type":"color","id":"tq_accent_text","label":"t:tq.s.accent_text"},
+    {"type":"select","id":"tq_radius","label":"t:tq.s.radius","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"0","label":"t:tq.s.square"},{"value":"4","label":"t:tq.s.slight"},{"value":"8","label":"t:tq.s.rounded"},{"value":"12","label":"t:tq.s.more_rounded"},{"value":"999","label":"t:tq.s.pill"}],"default":"theme"}
+  ]}
 {% endschema %}

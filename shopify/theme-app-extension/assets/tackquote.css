@@ -89,6 +89,15 @@
   letter-spacing: var(--tqd-btn-ls);
   text-transform: var(--tqd-btn-tt, var(--button-text-case-primary));
 }
+/* No theme rule painted a theme-look button (a reset theme): one class, the chain. */
+.tackquote-button--paint {
+  padding: 0.75em 1.25em;
+  border: var(--tqd-accent-border, 1px solid transparent);
+  border-radius: var(--tq-r);
+  background: var(--tq-accent);
+  color: var(--tq-accent-text);
+  font-weight: var(--tqd-btn-weight, 600);
+}
 /* The merchant chose a colour (tackquote-theme.js adds the class): it beats the theme class too. */
 .tackquote-button--custom {
   border-color: var(--tqm-accent);

@@ -1,0 +1,53 @@
+{
+  "tq": {
+    "s": {
+      "header": "Stijl",
+      "info": "Zoals thema (of leeg) gebruikt de lettertypen, kleuren, hoeken en knoppen van je thema.",
+      "size": "Tekstgrootte",
+      "smaller": "Kleiner",
+      "match": "Zoals thema",
+      "larger": "Groter",
+      "largest": "Grootst",
+      "font": "Lettertype",
+      "system": "Systeemlettertype",
+      "text": "Tekstkleur",
+      "bg": "Achtergrondkleur",
+      "accent": "Knopkleur",
+      "accent_text": "Tekstkleur van knop",
+      "radius": "Hoekafronding",
+      "square": "Recht",
+      "slight": "Licht",
+      "rounded": "Afgerond",
+      "more_rounded": "Meer afgerond",
+      "pill": "Pil"
+    },
+    "c": {
+      "proxy": "Geavanceerd: URL-voorvoegsel van de app",
+      "proxy_info": "Laat dit zoals het is. Wijzig het alleen als je de TackQuote-appproxy in Shopify hebt hernoemd (Instellingen, Apps en verkoopkanalen, TackQuote, App-proxy).",
+      "target": "Vraag om een richtprijs",
+      "target_info": "Voegt aan elke regel een optioneel veld Je richtprijs toe. Alleen wat de koper typt wordt verstuurd, nooit je winkelprijs.",
+      "message": "Kopers een bericht laten toevoegen",
+      "files": "Kopers bestanden laten bijvoegen",
+      "files_info": "Maximaal 3 PDF-, JPEG- of PNG-bestanden van elk 5 MB.",
+      "quote_page": "Offertepagina (optioneel)",
+      "quote_page_info": "Kies de pagina met het blok Offertepagina om die te openen in plaats van de pop-up."
+    },
+    "p": {
+      "buyer_group_badge_1": "Toont de TackQuote-kopersgroep van de ingelogde klant, bijvoorbeeld “Niveau 2”. Wie niet is ingelogd, niet aan een TackQuote-koper is gekoppeld of in geen groep zit, ziet niets.",
+      "credit_application_1": "Laat een ingelogde groothandelsklant betalingstermijnen aanvragen. Aanvragen komen ter beoordeling in TackQuote; niets wordt automatisch goedgekeurd.",
+      "order_limits_1": "Vermeldt op de productpagina de minimum- (of maximum-)bestelregels voor dit product. Ze worden hier getoond en toegepast wanneer TackQuote een offerte of conceptorder maakt. Staan afrekenprijzen aan in TackQuote, dan gelden ze ook bij de Shopify-checkout en zegt het blok dat; anders worden ze niet afgedwongen in de winkelwagen of bij de checkout. Beheer de regels in TackQuote onder Bestellimieten.",
+      "order_limits_2": "Algemene regels ziet elke bezoeker, omdat ze voor iedereen gelden. Regels voor een specifieke koper of een bedrijf verschijnen pas nadat die klant inlogt en zijn gemarkeerd als accountspecifiek.",
+      "price_gate_1": "Verbergt prijzen en de knop In winkelwagen voor wie ze niet mag zien en toont in plaats daarvan een link Log in om prijzen te zien. Dit verbergt wat de winkel TOONT. Het is geen checkoutregel en productgegevens die je thema publiceert blijven openbaar.",
+      "price_gate_2": "Producten met deze tag verbergen In winkelwagen en Nu kopen voor iedereen, zodat ze alleen via een offerte te koop zijn. Laat leeg om uit te zetten. Combineer het met het blok Offerte aanvragen.",
+      "price_gate_3": "Alleen als je thema ergens prijzen toont die dit mist. CSS-selectors gescheiden door komma’s, bijvoorbeeld .my-price. Accolades, puntkomma’s en @ worden geweigerd.",
+      "quantity_breaks_1": "Toont de groothandelsstaffel per aantal voor dit product. Staan afrekenprijzen aan in TackQuote, dan zegt de tabel dat de prijzen bij de checkout gelden; anders worden ze op een offerte aangeboden. Elke prijs komt uit de prijsengine van TackQuote, dus deze tabel en het blok Groothandelsprijs zijn het altijd eens.",
+      "quantity_breaks_2": "Ingelogde groothandelsklanten zien hun eigen staffel. Niet-ingelogde bezoekers zien een uitnodiging om in te loggen, of je openbare staffel als je die in TackQuote hebt gepubliceerd — zie de handleiding van de Shopify-connector.",
+      "quick_order_1": "Laat een ingelogde zakelijke koper SKU’s en aantallen plakken en alles in één keer aan de winkelwagen of een offerte toevoegen. Prijzen en bestellimieten komen uit TackQuote. Niet-ingelogde bezoekers zien een inloglink.",
+      "quote_cards_1": "Voegt op elke productkaart in je collectie- en zoekrasters een knop Aan offerte toevoegen toe. Producten met opties openen hun productpagina zodat de koper kan kiezen.",
+      "quote_cart_1": "Laat een koper de winkelwagen omzetten in een offerteaanvraag en zijn offerte weer openen. Voeg het toe na de winkelwagen (de voettekst van de winkelwagen of een apps-sectie eronder).",
+      "quote_page_1": "Toont de opgeslagen offerte van de koper met aantallen aanpassen en het aanvraagformulier. Zet het op een eigen pagina en kies die als Offertepagina in de zwevende offertewagen of de knop van de offertewagen.",
+      "wholesale_price_1": "Toont de groothandelsprijs van de ingelogde klant. Staan afrekenprijzen aan in TackQuote, dan zegt het blok dat de prijs bij de checkout geldt; anders wordt hij op een offerte aangeboden. TackQuote bepaalt de prijs uit de Shopify-sessie van de koper, dus hij wordt nooit van deze pagina gelezen en kan niet worden aangepast.",
+      "wholesale_signup_1": "Laat leeg om je standaard groothandelsaanvraagformulier uit TackQuote te tonen. Voor een ander formulier plak je het laatste deel van de winkellink uit TackQuote → Instellingen → Groothandel → Formulieren."
+    }
+  }
+}

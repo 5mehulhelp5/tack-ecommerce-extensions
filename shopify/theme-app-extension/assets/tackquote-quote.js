@@ -1,12 +1,7 @@
 /*
- * The quote request (Add/Request a Quote, quote-cart buttons, Quote page).
- * POSTs only to `<proxy>/quote-request` via the App Proxy on the merchant's own
- * domain; the server derives the tenant from Shopify's signed `shop`, so no
- * tenant id travels from here (never restore one). The quote accumulates in
- * localStorage and is sent whole. No storefront price is ever sent (see
- * tackquote-selection.liquid); a line carries `price` only when the merchant
- * turned on "Ask for a target price" and the BUYER typed one, which the API
- * records as the requested price. Each draft write fires `tackquote:draft`.
+ * The quote drawer and draft. POSTs only to `<proxy>/quote-request` (tenant from
+ * Shopify's signed `shop`; never send a tenant id). No storefront price is ever
+ * sent; `price` is only a target the BUYER typed. Notes: shopify/README.md.
  */
 (window.TackQuoteQ = window.TackQuoteQ || []).push((ns) => {
   if (ns.quoteOpen) return;
@@ -25,9 +20,7 @@
   function saveDraft(items) {
     try {
       window.localStorage.setItem(KEY, JSON.stringify(items));
-    } catch (_err) {
-      /* not persisted */
-    }
+    } catch (_err) {}
     document.dispatchEvent(new CustomEvent('tackquote:draft', { detail: { count: items.length } }));
   }
 
@@ -51,10 +44,11 @@
     return { items, already };
   }
 
-  // The trigger's own dialog when it names one (aria-controls), else the first.
-  const drawer = (id) => (id && document.getElementById(id)) || document.querySelector('dialog[data-tackquote-drawer]');
+  const drawer = (id) =>
+    (id && document.getElementById(id)) ||
+    document.querySelector('dialog[data-tackquote-drawer][data-tackquote-rich]') ||
+    document.querySelector('dialog[data-tackquote-drawer]');
 
-  // Add lines and open the drawer; false when full or there is no drawer.
   ns.quoteAdd = (lines, ctx) => {
     if (!drawer()) return false;
     const merged = mergeIntoDraft(lines, ctx && ctx.replace);
@@ -62,7 +56,6 @@
     open(Object.assign({}, ctx, { items: merged.items, persist: true }));
     return true;
   };
-  // Open on the saved quote; `from` is the trigger's styled root.
   ns.quoteOpen = (from, id) => {
     if (!drawer(id)) return false;
     open({ items: loadDraft(), persist: true, from, id });
@@ -103,7 +96,6 @@
       box.append(step(d.msgDecrease, '−', -1), qty, step(d.msgIncrease, '+', 1));
       ctl.append(box);
 
-      // Optional, buyer-typed only: sent as the line's requested `price`.
       if (d.tackquoteTargetPrice !== undefined) {
         const lab = mk('label', 'tackquote-line__target');
         const tp = mk('input', 'tackquote-field tackquote-field--short', { type: 'number', min: '0', step: '0.01', inputMode: 'decimal' });
@@ -123,7 +115,6 @@
         items.splice(index, 1);
         save();
         renderItems(el, items, persist);
-        // Keep focus in the list, not on <body>.
         const next = list.querySelectorAll('.tackquote-link-button')[Math.min(index, items.length - 1)];
         (next || el.querySelector('[name="name"]')).focus();
       });
@@ -145,13 +136,14 @@
     }
     button.disabled = true;
     status.textContent = d.msgSending;
-
-    fetch(`${ctx.proxy}/quote-request`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    const say = (t) => {
+      status.textContent = t;
+    };
+    const x = el.querySelector('[name="message"], [name="files"]') && ns.quoteExtras;
+    const body = (extra) =>
+      JSON.stringify({
         currency: ctx.currency,
-        buyer: { name, email, company: field('company').value.trim() || undefined },
+        buyer: { name, email, company: field('company').value.trim() || undefined, message: extra.message },
         // Honeypot: filled means bot; the API answers success-shaped, creates nothing.
         hp: field('hp').value,
         items: ctx.items.map((i) => ({
@@ -162,25 +154,46 @@
           // Only a price the BUYER typed; never the storefront's retail price.
           price: d.tackquoteTargetPrice !== undefined && typeof i.target === 'number' ? i.target : undefined,
         })),
-      }),
-    })
-      .then((r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
+        uploadIds: extra.uploadIds && extra.uploadIds.length ? extra.uploadIds : undefined,
+        uploadToken: extra.uploadToken,
+      });
+    const url = `${ctx.proxy}/quote-request`;
+    const go = (again) =>
+      (x ? x.collect(el, ctx.proxy, say) : Promise.resolve({}))
+        .then((extra) => {
+          say(d.msgSending);
+          if (x) return x.post(url, body(extra), 'application/json');
+          return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body(extra) }).then((r) => {
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            return r.json();
+          });
+        })
+        .catch((err) => {
+          if (x && !again && x.stale(err.message)) {
+            x.reset();
+            return go(true);
+          }
+          throw err;
+        });
+
+    go(false)
       .then(() => {
-        status.textContent = d.msgSuccess;
+        say(d.msgSuccess);
         ctx.items = [];
         if (ctx.persist) saveDraft([]);
         renderItems(el, ctx.items, ctx.persist);
+        if (x) {
+          x.reset();
+          for (const f of el.querySelectorAll('[name="message"], [name="files"]')) f.value = '';
+        }
       })
-      .catch(() => {
-        status.textContent = d.msgFailure;
+      .catch((err) => {
+        const m = err && err.message;
+        say(x && m && !/^HTTP \d/.test(m) ? m : d.msgFailure);
         button.disabled = false;
       });
   }
 
-  // Fill and wire the form (modal and inline page).
   function bind(el, ctx) {
     const d = el.dataset;
     ctx.proxy = ctx.proxy || ns.safeProxyPath(d.tackquoteProxy);
@@ -194,7 +207,6 @@
     const status = el.querySelector('[data-tackquote-drawer-status]');
     status.textContent = ctx.note || '';
 
-    // A fresh button drops the previous open's listener.
     const old = el.querySelector('[data-tackquote-submit]');
     const button = old.cloneNode(true);
     button.disabled = !ctx.proxy;
@@ -209,14 +221,12 @@
     if (el.parentNode !== document.body) document.body.appendChild(el);
     if (!el.dataset.tqWired) {
       el.dataset.tqWired = '1';
-      // Backdrop click closes, like theme drawers.
       el.addEventListener('click', (e) => {
         if (e.target !== el) return;
         const r = el.getBoundingClientRect();
         if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) el.close();
       });
     }
-    // Styled from the OPENING block's section (colour schemes are per section).
     if (ns.theme) ns.theme.carry(el, ctx.from);
     bind(el, ctx);
     if (!el.open) el.showModal();
@@ -226,6 +236,5 @@
     bind(el, { items: loadDraft(), persist: true });
   });
 
-  // For the trigger runtime (tackquote-quote-cart.js): merge, and open with a context.
   ns.quote = { merge: mergeIntoDraft, open, drawer };
 });

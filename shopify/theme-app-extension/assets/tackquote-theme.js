@@ -166,6 +166,13 @@
     const custom = Boolean(cs(root).getPropertyValue('--tqm-accent').trim());
     root.querySelectorAll('.tackquote-button:not(.tackquote-button--outline)').forEach((b) => {
       b.classList.toggle('tackquote-button--custom', custom);
+      // A theme `button { all: unset }`-style reset beats the :where() defaults;
+      // an unpainted theme-look button then gets the one-class paint.
+      b.classList.remove('tackquote-button--paint');
+      if (custom || !b.classList.contains('tackquote-button--theme')) return;
+      const c = cs(b);
+      const flat = !opaque(c.backgroundColor) && px(c.borderTopWidth) === 0 && c.boxShadow === 'none';
+      if (flat && cs(b, '::after').boxShadow === 'none' && !/gradient/.test(c.backgroundImage)) b.classList.add('tackquote-button--paint');
     });
   };
 

@@ -40,34 +40,36 @@
     return null;
   }
 
+  // Measured against the button's BASE position (current rect + current lift),
+  // so nothing is zeroed and re-applied: the lift only changes when it must,
+  // and the transition never replays (no bounce).
   function place(fab) {
-    fab.style.setProperty('--tq-lift', '0px');
-    if (modalOpen()) {
-      fab.style.visibility = 'hidden';
-      return;
-    }
-    fab.style.visibility = '';
-    if (!shown(fab) || window.getComputedStyle(fab).bottom === 'auto') return;
+    const hide = modalOpen() ? 'hidden' : '';
+    if (fab.style.visibility !== hide) fab.style.visibility = hide;
+    if (hide || !shown(fab) || window.getComputedStyle(fab).bottom === 'auto') return;
+    const cur = Number.parseFloat(fab.style.getPropertyValue('--tq-lift')) || 0;
     const r = fab.getBoundingClientRect();
+    const base = r.bottom + cur;
     let lift = 0;
     // Chat launchers: their height plus 12px, when they share our side.
     for (const c of document.querySelectorAll(CHATS)) {
       if (!shown(c)) continue;
       const cr = c.getBoundingClientRect();
       if (cr.right > r.left - 12 && cr.left < r.right + 12 && cr.top > window.innerHeight / 2) {
-        lift = Math.max(lift, r.bottom - cr.top + 12);
+        lift = Math.max(lift, base - cr.top + 12);
       }
     }
-    // Sticky add-to-cart bars, cookie banners: anything fixed under our corners.
-    if (document.elementsFromPoint) {
+    // Sticky add-to-cart bars, cookie banners: anything fixed under our base corners.
+    if (document.elementsFromPoint && base - 2 < window.innerHeight) {
       for (const x of [r.left + 2, r.right - 2]) {
-        for (const el of document.elementsFromPoint(x, r.bottom - 2)) {
+        for (const el of document.elementsFromPoint(x, base - 2)) {
           const bar = fixedBar(el, fab);
-          if (bar) lift = Math.max(lift, r.bottom - bar.getBoundingClientRect().top + 8);
+          if (bar) lift = Math.max(lift, base - bar.getBoundingClientRect().top + 8);
         }
       }
     }
-    if (lift > 0) fab.style.setProperty('--tq-lift', `${Math.round(lift)}px`);
+    const next = Math.max(0, Math.round(lift));
+    if (next !== cur) fab.style.setProperty('--tq-lift', `${next}px`);
   }
 
   let timer = null;
@@ -87,8 +89,9 @@
       fabs().forEach((fab) => {
         const small = window.matchMedia('(max-width: 749px)').matches;
         if (fab.dataset.collapse === undefined && !small) return;
-        if (down) fab.dataset.collapsed = '';
-        else delete fab.dataset.collapsed;
+        // Written only on a change, so scrolling does not churn attributes.
+        if (down && fab.dataset.collapsed === undefined) fab.dataset.collapsed = '';
+        else if (!down && fab.dataset.collapsed !== undefined) delete fab.dataset.collapsed;
       });
       later();
     },
@@ -122,6 +125,9 @@
     );
     if (!cart || !cart.parentNode) return;
     const icon = tpl.content.firstElementChild.cloneNode(true);
+    // The icon's SVG is the floating button's, not a second copy in the Liquid.
+    const art = document.querySelector('[data-tackquote-fab] svg');
+    if (art) icon.prepend(art.cloneNode(true));
     for (const c of cart.className.split(/\s+/)) if (c && !/cart|bubble|drawer|active/i.test(c)) icon.classList.add(c);
     icon.dataset.placed = '';
     cart.parentNode.insertBefore(icon, cart);

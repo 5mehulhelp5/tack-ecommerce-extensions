@@ -65,7 +65,10 @@
       "fab_label": "Offerte",
       "target_price": "Je richtprijs (per stuk)",
       "editor_view": "Offerte bekijken verschijnt hier zodra de offerte artikelen bevat.",
-      "card_failed": "We konden dat artikel niet toevoegen. Probeer het opnieuw."
+      "card_failed": "We konden dat artikel niet toevoegen. Probeer het opnieuw.",
+      "files": "Bestanden bijvoegen (optioneel)",
+      "files_help": "Maximaal 3 PDF-, JPEG- of PNG-bestanden, elk 5 MB.",
+      "files_max": "Voeg maximaal 3 bestanden toe."
     },
     "signup": {
       "loading": "Aanvraagformulier wordt geladen",

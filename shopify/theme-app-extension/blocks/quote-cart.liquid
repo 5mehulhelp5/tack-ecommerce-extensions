@@ -14,32 +14,23 @@
   endif
 -%}
 
-{%- comment -%}
-  Cart-page quote button: Dawn main-cart-footer / Horizon main-cart @app slot,
-  or an Apps section. Cart drawers take no app block; quote-fab covers them.
-  The cart import reads the live cart (tackquote-quote-cart.js); no price.
-{%- endcomment -%}
+{%- # README.md, Liquid design notes: quote-cart.liquid (1) -%}
 {%- if proxy_path == blank -%}
-  {%- if request.design_mode -%}
-    <div class="tackquote-setup" {{ block.shopify_attributes }}>
-      <strong>{{ 'tackquote.setup.title' | t }}</strong>
-      <p>{{ 'tackquote.setup.proxy' | t }}</p>
-    </div>
-  {%- endif -%}
+  {% render 'tackquote-setup', attrs: block.shopify_attributes %}
 {%- else -%}
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
     class="tackquote-qcart"
-    data-tq-root
-    data-placement="{{ block.settings.placement | escape }}"
-    data-msg-sending="{{ 'tackquote.quote.sending' | t | escape }}"
-    data-msg-cart-empty="{{ 'tackquote.quote.cart_empty' | t | escape }}"
-    data-msg-cart-added="{{ 'tackquote.quote.cart_added' | t | escape }}"
-    data-msg-cart-failed="{{ 'tackquote.quote.cart_failed' | t | escape }}"
-    data-msg-full="{{ 'tackquote.quote.full' | t | escape }}"
-    {{ tq_attrs }}
-    {{ block.shopify_attributes }}
+  data-tq-root
+  data-placement="{{ block.settings.placement | escape }}"
+  data-msg-sending="{{ 'tackquote.quote.sending' | t | escape }}"
+  data-msg-cart-empty="{{ 'tackquote.quote.cart_empty' | t | escape }}"
+  data-msg-cart-added="{{ 'tackquote.quote.cart_added' | t | escape }}"
+  data-msg-cart-failed="{{ 'tackquote.quote.cart_failed' | t | escape }}"
+  data-msg-full="{{ 'tackquote.quote.full' | t | escape }}"
+  {{ tq_attrs }}
+  {{ block.shopify_attributes }}
   >
     {%- if cart.item_count > 0 or request.design_mode -%}
       <button type="button" class="tackquote-button tackquote-button--theme button button--primary btn" data-tackquote-cart-import>
@@ -49,11 +40,11 @@
     <button
       type="button"
       class="tackquote-button tackquote-button--theme tackquote-hidden-empty button button--secondary btn btn--secondary"
-      data-tackquote-open
-      data-tackquote-page="{{ quote_page | escape }}"
-      data-tackquote-hide-empty
-      data-tackquote-label="{{ label_view | escape }}"
-      data-tackquote-count-label="{{ 'tackquote.quote.count_label' | t | escape }}"
+  data-tackquote-open
+  data-tackquote-page="{{ quote_page | escape }}"
+  data-tackquote-hide-empty
+  data-tackquote-label="{{ label_view | escape }}"
+  data-tackquote-count-label="{{ 'tackquote.quote.count_label' | t | escape }}"
       aria-haspopup="dialog"
       hidden
     >
@@ -66,35 +57,30 @@
     <p class="tackquote-status" data-tackquote-status role="status" aria-live="polite"></p>
   </div>
 
-  {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs, target_price: block.settings.target_price %}
+  {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs, target_price: block.settings.target_price, message: block.settings.allow_message, files: block.settings.allow_files %}
   <script src="{{ 'tackquote-quote.js' | asset_url }}" defer></script>
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
   <script src="{{ 'tackquote-theme.js' | asset_url }}" async></script>
 {%- endif -%}
 
 {% schema %}
-{
-  "name": "Quote cart button",
-  "target": "section",
-  "enabled_on": { "templates": ["cart"] },
-  "stylesheet": "tackquote.css",
-  "javascript": "tackquote-quote-cart.js",
-  "settings": [
-    { "type": "paragraph", "content": "Lets a buyer turn the cart into a quote request, and reopen their quote. Add it after the cart (the cart footer, or an Apps section below the cart)." },
-    { "type": "select", "id": "placement", "label": "Spacing", "options": [{ "value": "after", "label": "After the cart (space above)" }, { "value": "before", "label": "Before checkout (space below)" }], "default": "after" },
-    { "type": "text", "id": "request_label", "label": "Request button text", "default": "Request a quote for your cart" },
-    { "type": "text", "id": "view_label", "label": "View button text", "default": "View quote" },
-    { "type": "page", "id": "quote_page", "label": "Quote page (optional)", "info": "Pick the page that holds the Quote page block to open it instead of the pop-up." },
-    { "type": "checkbox", "id": "target_price", "label": "Ask for a target price", "info": "Adds an optional Your target price field to each line of the quote form. Only what the buyer types is sent, never your storefront price.", "default": false },
-    { "type": "text", "id": "proxy_path", "label": "Advanced: app URL prefix", "default": "/apps/tackquote", "info": "Leave this as it is. Change it only if you renamed the TackQuote app proxy in Shopify (Settings, Apps and sales channels, TackQuote, App proxy)." },
-    {"type":"header","content":"Style","info":"Match theme (or empty) uses your theme's fonts, colors, corners and buttons."},
-    {"type":"select","id":"tq_size","label":"Text size","options":[{"value":"0.875","label":"Smaller"},{"value":"1","label":"Match theme"},{"value":"1.125","label":"Larger"},{"value":"1.25","label":"Largest"}],"default":"1"},
-    {"type":"select","id":"tq_font","label":"Font","options":[{"value":"theme","label":"Match theme"},{"value":"system","label":"System font"}],"default":"theme"},
-    {"type":"color","id":"tq_text","label":"Text color"},
-    {"type":"color","id":"tq_bg","label":"Background color"},
-    {"type":"color","id":"tq_accent","label":"Button color"},
-    {"type":"color","id":"tq_accent_text","label":"Button text color"},
-    {"type":"select","id":"tq_radius","label":"Corner radius","options":[{"value":"theme","label":"Match theme"},{"value":"0","label":"Square"},{"value":"4","label":"Slight"},{"value":"8","label":"Rounded"},{"value":"12","label":"More rounded"},{"value":"999","label":"Pill"}],"default":"theme"}
-  ]
-}
+{"name": "Quote cart button", "target": "section", "enabled_on": {"templates": ["cart"]}, "stylesheet": "tackquote.css", "javascript": "tackquote-quote-cart.js","settings":[
+    {"type":"paragraph","content":"t:tq.p.quote_cart_1"},
+    {"type":"select","id":"placement","label":"Spacing","options":[{"value":"after","label":"After the cart (space above)"},{"value":"before","label":"Before checkout (space below)"}],"default":"after"},
+    {"type":"text","id":"request_label","label":"Request button text","default":"Request a quote for your cart"},
+    {"type":"text","id":"view_label","label":"View button text","default":"View quote"},
+    {"type":"page","id":"quote_page","label":"t:tq.c.quote_page","info":"t:tq.c.quote_page_info"},
+    {"type":"checkbox","id":"target_price","label":"t:tq.c.target","info":"t:tq.c.target_info","default":false},
+    {"type":"checkbox","id":"allow_message","label":"t:tq.c.message","default":false},
+    {"type":"checkbox","id":"allow_files","label":"t:tq.c.files","info":"t:tq.c.files_info","default":false},
+    {"type":"text","id":"proxy_path","label":"t:tq.c.proxy","default":"/apps/tackquote","info":"t:tq.c.proxy_info"},
+    {"type":"header","content":"t:tq.s.header","info":"t:tq.s.info"},
+    {"type":"select","id":"tq_size","label":"t:tq.s.size","options":[{"value":"0.875","label":"t:tq.s.smaller"},{"value":"1","label":"t:tq.s.match"},{"value":"1.125","label":"t:tq.s.larger"},{"value":"1.25","label":"t:tq.s.largest"}],"default":"1"},
+    {"type":"select","id":"tq_font","label":"t:tq.s.font","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"system","label":"t:tq.s.system"}],"default":"theme"},
+    {"type":"color","id":"tq_text","label":"t:tq.s.text"},
+    {"type":"color","id":"tq_bg","label":"t:tq.s.bg"},
+    {"type":"color","id":"tq_accent","label":"t:tq.s.accent"},
+    {"type":"color","id":"tq_accent_text","label":"t:tq.s.accent_text"},
+    {"type":"select","id":"tq_radius","label":"t:tq.s.radius","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"0","label":"t:tq.s.square"},{"value":"4","label":"t:tq.s.slight"},{"value":"8","label":"t:tq.s.rounded"},{"value":"12","label":"t:tq.s.more_rounded"},{"value":"999","label":"t:tq.s.pill"}],"default":"theme"}
+  ]}
 {% endschema %}

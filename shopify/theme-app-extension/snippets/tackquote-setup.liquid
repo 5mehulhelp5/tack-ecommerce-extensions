@@ -1,0 +1,7 @@
+{%- comment -%} The merchant-only "not configured" note. @param {string} attrs - block.shopify_attributes {%- endcomment -%}
+{%- if request.design_mode -%}
+  <div class="tackquote-setup" {{ attrs }}>
+    <strong>{{ 'tackquote.setup.title' | t }}</strong>
+    <p>{{ 'tackquote.setup.proxy' | t }}</p>
+  </div>
+{%- endif -%}

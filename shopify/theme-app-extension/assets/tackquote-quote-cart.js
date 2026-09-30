@@ -27,6 +27,24 @@
     }
   };
 
+  /**
+   * Pure: cart.js lines to quote lines, ONE per variant with quantities summed.
+   * A cart can carry the same variant on two lines (different properties or
+   * selling plans); with `replace` the second would overwrite the first. The
+   * 100-line cap is then counted on the aggregated lines, in the merge.
+   */
+  ns.cartLines = (items) => {
+    const by = new Map();
+    for (const i of items || []) {
+      const id = String(i.variant_id);
+      const q = Number(i.quantity) > 0 ? Number(i.quantity) : 0;
+      const had = by.get(id);
+      if (had) had.quantity += q;
+      else by.set(id, { variantId: id, name: i.title || i.product_title, sku: i.sku || '', quantity: q });
+    }
+    return Array.from(by.values()).filter((l) => l.quantity > 0);
+  };
+
   const paint = (n) => {
     const c = typeof n === 'number' ? n : ns.quoteCount();
     document.querySelectorAll('[data-tackquote-count]').forEach((el) => {
@@ -128,12 +146,7 @@
           return r.json();
         })
         .then((cart) => {
-          const lines = (cart.items || []).map((i) => ({
-            variantId: String(i.variant_id),
-            name: i.title || i.product_title,
-            sku: i.sku || '',
-            quantity: i.quantity,
-          }));
+          const lines = ns.cartLines(cart.items);
           if (!lines.length) {
             status.textContent = d.msgCartEmpty;
             return;

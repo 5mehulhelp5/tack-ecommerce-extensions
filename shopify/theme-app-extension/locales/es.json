@@ -65,7 +65,10 @@
       "fab_label": "Presupuesto",
       "target_price": "Tu precio objetivo (por unidad)",
       "editor_view": "Ver presupuesto aparece aquí cuando el presupuesto tiene artículos.",
-      "card_failed": "No hemos podido añadir ese artículo. Inténtalo de nuevo."
+      "card_failed": "No hemos podido añadir ese artículo. Inténtalo de nuevo.",
+      "files": "Adjuntar archivos (opcional)",
+      "files_help": "Hasta 3 archivos PDF, JPEG o PNG, de 5 MB cada uno.",
+      "files_max": "Adjunta como máximo 3 archivos."
     },
     "signup": {
       "loading": "Cargando el formulario de solicitud",

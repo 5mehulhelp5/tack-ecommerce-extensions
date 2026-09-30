@@ -1,33 +1,7 @@
 {%- comment -%}
-  Catalog visibility (TackQuote metafield contract v2) for the product blocks.
-
-  Outputs exactly one of:
-    `hidden`        a shopper who may not buy this product: the calling block
-                    renders nothing, so no price, quantity break, limit or quote
-                    control is offered for it;
-    the editor note in the theme editor, for a restricted product, so the
-                    merchant sees why shoppers may not see the block;
-    nothing         an unrestricted product, or one this shopper may buy.
-
-  It reads the product's `$app:visibility` and the customer's `$app:groups`
-  (the buyer-group codes of `$app:buyer` and nothing else: `$app:buyer` also
-  carries confidential prices, so it is never exposed to the storefront),
-  through the reserved-prefix syntax documented for theme app extensions
-  (https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/configuration,
-  "Reserved prefixes for metafields and metaobjects"). The rule is the one the
-  checkout validation Function enforces (`is_entitled` in
-  shopify/functions/contract/contract.rs):
-    1. deny first: a linked buyer in any `d` audience may not buy;
-    2. then `a`: only a linked buyer in an `a` audience may; a guest never may;
-    3. `*` means any linked TackQuote buyer, never a guest.
-  A value that is not a v2 document is not a restriction, exactly as the
-  Function treats it. The Function is what enforces this at checkout; this
-  snippet only stops the storefront from offering what checkout will refuse.
-
+  README.md, Liquid design notes: tackquote-visibility.liquid (1). Mirrors is_entitled
+  in shopify/functions/contract/contract.rs.
   @param {product} product - The product the calling block is rendered for.
-
-  @example
-  {%- capture tackquote_access -%}{% render 'tackquote-visibility', product: product %}{%- endcapture -%}
 {%- endcomment -%}
 {%- liquid
   assign vis = product.metafields['$app'].visibility.value

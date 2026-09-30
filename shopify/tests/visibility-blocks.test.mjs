@@ -76,7 +76,8 @@ test('the snippet implements the Function rule: v2 only, deny first, then allow,
 });
 
 test('the editor note exists in every storefront locale', () => {
-  for (const f of readdirSync(new URL('locales/', EXT)).filter((x) => x.endsWith('.json'))) {
+  // Storefront locales only: *.schema.json holds theme-editor labels.
+  for (const f of readdirSync(new URL('locales/', EXT)).filter((x) => x.endsWith('.json') && !x.endsWith('.schema.json'))) {
     const l = JSON.parse(read(`locales/${f}`));
     assert.equal(typeof l.tackquote.visibility.editor_note, 'string', f);
   }

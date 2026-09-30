@@ -4,12 +4,7 @@
 -%}
 
 {%- if proxy_path == blank -%}
-  {%- if request.design_mode -%}
-    <div class="tackquote-setup" {{ block.shopify_attributes }}>
-      <strong>{{ 'tackquote.setup.title' | t }}</strong>
-      <p>{{ 'tackquote.setup.proxy' | t }}</p>
-    </div>
-  {%- endif -%}
+  {% render 'tackquote-setup', attrs: block.shopify_attributes %}
 {%- elsif customer == blank -%}
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
@@ -24,33 +19,33 @@
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
     class="tackquote-block tackquote-qo"
-    data-tackquote-mode="quick-order"
-    data-tackquote-proxy="{{ proxy_path | escape }}"
-    data-tackquote-currency="{{ cart.currency.iso_code }}"
-    data-tackquote-design="{% if request.design_mode %}true{% else %}false{% endif %}"
-    data-msg-col-sku="{{ 'tackquote.quick_order.col_sku' | t | escape }}"
-    data-msg-col-item="{{ 'tackquote.quick_order.col_item' | t | escape }}"
-    data-msg-col-qty="{{ 'tackquote.quick_order.col_qty' | t | escape }}"
-    data-msg-col-price="{{ 'tackquote.quick_order.col_price' | t | escape }}"
-    data-msg-each="{{ 'tackquote.price.each' | t | escape }}"
-    data-msg-not-found="{{ 'tackquote.quick_order.not_found' | t | escape }}"
-    data-msg-price-at-checkout="{{ 'tackquote.quick_order.price_at_checkout' | t | escape }}"
-    data-msg-currency="{{ 'tackquote.currency.quote' | t | escape }}"
-    data-msg-limit-min="{{ 'tackquote.quick_order.limit_min' | t | escape }}"
-    data-msg-limit-max="{{ 'tackquote.quick_order.limit_max' | t | escape }}"
-    data-msg-empty="{{ 'tackquote.quick_order.empty' | t | escape }}"
-    data-msg-too-many="{{ 'tackquote.quick_order.too_many' | t | escape }}"
-    data-msg-bad-lines="{{ 'tackquote.quick_order.bad_lines' | t | escape }}"
-    data-msg-loading="{{ 'tackquote.quick_order.loading' | t | escape }}"
-    data-msg-unlinked="{{ 'tackquote.quick_order.unlinked' | t | escape }}"
-    data-msg-sign-in="{{ 'tackquote.quick_order.sign_in' | t | escape }}"
-    data-msg-error="{{ 'tackquote.quick_order.error' | t | escape }}"
-    data-msg-added-cart="{{ 'tackquote.quick_order.added_cart' | t | escape }}"
-    data-msg-cart-failed="{{ 'tackquote.quick_order.cart_failed' | t | escape }}"
-    data-msg-quote-failed="{{ 'tackquote.quick_order.quote_failed' | t | escape }}"
-    {{ tackquote_diagnostics | split: '-->' | last | split: '<!--' | first }}
-    {{ tq_attrs }}
-    {{ block.shopify_attributes }}
+  data-tackquote-mode="quick-order"
+  data-tackquote-proxy="{{ proxy_path | escape }}"
+  data-tackquote-currency="{{ cart.currency.iso_code }}"
+  data-tackquote-design="{% if request.design_mode %}true{% else %}false{% endif %}"
+  data-msg-col-sku="{{ 'tackquote.quick_order.col_sku' | t | escape }}"
+  data-msg-col-item="{{ 'tackquote.quick_order.col_item' | t | escape }}"
+  data-msg-col-qty="{{ 'tackquote.quick_order.col_qty' | t | escape }}"
+  data-msg-col-price="{{ 'tackquote.quick_order.col_price' | t | escape }}"
+  data-msg-each="{{ 'tackquote.price.each' | t | escape }}"
+  data-msg-not-found="{{ 'tackquote.quick_order.not_found' | t | escape }}"
+  data-msg-price-at-checkout="{{ 'tackquote.quick_order.price_at_checkout' | t | escape }}"
+  data-msg-currency="{{ 'tackquote.currency.quote' | t | escape }}"
+  data-msg-limit-min="{{ 'tackquote.quick_order.limit_min' | t | escape }}"
+  data-msg-limit-max="{{ 'tackquote.quick_order.limit_max' | t | escape }}"
+  data-msg-empty="{{ 'tackquote.quick_order.empty' | t | escape }}"
+  data-msg-too-many="{{ 'tackquote.quick_order.too_many' | t | escape }}"
+  data-msg-bad-lines="{{ 'tackquote.quick_order.bad_lines' | t | escape }}"
+  data-msg-loading="{{ 'tackquote.quick_order.loading' | t | escape }}"
+  data-msg-unlinked="{{ 'tackquote.quick_order.unlinked' | t | escape }}"
+  data-msg-sign-in="{{ 'tackquote.quick_order.sign_in' | t | escape }}"
+  data-msg-error="{{ 'tackquote.quick_order.error' | t | escape }}"
+  data-msg-added-cart="{{ 'tackquote.quick_order.added_cart' | t | escape }}"
+  data-msg-cart-failed="{{ 'tackquote.quick_order.cart_failed' | t | escape }}"
+  data-msg-quote-failed="{{ 'tackquote.quick_order.quote_failed' | t | escape }}"
+  {{ tackquote_diagnostics | split: '-->' | last | split: '<!--' | first }}
+  {{ tq_attrs }}
+  {{ block.shopify_attributes }}
   >
     <h3 class="tackquote-qo__heading">{{ block.settings.heading | default: 'Quick order' | escape }}</h3>
     <label class="tackquote-qo__label" for="tackquote-qo-{{ block.id }}">{{ 'tackquote.quick_order.help' | t }}</label>
@@ -61,7 +56,7 @@
       spellcheck="false"
       autocomplete="off"
       placeholder="{{ 'tackquote.quick_order.placeholder' | t | escape }}"
-      data-tackquote-qo-input
+  data-tackquote-qo-input
     ></textarea>
     <div class="tackquote-qo__actions">
       <button type="button" class="tackquote-button tackquote-button--outline" data-tackquote-qo-check>
@@ -90,49 +85,18 @@
 {%- endif -%}
 
 {% schema %}
-{
-  "name": "Quick Order",
-  "target": "section",
-  "enabled_on": {
-    "templates": [
-      "product",
-      "page"
-    ]
-  },
-  "stylesheet": "tackquote.css",
-  "javascript": "tackquote-quick-order.js",
-  "settings": [
-    {
-      "type": "paragraph",
-      "content": "Lets a signed-in trade buyer paste SKUs and quantities and add them all to the cart or to a quote at once. Prices and order limits come from TackQuote. Shoppers who are not signed in see a sign-in link."
-    },
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading",
-      "default": "Quick order"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_quote",
-      "label": "Show Add all to quote",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "proxy_path",
-      "label": "Advanced: app URL prefix",
-      "default": "/apps/tackquote",
-      "info": "Leave this as it is. Change it only if you renamed the TackQuote app proxy in Shopify (Settings, Apps and sales channels, TackQuote, App proxy)."
-    },
-    {"type":"header","content":"Style","info":"Match theme (or empty) uses your theme's fonts, colors, corners and buttons."},
-    {"type":"select","id":"tq_size","label":"Text size","options":[{"value":"0.875","label":"Smaller"},{"value":"1","label":"Match theme"},{"value":"1.125","label":"Larger"},{"value":"1.25","label":"Largest"}],"default":"1"},
-    {"type":"select","id":"tq_font","label":"Font","options":[{"value":"theme","label":"Match theme"},{"value":"system","label":"System font"}],"default":"theme"},
-    {"type":"color","id":"tq_text","label":"Text color"},
-    {"type":"color","id":"tq_bg","label":"Background color"},
-    {"type":"color","id":"tq_accent","label":"Button color"},
-    {"type":"color","id":"tq_accent_text","label":"Button text color"},
-    {"type":"select","id":"tq_radius","label":"Corner radius","options":[{"value":"theme","label":"Match theme"},{"value":"0","label":"Square"},{"value":"4","label":"Slight"},{"value":"8","label":"Rounded"},{"value":"12","label":"More rounded"},{"value":"999","label":"Pill"}],"default":"theme"}
-  ]
-}
+{"name": "Quick Order", "target": "section", "enabled_on": {"templates": ["product", "page"]}, "stylesheet": "tackquote.css", "javascript": "tackquote-quick-order.js","settings":[
+    {"type":"paragraph","content":"t:tq.p.quick_order_1"},
+    {"type":"text","id":"heading","label":"Heading","default":"Quick order"},
+    {"type":"checkbox","id":"show_quote","label":"Show Add all to quote","default":true},
+    {"type":"text","id":"proxy_path","label":"t:tq.c.proxy","default":"/apps/tackquote","info":"t:tq.c.proxy_info"},
+    {"type":"header","content":"t:tq.s.header","info":"t:tq.s.info"},
+    {"type":"select","id":"tq_size","label":"t:tq.s.size","options":[{"value":"0.875","label":"t:tq.s.smaller"},{"value":"1","label":"t:tq.s.match"},{"value":"1.125","label":"t:tq.s.larger"},{"value":"1.25","label":"t:tq.s.largest"}],"default":"1"},
+    {"type":"select","id":"tq_font","label":"t:tq.s.font","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"system","label":"t:tq.s.system"}],"default":"theme"},
+    {"type":"color","id":"tq_text","label":"t:tq.s.text"},
+    {"type":"color","id":"tq_bg","label":"t:tq.s.bg"},
+    {"type":"color","id":"tq_accent","label":"t:tq.s.accent"},
+    {"type":"color","id":"tq_accent_text","label":"t:tq.s.accent_text"},
+    {"type":"select","id":"tq_radius","label":"t:tq.s.radius","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"0","label":"t:tq.s.square"},{"value":"4","label":"t:tq.s.slight"},{"value":"8","label":"t:tq.s.rounded"},{"value":"12","label":"t:tq.s.more_rounded"},{"value":"999","label":"t:tq.s.pill"}],"default":"theme"}
+  ]}
 {% endschema %}

@@ -571,8 +571,12 @@ export const SIZE_LIMITS = {
   jsGzipBytes: 10 * 1024,
   /** Per schema-referenced CSS asset, gzipped. Suggested, not enforced. */
   cssGzipBytes: 100 * 1024,
-  /** Every .liquid file in the extension, added together. ENFORCED. */
-  totalLiquidBytes: 100 * 1024,
+  /**
+   * Every .liquid file in the extension, added together. ENFORCED by Shopify at
+   * 100 KB; ratcheted to 100,000 B (2026-10-01) so the decimal reading of
+   * "100 KB" also passes, after the extension reached 98.5 KB.
+   */
+  totalLiquidBytes: 100_000,
 };
 
 export function gzipBytes(filePath) {
@@ -635,7 +639,7 @@ describe('the size guards can fail', () => {
     // without someone deliberately editing these three numbers.
     assert.equal(SIZE_LIMITS.jsGzipBytes, 10240);
     assert.equal(SIZE_LIMITS.cssGzipBytes, 102400);
-    assert.equal(SIZE_LIMITS.totalLiquidBytes, 102400);
+    assert.equal(SIZE_LIMITS.totalLiquidBytes, 100000);
   });
 
   test('finds every liquid file, snippets included', () => {
@@ -774,5 +778,38 @@ describe('the 100-line quote cap', () => {
   test('no storefront price is ever sent: only a price the buyer typed', () => {
     assert.match(quote, /price: d\.tackquoteTargetPrice !== undefined && typeof i\.target === 'number' \? i\.target : undefined/);
     assert.ok(!/variant\.price|\.price\b(?!:)/.test(quote.replace(/price: d\.tackquote/, '')), 'reads a catalog price');
+  });
+});
+
+/*
+ * Schema translations (2026-10-01). Repeated setting labels live in
+ * locales/*.schema.json as `t:` keys to keep the Liquid under Shopify's
+ * enforced total. A `t:` key with no default entry shows the raw key to the
+ * merchant in the theme editor.
+ */
+describe('schema translations', () => {
+  const LOC = path.join(EXTENSION_DIR, 'locales');
+  const load = (f) => JSON.parse(fs.readFileSync(path.join(LOC, f), 'utf8'));
+  const en = load('en.default.schema.json');
+  const get = (o, k) => k.split('.').reduce((n, p) => n?.[p], o);
+  const keys = new Set();
+  for (const file of blockFiles()) {
+    for (const m of schemaBodyOf(file).matchAll(/"t:([a-z0-9_.]+)"/g)) keys.add(m[1]);
+  }
+  test('the blocks do use schema keys (guards the regex)', () => {
+    assert.ok(keys.size >= 20, `found ${keys.size}`);
+  });
+  for (const k of keys) {
+    test(`t:${k} resolves in en.default.schema.json`, () => {
+      assert.equal(typeof get(en, k), 'string');
+    });
+  }
+  test('every schema label and help text is translated in every locale', () => {
+    for (const lang of ['de', 'es', 'fr', 'it', 'nl', 'pt-BR', 'ja']) {
+      const tr = load(`${lang}.schema.json`);
+      for (const g of ['s', 'c', 'p']) {
+        assert.deepStrictEqual(Object.keys(tr.tq[g]).sort(), Object.keys(en.tq[g]).sort(), `${lang} tq.${g}`);
+      }
+    }
   });
 });

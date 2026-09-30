@@ -65,7 +65,10 @@
       "fab_label": "Quote",
       "target_price": "Your target price (each)",
       "editor_view": "View quote appears here once the quote has items.",
-      "card_failed": "We could not add that item. Please try again."
+      "card_failed": "We could not add that item. Please try again.",
+      "files": "Attach files (optional)",
+      "files_help": "Up to 3 PDF, JPEG or PNG files, 5 MB each.",
+      "files_max": "Please attach up to 3 files."
     },
     "signup": {
       "loading": "Loading the application form",

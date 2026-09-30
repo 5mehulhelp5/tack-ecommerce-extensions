@@ -7,6 +7,10 @@
  * product goes straight into the quote; a product with options opens its page,
  * because guessing a variant would quote the wrong thing. No price is read.
  *
+ * No layout shift: the button is OVERLAID in the card's top corner
+ * (position:absolute; the card becomes position:relative only if it was
+ * static), so nothing visible moves when it arrives.
+ * https://shopify.dev/docs/storefronts/themes/best-practices/performance/reserve-space-app-injected
  * Re-scans (debounced) when the theme re-renders the grid: filters, sorting,
  * infinite scroll. Capped per scan so a long page costs little.
  */
@@ -38,8 +42,10 @@
       const s = btn.parentNode.querySelector('[data-tackquote-card-status]');
       if (s) s.textContent = t;
     };
-    if (!handle) return;
-    btn.disabled = true;
+    // Busy, not disabled: a disabled trigger cannot take focus back when the
+    // quote dialog it opened closes.
+    if (!handle || btn.getAttribute('aria-busy') === 'true') return;
+    btn.setAttribute('aria-busy', 'true');
     fetch(`${shopRoot}products/${encodeURIComponent(handle)}.js`, { headers: { Accept: 'application/json' }, credentials: 'same-origin' })
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -62,7 +68,7 @@
       })
       .catch(() => say(d.msgFailure))
       .finally(() => {
-        btn.disabled = false;
+        btn.removeAttribute('aria-busy');
       });
   }
 
@@ -80,6 +86,7 @@
         e.stopPropagation();
         add(btn, link);
       });
+      if (window.getComputedStyle(card).position === 'static') card.style.position = 'relative';
       card.appendChild(frag);
       if (ns.theme) ns.theme.apply(card.querySelector('.tackquote-card-add'));
       n += 1;

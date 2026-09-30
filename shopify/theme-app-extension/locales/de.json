@@ -65,7 +65,10 @@
       "fab_label": "Angebot",
       "target_price": "Ihr Wunschpreis (pro Stück)",
       "editor_view": "Angebot ansehen erscheint hier, sobald die Anfrage Artikel enthält.",
-      "card_failed": "Der Artikel konnte nicht hinzugefügt werden. Bitte versuchen Sie es erneut."
+      "card_failed": "Der Artikel konnte nicht hinzugefügt werden. Bitte versuchen Sie es erneut.",
+      "files": "Dateien anhängen (optional)",
+      "files_help": "Bis zu 3 PDF-, JPEG- oder PNG-Dateien, je 5 MB.",
+      "files_max": "Bitte hängen Sie höchstens 3 Dateien an."
     },
     "signup": {
       "loading": "Antragsformular wird geladen",

@@ -3,53 +3,43 @@
   assign variant = product.selected_or_first_available_variant
 -%}
 
-{%- comment -%}
-  Catalog visibility: a product restricted to TackQuote buyer groups offers
-  no price, break, limit or quote control to a shopper who may not buy it.
-  The rule, and why, is in snippets/tackquote-visibility.liquid.
-{%- endcomment -%}
+{%- # README.md, Liquid design notes: add-to-quote.liquid (1) -%}
 {%- capture tackquote_access -%}{% render 'tackquote-visibility', product: product %}{%- endcapture -%}
 {%- assign tackquote_access = tackquote_access | strip -%}
 {%- unless tackquote_access == 'hidden' -%}
 {{ tackquote_access }}
 {%- if proxy_path == blank -%}
-  {%- if request.design_mode -%}
-    <div class="tackquote-setup" {{ block.shopify_attributes }}>
-      <strong>{{ 'tackquote.setup.title' | t }}</strong>
-      <p>{{ 'tackquote.setup.proxy' | t }}</p>
-    </div>
-  {%- endif -%}
+  {% render 'tackquote-setup', attrs: block.shopify_attributes %}
 {%- else -%}
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
     class="tackquote-block tackquote-add"
-    data-tackquote-mode="add"
-    data-tackquote-proxy="{{ proxy_path | escape }}"
-    data-tackquote-product="{{ product.title | escape }}"
-    data-tackquote-variant="{{ variant.id }}"
-    data-tackquote-currency="{{ cart.currency.iso_code | default: shop.currency }}"
-    {{ tq_attrs }}
-    {{ block.shopify_attributes }}
+  data-tackquote-mode="add"
+  data-tackquote-proxy="{{ proxy_path | escape }}"
+  data-tackquote-product="{{ product.title | escape }}"
+  data-tackquote-variant="{{ variant.id }}"
+  data-tackquote-currency="{{ cart.currency.iso_code | default: shop.currency }}"
+  {{ tq_attrs }}
+  {{ block.shopify_attributes }}
   >
     {% render 'tackquote-selection', product: product %}
     <button
       type="button"
       class="tackquote-button tackquote-button--{{ block.settings.button_style }}{% if block.settings.button_style == 'theme' %} button button--primary btn{% endif %}"
-      data-tackquote-action="add"
+  data-tackquote-action="add"
     >
-      {%- comment -%}The schema default is English. Left as it is (or blank), the
-      shopper's language is used instead; a merchant's own wording is kept.{%- endcomment -%}
+      {%- # README.md, Liquid design notes: add-to-quote.liquid (2) -%}
       {%- assign tackquote_label = block.settings.button_label | strip -%}
       {%- if tackquote_label == blank or tackquote_label == 'Add to Quote' -%}
         {%- assign tackquote_label = 'tackquote.quote.add_button' | t -%}
       {%- endif -%}
-      {{ tackquote_label }}
+  {{ tackquote_label }}
     </button>
     <p class="tackquote-status" data-tackquote-status role="status" aria-live="polite"></p>
   </div>
 
-  {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs, target_price: block.settings.target_price %}
+  {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs, target_price: block.settings.target_price, message: block.settings.allow_message, files: block.settings.allow_files %}
   <script src="{{ 'tackquote-quote-cart.js' | asset_url }}" defer></script>
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
   <script src="{{ 'tackquote-theme.js' | asset_url }}" async></script>
@@ -57,59 +47,20 @@
 {%- endunless -%}
 
 {% schema %}
-{
-  "name": "Add to Quote",
-  "target": "section",
-  "enabled_on": {
-    "templates": [
-      "product"
-    ]
-  },
-  "stylesheet": "tackquote.css",
-  "javascript": "tackquote-quote.js",
-  "settings": [
-    {
-      "type": "text",
-      "id": "proxy_path",
-      "label": "Advanced: app URL prefix",
-      "default": "/apps/tackquote",
-      "info": "Leave this as it is. Change it only if you renamed the TackQuote app proxy in Shopify (Settings, Apps and sales channels, TackQuote, App proxy)."
-    },
-    {
-      "type": "text",
-      "id": "button_label",
-      "label": "Button text",
-      "default": "Add to Quote"
-    },
-    {
-      "type": "select",
-      "id": "button_style",
-      "label": "Button style",
-      "options": [
-        {
-          "value": "theme",
-          "label": "Match my theme's buttons"
-        },
-        {
-          "value": "solid",
-          "label": "Solid"
-        },
-        {
-          "value": "outline",
-          "label": "Outline"
-        }
-      ],
-      "default": "theme"
-    },
-    {"type": "checkbox", "id": "target_price", "label": "Ask for a target price", "info": "Adds an optional Your target price field to each line of the quote form. Only what the buyer types is sent, never your storefront price.", "default": false},
-    {"type":"header","content":"Style","info":"Match theme (or empty) uses your theme's fonts, colors, corners and buttons."},
-    {"type":"select","id":"tq_size","label":"Text size","options":[{"value":"0.875","label":"Smaller"},{"value":"1","label":"Match theme"},{"value":"1.125","label":"Larger"},{"value":"1.25","label":"Largest"}],"default":"1"},
-    {"type":"select","id":"tq_font","label":"Font","options":[{"value":"theme","label":"Match theme"},{"value":"system","label":"System font"}],"default":"theme"},
-    {"type":"color","id":"tq_text","label":"Text color"},
-    {"type":"color","id":"tq_bg","label":"Background color"},
-    {"type":"color","id":"tq_accent","label":"Button color"},
-    {"type":"color","id":"tq_accent_text","label":"Button text color"},
-    {"type":"select","id":"tq_radius","label":"Corner radius","options":[{"value":"theme","label":"Match theme"},{"value":"0","label":"Square"},{"value":"4","label":"Slight"},{"value":"8","label":"Rounded"},{"value":"12","label":"More rounded"},{"value":"999","label":"Pill"}],"default":"theme"}
-  ]
-}
+{"name": "Add to Quote", "target": "section", "enabled_on": {"templates": ["product"]}, "stylesheet": "tackquote.css", "javascript": "tackquote-quote.js","settings":[
+    {"type":"text","id":"button_label","label":"Button text","default":"Add to Quote"},
+    {"type":"select","id":"button_style","label":"Button style","options":[{"value":"theme","label":"Match my theme's buttons"},{"value":"solid","label":"Solid"},{"value":"outline","label":"Outline"}],"default":"theme"},
+    {"type":"checkbox","id":"target_price","label":"t:tq.c.target","info":"t:tq.c.target_info","default":false},
+    {"type":"checkbox","id":"allow_message","label":"t:tq.c.message","default":false},
+    {"type":"checkbox","id":"allow_files","label":"t:tq.c.files","info":"t:tq.c.files_info","default":false},
+    {"type":"text","id":"proxy_path","label":"t:tq.c.proxy","default":"/apps/tackquote","info":"t:tq.c.proxy_info"},
+    {"type":"header","content":"t:tq.s.header","info":"t:tq.s.info"},
+    {"type":"select","id":"tq_size","label":"t:tq.s.size","options":[{"value":"0.875","label":"t:tq.s.smaller"},{"value":"1","label":"t:tq.s.match"},{"value":"1.125","label":"t:tq.s.larger"},{"value":"1.25","label":"t:tq.s.largest"}],"default":"1"},
+    {"type":"select","id":"tq_font","label":"t:tq.s.font","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"system","label":"t:tq.s.system"}],"default":"theme"},
+    {"type":"color","id":"tq_text","label":"t:tq.s.text"},
+    {"type":"color","id":"tq_bg","label":"t:tq.s.bg"},
+    {"type":"color","id":"tq_accent","label":"t:tq.s.accent"},
+    {"type":"color","id":"tq_accent_text","label":"t:tq.s.accent_text"},
+    {"type":"select","id":"tq_radius","label":"t:tq.s.radius","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"0","label":"t:tq.s.square"},{"value":"4","label":"t:tq.s.slight"},{"value":"8","label":"t:tq.s.rounded"},{"value":"12","label":"t:tq.s.more_rounded"},{"value":"999","label":"t:tq.s.pill"}],"default":"theme"}
+  ]}
 {% endschema %}

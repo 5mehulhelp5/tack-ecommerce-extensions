@@ -1,24 +1,6 @@
 {%- comment -%}
-  The merchant's style overrides for one block or embed, as ATTRIBUTES for its
-  root tag: a `style` of --tqm-* custom properties, plus `data-tqm-bg` when a
-  background is set (so the root gets padding). Every setting defaults to
-  "Match theme", which emits nothing.
-
-  Only TackQuote's own --tqm-* properties are written, never a theme token
-  (--color-foreground, --color-button, --buttons-radius, --inputs-radius):
-  Horizon holds full colours where Dawn holds r,g,b triplets, and Dawn derives
-  --buttons-radius-outset from --buttons-radius, so writing either breaks one.
-
-  Rendered inside an attribute list, so every caller MUST strip the theme
-  editor's snippet markers, as snippets/tackquote-diagnostics.liquid explains:
-  output through  split: '-->' | last | split: '<!--' | first .
-
+  README.md, Liquid design notes: tackquote-style.liquid (1).
   @param {object} s - The block's settings (block.settings).
-
-  @example
-  {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
-  {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
-  <div {{ tq_attrs }}></div>
 {%- endcomment -%}
 {%- liquid
   assign st = ''

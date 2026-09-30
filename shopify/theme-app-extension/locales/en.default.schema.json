@@ -1,0 +1,53 @@
+{
+  "tq": {
+    "s": {
+      "header": "Style",
+      "info": "Match theme (or empty) uses your theme’s fonts, colors, corners and buttons.",
+      "size": "Text size",
+      "smaller": "Smaller",
+      "match": "Match theme",
+      "larger": "Larger",
+      "largest": "Largest",
+      "font": "Font",
+      "system": "System font",
+      "text": "Text color",
+      "bg": "Background color",
+      "accent": "Button color",
+      "accent_text": "Button text color",
+      "radius": "Corner radius",
+      "square": "Square",
+      "slight": "Slight",
+      "rounded": "Rounded",
+      "more_rounded": "More rounded",
+      "pill": "Pill"
+    },
+    "c": {
+      "proxy": "Advanced: app URL prefix",
+      "proxy_info": "Leave this as it is. Change it only if you renamed the TackQuote app proxy in Shopify (Settings, Apps and sales channels, TackQuote, App proxy).",
+      "target": "Ask for a target price",
+      "target_info": "Adds an optional Your target price field to each line. Only what the buyer types is sent, never your storefront price.",
+      "message": "Let buyers add a message",
+      "files": "Let buyers attach files",
+      "files_info": "Up to 3 PDF, JPEG or PNG files of 5 MB each.",
+      "quote_page": "Quote page (optional)",
+      "quote_page_info": "Pick the page that holds the Quote page block to open it instead of the pop-up."
+    },
+    "p": {
+      "buyer_group_badge_1": "Shows the signed-in customer’s TackQuote buyer group, for example “Tier 2”. A shopper who is signed out, is not linked to a TackQuote buyer, or belongs to no group sees nothing at all.",
+      "credit_application_1": "Lets a signed-in wholesale customer apply for net payment terms. Applications land in TackQuote for review; nothing is approved automatically.",
+      "order_limits_1": "States the minimum (or maximum) order rules that apply to this product, on the product page. The rules are shown to shoppers here and applied when TackQuote builds a quote or draft order. When checkout pricing is on in TackQuote they are also enforced at Shopify checkout, and the block says so; otherwise they are not enforced in the storefront cart or at checkout. Rules are managed in TackQuote under Order Limits.",
+      "order_limits_2": "Blanket rules are shown to every visitor, because everyone is subject to them. Rules that apply only to a specific buyer or company are shown only after that customer signs in, and are labelled as account-specific.",
+      "price_gate_1": "Hides prices and the add to cart button from shoppers who should not see them, and shows a Log in to see prices link instead. This hides what the storefront DISPLAYS. It is not a checkout rule, and product data your theme publishes stays public.",
+      "price_gate_2": "Products with this tag hide add to cart and Buy it now from every shopper, so a quote is the only way to buy them. Leave blank to switch off. Pair it with the Request a Quote block.",
+      "price_gate_3": "Only if your theme shows prices somewhere this misses. Comma separated CSS selectors, for example .my-price. Braces, semicolons and @ are refused.",
+      "quantity_breaks_1": "Shows the wholesale quantity-break ladder for this product. When checkout pricing is on in TackQuote the table says the prices are applied at checkout; otherwise they are offered on a quote. Every price comes from TackQuote’s own pricing engine, so this table and the Wholesale Price block can never disagree.",
+      "quantity_breaks_2": "Signed-in wholesale customers see their own ladder. Signed-out visitors see a sign-in prompt, or your public ladder if you have published one in TackQuote — see the Shopify connector guide.",
+      "quick_order_1": "Lets a signed-in trade buyer paste SKUs and quantities and add them all to the cart or to a quote at once. Prices and order limits come from TackQuote. Shoppers who are not signed in see a sign-in link.",
+      "quote_cards_1": "Adds an Add to Quote button on each product card in your collection and search grids. Products with options open their product page so the buyer can choose.",
+      "quote_cart_1": "Lets a buyer turn the cart into a quote request, and reopen their quote. Add it after the cart (the cart footer, or an Apps section below the cart).",
+      "quote_page_1": "Shows the buyer’s saved quote with quantity editing and the request form. Put it on its own page, then pick that page as the Quote page in the Floating quote cart or Quote cart button.",
+      "wholesale_price_1": "Shows the signed-in customer’s wholesale price. When checkout pricing is on in TackQuote the block says the price is applied at checkout; otherwise it offers the price on a quote. TackQuote resolves the price from the shopper’s Shopify session, so it is never read from this page and a shopper cannot alter it.",
+      "wholesale_signup_1": "Leave blank to show your default wholesale application form from TackQuote. To show a different form, paste the last part of its store link from TackQuote → Settings → Wholesale → Forms."
+    }
+  }
+}

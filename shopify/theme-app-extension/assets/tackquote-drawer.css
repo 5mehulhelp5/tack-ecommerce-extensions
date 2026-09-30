@@ -8,6 +8,7 @@
   box-sizing: border-box;
   inline-size: min(34em, calc(100vw - 2em));
   max-block-size: min(88vh, 56em);
+  max-block-size: min(88dvh, 56em);
   margin: auto;
   padding: 1.25em 1.5em 1.5em;
   overflow-y: auto;
@@ -166,6 +167,7 @@
     inline-size: 100vw;
     max-inline-size: 100vw;
     max-block-size: 92vh;
+    max-block-size: 92dvh;
     margin-block-end: 0;
     border-end-start-radius: 0;
     border-end-end-radius: 0;
@@ -237,8 +239,8 @@
   border: var(--tqd-accent-border, 0 none);
   border-radius: var(--tqm-radius, var(--tq-shape, var(--tq-r)));
   box-shadow: 0 0.35em 1.2em rgb(0 0 0 / 18%);
-  background: var(--tqm-accent, var(--tqd-fab-bg, var(--tq-accent)));
-  color: var(--tqm-accent-text, var(--tqd-fab-fg, var(--tq-accent-text)));
+  background: var(--tq-accent);
+  color: var(--tq-accent-text);
   font-family: var(--tqm-font, var(--tqd-btn-font, inherit));
   font-size: calc(var(--tqm-size, 1) * max(1em, var(--tqd-body, 1em)));
   font-weight: var(--tqd-btn-weight, 600);
@@ -298,7 +300,7 @@
 }
 .tackquote-fab > .tackquote-count {
   --tq-count-bg: currentColor;
-  --tq-count-fg: var(--tqm-accent, var(--tqd-fab-bg, var(--tq-accent)));
+  --tq-count-fg: var(--tq-accent);
 }
 .tackquote-fab[data-icon-only] > .tackquote-count,
 .tackquote-fab[data-collapsed] > .tackquote-count,
@@ -354,11 +356,21 @@
   appearance: none;
 }
 
-/* Product-card "Add to quote", injected by the Quote on product cards embed. */
+/* Product-card "Add to quote": overlaid in the card's top corner, so its
+   arrival shifts nothing (reserve-space-app-injected). */
 .tackquote-card-add {
-  position: relative;
+  position: absolute;
   z-index: 2;
-  margin-block-start: 0.5em;
+  inset-block-start: 0.5em;
+  inset-inline-end: 0.5em;
+  max-inline-size: calc(100% - 1em);
+}
+.tackquote-card-add > .tackquote-button {
+  inline-size: auto;
+  min-block-size: 44px;
+  padding-block: 0.4em;
+  padding-inline: 0.9em;
+  box-shadow: 0 0.2em 0.8em rgb(0 0 0 / 15%);
 }
 @media (prefers-reduced-motion: reduce) {
   .tackquote-fab {
