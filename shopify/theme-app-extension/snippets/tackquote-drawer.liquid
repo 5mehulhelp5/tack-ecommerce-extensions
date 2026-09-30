@@ -1,12 +1,12 @@
 {%- comment -%}
   README.md, Liquid design notes: tackquote-drawer.liquid (1).
-  @param {string} proxy - The app proxy path, already stripped of a trailing slash.
-  @param {boolean} [inline] - Render in the page instead of as a modal.
-  @param {string} [attrs] - Style attributes from tackquote-style, markers stripped.
-  @param {boolean} [target_price] - Offer an optional "Your target price" per line.
-  @param {string} [id] - An id for the dialog, for a trigger's aria-controls.
-  @param {boolean} [message] - Offer an optional buyer message.
-  @param {boolean} [files] - Offer up to 3 file attachments (quote-upload).
+  @param {string} proxy
+  @param {boolean} [inline]
+  @param {string} [attrs]
+  @param {boolean} [target_price]
+  @param {string} [id]
+  @param {boolean} [message]
+  @param {boolean} [files]
 {%- endcomment -%}
 {%- assign title = 'tackquote.quote.title' | t -%}
 {%- capture a -%}
@@ -28,6 +28,10 @@
   data-msg-decrease="{{ 'tackquote.quote.decrease' | t | escape }}"
   data-msg-increase="{{ 'tackquote.quote.increase' | t | escape }}"
   data-msg-full="{{ 'tackquote.quote.full' | t | escape }}"
+  data-msg-price="{{ 'tackquote.quote.price' | t | escape }}"
+  data-msg-your-price="{{ 'tackquote.quote.your_price' | t | escape }}"
+  data-msg-each="{{ 'tackquote.price.each' | t | escape }}"
+  data-msg-subtotal="{{ 'tackquote.quote.subtotal' | t | escape }}"
   {% if target_price %}data-tackquote-target-price data-msg-target="{{ 'tackquote.quote.target_price' | t | escape }}"{% endif %}
   {% if target_price or message or files %}data-tackquote-rich{% endif %}
   {% if files %}data-msg-files-max="{{ 'tackquote.quote.files_max' | t | escape }}" data-msg-file-type="{{ 'tackquote.signup.file_type' | t | escape }}" data-msg-file-size="{{ 'tackquote.signup.file_size' | t | escape }}" data-msg-uploading="{{ 'tackquote.signup.uploading' | t | escape }}"{% endif %}
@@ -45,6 +49,7 @@
     {%- endunless -%}
   </div>
   <ul class="tackquote-drawer__items" data-tackquote-items></ul>
+  <p class="tackquote-drawer__subtotal" data-tackquote-subtotal hidden></p>
   <p class="tackquote-drawer__empty" data-tackquote-empty>{{ 'tackquote.quote.empty' | t }}</p>
   <div class="tackquote-drawer__form">
     <label class="tackquote-drawer__label">
@@ -78,6 +83,7 @@
   </div>
 {%- endcapture -%}
 {{ 'tackquote-drawer.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'tackquote-quote-lines.js' | asset_url }}" defer></script>
 {%- if message or files -%}<script src="{{ 'tackquote-attach.js' | asset_url }}" defer></script>{%- endif -%}
 {%- if inline -%}
   <section class="tackquote-drawer tackquote-drawer--inline" data-tackquote-inline {{ a }}>{{ inner }}</section>

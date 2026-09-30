@@ -24,13 +24,16 @@
     "c": {
       "proxy": "Avancé : préfixe d’URL de l’app",
       "proxy_info": "Laissez tel quel. Modifiez-le uniquement si vous avez renommé le proxy d’app TackQuote dans Shopify (Paramètres, Applications et canaux de vente, TackQuote, Proxy d’app).",
-      "target": "Demander un prix cible",
+      "target": "Permettre aux acheteurs d’indiquer le prix demandé",
       "target_info": "Ajoute un champ facultatif Votre prix cible à chaque ligne. Seule la saisie de l’acheteur est envoyée, jamais le prix de votre boutique.",
       "message": "Permettre aux acheteurs d’ajouter un message",
       "files": "Permettre aux acheteurs de joindre des fichiers",
       "files_info": "Jusqu’à 3 fichiers PDF, JPEG ou PNG de 5 Mo chacun.",
       "quote_page": "Page de devis (facultatif)",
-      "quote_page_info": "Choisissez la page contenant le bloc Page de devis pour l’ouvrir à la place de la fenêtre."
+      "quote_page_info": "Choisissez la page contenant le bloc Page de devis pour l’ouvrir à la place de la fenêtre.",
+      "soldout": "Quand la variante est épuisée",
+      "soldout_allow": "Autoriser les demandes de devis",
+      "soldout_disable": "Désactiver le bouton"
     },
     "p": {
       "buyer_group_badge_1": "Affiche le groupe d’acheteurs TackQuote du client connecté, par exemple « Niveau 2 ». Un visiteur déconnecté, non lié à un acheteur TackQuote ou sans groupe ne voit rien.",

@@ -63,12 +63,16 @@
       "cart_empty": "Your cart is empty.",
       "cart_failed": "We could not read your cart. Please try again.",
       "fab_label": "Quote",
-      "target_price": "Your target price (each)",
+      "target_price": "Price you are asking for (each)",
       "editor_view": "View quote appears here once the quote has items.",
       "card_failed": "We could not add that item. Please try again.",
       "files": "Attach files (optional)",
       "files_help": "Up to 3 PDF, JPEG or PNG files, 5 MB each.",
-      "files_max": "Please attach up to 3 files."
+      "files_max": "Please attach up to 3 files.",
+      "out_of_stock": "Out of stock — quote request",
+      "price": "Price",
+      "your_price": "Your price",
+      "subtotal": "Estimated subtotal: {amount}. Your quote confirms the final price."
     },
     "signup": {
       "loading": "Loading the application form",
@@ -109,7 +113,8 @@
       "heading_applied": "Wholesale quantity pricing, applied at checkout",
       "caption_applied": "Wholesale price per unit by quantity, applied at checkout",
       "price_applied": "Your price each",
-      "applied_note": "Applied at checkout."
+      "applied_note": "Applied at checkout.",
+      "heading": "Wholesale quantity pricing"
     },
     "badge": {
       "label": "Your pricing tier",

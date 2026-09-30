@@ -2,15 +2,15 @@
   assign proxy_path = block.settings.proxy_path | strip | split: '/' | join: '/'
   assign label_request = block.settings.request_label | strip
   if label_request == blank or label_request == 'Request a quote for your cart'
-    assign label_request = 'tackquote.quote.cart_request' | t
+  assign label_request = 'tackquote.quote.cart_request' | t
   endif
   assign label_view = block.settings.view_label | strip
   if label_view == blank or label_view == 'View quote'
-    assign label_view = 'tackquote.quote.view' | t
+  assign label_view = 'tackquote.quote.view' | t
   endif
   assign quote_page = ''
   if block.settings.quote_page != blank
-    assign quote_page = block.settings.quote_page.url
+  assign quote_page = block.settings.quote_page.url
   endif
 -%}
 
@@ -21,7 +21,7 @@
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
-    class="tackquote-qcart"
+  class="tackquote-qcart"
   data-tq-root
   data-placement="{{ block.settings.placement | escape }}"
   data-msg-sending="{{ 'tackquote.quote.sending' | t | escape }}"
@@ -32,29 +32,29 @@
   {{ tq_attrs }}
   {{ block.shopify_attributes }}
   >
-    {%- if cart.item_count > 0 or request.design_mode -%}
-      <button type="button" class="tackquote-button tackquote-button--theme button button--primary btn" data-tackquote-cart-import>
-        {{- label_request -}}
-      </button>
-    {%- endif -%}
-    <button
-      type="button"
-      class="tackquote-button tackquote-button--theme tackquote-hidden-empty button button--secondary btn btn--secondary"
+  {%- if cart.item_count > 0 or request.design_mode -%}
+  <button type="button" class="tackquote-button tackquote-button--theme button button--primary btn" data-tackquote-cart-import>
+  {{- label_request -}}
+  </button>
+  {%- endif -%}
+  <button
+  type="button"
+  class="tackquote-button tackquote-button--theme tackquote-hidden-empty button button--secondary btn btn--secondary"
   data-tackquote-open
   data-tackquote-page="{{ quote_page | escape }}"
   data-tackquote-hide-empty
   data-tackquote-label="{{ label_view | escape }}"
   data-tackquote-count-label="{{ 'tackquote.quote.count_label' | t | escape }}"
-      aria-haspopup="dialog"
-      hidden
-    >
-      <span>{{ label_view }}</span>
-      <span class="tackquote-count" data-tackquote-count aria-hidden="true" hidden>0</span>
-    </button>
-    {%- if request.design_mode -%}
-      <p class="tackquote-qcart__placeholder">{{ 'tackquote.quote.editor_view' | t }}</p>
-    {%- endif -%}
-    <p class="tackquote-status" data-tackquote-status role="status" aria-live="polite"></p>
+  aria-haspopup="dialog"
+  hidden
+  >
+  <span>{{ label_view }}</span>
+  <span class="tackquote-count" data-tackquote-count aria-hidden="true" hidden>0</span>
+  </button>
+  {%- if request.design_mode -%}
+  <p class="tackquote-qcart__placeholder">{{ 'tackquote.quote.editor_view' | t }}</p>
+  {%- endif -%}
+  <p class="tackquote-status" data-tackquote-status role="status" aria-live="polite"></p>
   </div>
 
   {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs, target_price: block.settings.target_price, message: block.settings.allow_message, files: block.settings.allow_files %}

@@ -19,6 +19,10 @@
    * prompt), `unlinked` a customer with no wholesale link (a quote CTA). Only a
    * real fetch failure reaches `standDown`, and only the merchant sees why.
    */
+  /** Pure: the automatic heading for a view. */
+  ns.breaksHeading = (view, applied, m) =>
+    view === 'login' ? m.msgHeadingNeutral : applied ? m.msgHeadingApplied : m.msgHeadingQuote;
+
   ns.breaksView = (data, designMode, pageCurrency) => {
     const s = data && data.status;
     // Never a ladder in another currency than the page shows (Wave 3).
@@ -109,14 +113,17 @@
       return el;
     }
 
+    let lastSku = '';
     function render(data) {
       // True only when TackQuote's checkout discount is confirmed active.
       const applied = data.checkoutApplied === true;
+      const view = ns.breaksView(data, designMode, ns.pageCurrency(root));
       const h = root.querySelector('.tackquote-breaks__heading');
       if (h && root.dataset.tackquoteAutoHeading === 'true') {
-        h.textContent = applied ? root.dataset.msgHeadingApplied : root.dataset.msgHeadingQuote;
+        // A guest sees a sign-in prompt, not prices: a neutral heading, never
+        // "applied at checkout" above "Sign in to see…" (QA 2026-10-01).
+        h.textContent = ns.breaksHeading(view, applied, root.dataset);
       }
-      const view = ns.breaksView(data, designMode, ns.pageCurrency(root));
       if (view === 'hide') {
         root.hidden = true;
         return;
@@ -151,6 +158,10 @@
         return;
       }
 
+      // This buyer's own rungs, for the quote drawer's DISPLAY price.
+      if (lastSku && data.accountSpecific) {
+        (ns.breaks = ns.breaks || {})[lastSku] = { rows: data.rows.map((r) => [r.minQty, r.unitPrice]), currency: data.currency };
+      }
       const wrap = document.createElement('div');
       wrap.appendChild(table(data, applied));
       if (applied) wrap.appendChild(line(root.dataset.msgAppliedNote, 'tackquote-breaks__note'));
@@ -166,6 +177,7 @@
     function refresh() {
       const variant = ns.findVariant(variants, ns.variantId(root));
       const sku = variant ? variant.sku : '';
+      lastSku = sku;
       if (!sku) {
         // Not a failure: the variant has no SKU to price. Merchant hint only.
         if (designMode) show(line(root.dataset.msgDiagNoSku, 'tackquote-breaks__error'));

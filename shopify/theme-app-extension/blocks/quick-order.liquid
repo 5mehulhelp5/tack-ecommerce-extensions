@@ -9,16 +9,16 @@
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div class="tackquote-block tackquote-qo" {{ tq_attrs }} {{ block.shopify_attributes }}>
-    <h3 class="tackquote-qo__heading">{{ block.settings.heading | default: 'Quick order' | escape }}</h3>
-    <p>{{ 'tackquote.quick_order.sign_in' | t }}</p>
-    <a class="tackquote-price__login" href="{{ login_url }}">{{ 'tackquote.quick_order.login' | t }}</a>
+  <h3 class="tackquote-qo__heading">{{ block.settings.heading | default: 'Quick order' | escape }}</h3>
+  <p>{{ 'tackquote.quick_order.sign_in' | t }}</p>
+  <a class="tackquote-price__login" href="{{ login_url }}">{{ 'tackquote.quick_order.login' | t }}</a>
   </div>
 {%- else -%}
   {%- capture tackquote_diagnostics -%}{% render 'tackquote-diagnostics' %}{%- endcapture -%}
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
-    class="tackquote-block tackquote-qo"
+  class="tackquote-block tackquote-qo"
   data-tackquote-mode="quick-order"
   data-tackquote-proxy="{{ proxy_path | escape }}"
   data-tackquote-currency="{{ cart.currency.iso_code }}"
@@ -47,37 +47,37 @@
   {{ tq_attrs }}
   {{ block.shopify_attributes }}
   >
-    <h3 class="tackquote-qo__heading">{{ block.settings.heading | default: 'Quick order' | escape }}</h3>
-    <label class="tackquote-qo__label" for="tackquote-qo-{{ block.id }}">{{ 'tackquote.quick_order.help' | t }}</label>
-    <textarea
-      id="tackquote-qo-{{ block.id }}"
-      class="tackquote-field tackquote-qo__input"
-      rows="6"
-      spellcheck="false"
-      autocomplete="off"
-      placeholder="{{ 'tackquote.quick_order.placeholder' | t | escape }}"
+  <h3 class="tackquote-qo__heading">{{ block.settings.heading | default: 'Quick order' | escape }}</h3>
+  <label class="tackquote-qo__label" for="tackquote-qo-{{ block.id }}">{{ 'tackquote.quick_order.help' | t }}</label>
+  <textarea
+  id="tackquote-qo-{{ block.id }}"
+  class="tackquote-field tackquote-qo__input"
+  rows="6"
+  spellcheck="false"
+  autocomplete="off"
+  placeholder="{{ 'tackquote.quick_order.placeholder' | t | escape }}"
   data-tackquote-qo-input
-    ></textarea>
-    <div class="tackquote-qo__actions">
-      <button type="button" class="tackquote-button tackquote-button--outline" data-tackquote-qo-check>
-        {{- 'tackquote.quick_order.check' | t -}}
-      </button>
-      <button type="button" class="tackquote-button tackquote-button--theme button button--primary btn" data-tackquote-qo-cart disabled>
-        {{- 'tackquote.quick_order.add_cart' | t -}}
-      </button>
-      {%- if block.settings.show_quote -%}
-        <button type="button" class="tackquote-button tackquote-button--outline" data-tackquote-qo-quote disabled>
-          {{- 'tackquote.quick_order.add_quote' | t -}}
-        </button>
-      {%- endif -%}
-    </div>
-    <p class="tackquote-status" data-tackquote-qo-status role="status" aria-live="polite"></p>
-    <div class="tackquote-qo__out" data-tackquote-qo-out></div>
+  ></textarea>
+  <div class="tackquote-qo__actions">
+  <button type="button" class="tackquote-button tackquote-button--outline" data-tackquote-qo-check>
+  {{- 'tackquote.quick_order.check' | t -}}
+  </button>
+  <button type="button" class="tackquote-button tackquote-button--theme button button--primary btn" data-tackquote-qo-cart disabled>
+  {{- 'tackquote.quick_order.add_cart' | t -}}
+  </button>
+  {%- if block.settings.show_quote -%}
+  <button type="button" class="tackquote-button tackquote-button--outline" data-tackquote-qo-quote disabled>
+  {{- 'tackquote.quick_order.add_quote' | t -}}
+  </button>
+  {%- endif -%}
+  </div>
+  <p class="tackquote-status" data-tackquote-qo-status role="status" aria-live="polite"></p>
+  <div class="tackquote-qo__out" data-tackquote-qo-out></div>
   </div>
 
   {%- if block.settings.show_quote -%}
-    {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs %}
-    <script src="{{ 'tackquote-quote.js' | asset_url }}" defer></script>
+  {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs %}
+  <script src="{{ 'tackquote-quote.js' | asset_url }}" defer></script>
   {%- endif -%}
   {{ 'tackquote-quick-order.css' | asset_url | stylesheet_tag }}
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>

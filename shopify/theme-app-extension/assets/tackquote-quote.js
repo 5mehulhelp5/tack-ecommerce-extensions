@@ -62,67 +62,10 @@
     return true;
   };
 
-  const mk = (tag, cls, props) => {
-    const n = Object.assign(document.createElement(tag), props || {});
-    if (cls) n.className = cls;
-    return n;
+  // Lines, prices and subtotal: tackquote-quote-lines.js.
+  const renderItems = (el, items, persist) => {
+    if (ns.renderQuoteLines) ns.renderQuoteLines(el, items, persist, saveDraft);
   };
-
-  function renderItems(el, items, persist) {
-    const list = el.querySelector('[data-tackquote-items]');
-    const d = el.dataset;
-    const save = () => persist && saveDraft(items);
-    list.textContent = '';
-    el.querySelector('[data-tackquote-empty]').hidden = items.length > 0;
-
-    items.forEach((item, index) => {
-      const li = mk('li', 'tackquote-line');
-      const ctl = mk('div', 'tackquote-line__controls');
-      const box = mk('div', 'tackquote-qty');
-      const qty = mk('input', 'tackquote-qty__input', { type: 'number', min: '1', inputMode: 'numeric', value: String(item.quantity) });
-      qty.setAttribute('aria-label', `${d.msgQuantity}: ${item.name}`);
-      const set = (n) => {
-        items[index].quantity = Number.isFinite(n) && n > 0 ? Math.min(n, 1000000) : 1;
-        qty.value = String(items[index].quantity);
-        save();
-      };
-      const step = (label, glyph, delta) => {
-        const b = mk('button', 'tackquote-icon-button', { type: 'button', textContent: glyph });
-        b.setAttribute('aria-label', `${label}: ${item.name}`);
-        b.addEventListener('click', () => set(items[index].quantity + delta));
-        return b;
-      };
-      qty.addEventListener('change', () => set(Number.parseInt(qty.value, 10)));
-      box.append(step(d.msgDecrease, '−', -1), qty, step(d.msgIncrease, '+', 1));
-      ctl.append(box);
-
-      if (d.tackquoteTargetPrice !== undefined) {
-        const lab = mk('label', 'tackquote-line__target');
-        const tp = mk('input', 'tackquote-field tackquote-field--short', { type: 'number', min: '0', step: '0.01', inputMode: 'decimal' });
-        if (typeof item.target === 'number') tp.value = String(item.target);
-        tp.addEventListener('change', () => {
-          const v = Number.parseFloat(tp.value);
-          items[index].target = Number.isFinite(v) && v >= 0 ? Math.round(v * 10000) / 10000 : undefined;
-          save();
-        });
-        lab.append(mk('span', '', { textContent: d.msgTarget }), tp);
-        ctl.append(lab);
-      }
-
-      const remove = mk('button', 'tackquote-link-button', { type: 'button', textContent: d.msgRemove });
-      remove.setAttribute('aria-label', `${d.msgRemove}: ${item.name}`);
-      remove.addEventListener('click', () => {
-        items.splice(index, 1);
-        save();
-        renderItems(el, items, persist);
-        const next = list.querySelectorAll('.tackquote-link-button')[Math.min(index, items.length - 1)];
-        (next || el.querySelector('[name="name"]')).focus();
-      });
-      ctl.append(remove);
-      li.append(mk('span', 'tackquote-line__name', { textContent: item.name }), ctl);
-      list.appendChild(li);
-    });
-  }
 
   function send(el, ctx, button, status) {
     const d = el.dataset;
@@ -179,6 +122,9 @@
     go(false)
       .then(() => {
         say(d.msgSuccess);
+        // Ready for the next request (QA: it looked stuck). Name, email and
+        // company are kept for convenience; lines, message and files clear.
+        button.disabled = false;
         ctx.items = [];
         if (ctx.persist) saveDraft([]);
         renderItems(el, ctx.items, ctx.persist);

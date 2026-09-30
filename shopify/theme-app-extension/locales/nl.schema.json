@@ -24,13 +24,16 @@
     "c": {
       "proxy": "Geavanceerd: URL-voorvoegsel van de app",
       "proxy_info": "Laat dit zoals het is. Wijzig het alleen als je de TackQuote-appproxy in Shopify hebt hernoemd (Instellingen, Apps en verkoopkanalen, TackQuote, App-proxy).",
-      "target": "Vraag om een richtprijs",
+      "target": "Kopers de prijs laten invullen die ze vragen",
       "target_info": "Voegt aan elke regel een optioneel veld Je richtprijs toe. Alleen wat de koper typt wordt verstuurd, nooit je winkelprijs.",
       "message": "Kopers een bericht laten toevoegen",
       "files": "Kopers bestanden laten bijvoegen",
       "files_info": "Maximaal 3 PDF-, JPEG- of PNG-bestanden van elk 5 MB.",
       "quote_page": "Offertepagina (optioneel)",
-      "quote_page_info": "Kies de pagina met het blok Offertepagina om die te openen in plaats van de pop-up."
+      "quote_page_info": "Kies de pagina met het blok Offertepagina om die te openen in plaats van de pop-up.",
+      "soldout": "Als de variant is uitverkocht",
+      "soldout_allow": "Offerteaanvragen toestaan",
+      "soldout_disable": "Knop uitschakelen"
     },
     "p": {
       "buyer_group_badge_1": "Toont de TackQuote-kopersgroep van de ingelogde klant, bijvoorbeeld “Niveau 2”. Wie niet is ingelogd, niet aan een TackQuote-koper is gekoppeld of in geen groep zit, ziet niets.",

@@ -9,7 +9,7 @@
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div class="tackquote-block tackquote-quote-page" {{ tq_attrs }} {{ block.shopify_attributes }}>
-    {% render 'tackquote-drawer', proxy: proxy_path, inline: true, target_price: block.settings.target_price, message: block.settings.allow_message, files: block.settings.allow_files %}
+  {% render 'tackquote-drawer', proxy: proxy_path, inline: true, target_price: block.settings.target_price, message: block.settings.allow_message, files: block.settings.allow_files %}
   </div>
   <script src="{{ 'tackquote-quote.js' | asset_url }}" defer></script>
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>

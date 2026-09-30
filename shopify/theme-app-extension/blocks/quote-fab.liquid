@@ -2,36 +2,36 @@
   assign proxy_path = block.settings.proxy_path | strip | split: '/' | join: '/'
   assign show = false
   case block.settings.pages
-    when 'all'
-      assign show = true
-    when 'shopping'
-      if template.name == 'product' or template.name == 'collection' or template.name == 'cart'
-        assign show = true
-      endif
-    when 'cart'
-      if template.name == 'cart'
-        assign show = true
-      endif
+  when 'all'
+  assign show = true
+  when 'shopping'
+  if template.name == 'product' or template.name == 'collection' or template.name == 'cart'
+  assign show = true
+  endif
+  when 'cart'
+  if template.name == 'cart'
+  assign show = true
+  endif
   endcase
   if proxy_path == blank
-    assign show = false
+  assign show = false
   endif
 
   assign label = block.settings.label | strip
   if label == blank or label == 'Quote'
-    assign label = 'tackquote.quote.fab_label' | t
+  assign label = 'tackquote.quote.fab_label' | t
   endif
   assign quote_page = ''
   if block.settings.quote_page != blank
-    assign quote_page = block.settings.quote_page.url
+  assign quote_page = block.settings.quote_page.url
   endif
   assign hide_empty = true
   if block.settings.show_when_empty or request.design_mode
-    assign hide_empty = false
+  assign hide_empty = false
   endif
   assign mpos = block.settings.mobile_position
   if mpos == 'same'
-    assign mpos = ''
+  assign mpos = ''
   endif
 -%}
 
@@ -43,24 +43,24 @@
   data-pos="{{ block.settings.position | escape }}"
   data-size="{{ block.settings.size | escape }}"
   data-shape="{{ block.settings.shape | escape }}"
-    {% if mpos != blank %}data-mpos="{{ mpos | escape }}"{% endif %}
-    {% if block.settings.icon_only %}data-icon-only{% endif %}
-    {% if block.settings.collapse_on_scroll %}data-collapse{% endif %}
-    {% if block.settings.hide_on_mobile %}data-hide-mobile{% endif %}
-    {% if hide_empty %}data-tackquote-hide-empty hidden{% endif %}
-    {% if quote_page == blank %}aria-haspopup="dialog" aria-controls="tackquote-quote-drawer"{% endif %}
+  {% if mpos != blank %}data-mpos="{{ mpos | escape }}"{% endif %}
+  {% if block.settings.icon_only %}data-icon-only{% endif %}
+  {% if block.settings.collapse_on_scroll %}data-collapse{% endif %}
+  {% if block.settings.hide_on_mobile %}data-hide-mobile{% endif %}
+  {% if hide_empty %}data-tackquote-hide-empty hidden{% endif %}
+  {% if quote_page == blank %}aria-haspopup="dialog" aria-controls="tackquote-quote-drawer"{% endif %}
   {%- endcapture -%}
 
   {{ 'tackquote.css' | asset_url | stylesheet_tag }}
   {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs, target_price: block.settings.target_price, message: block.settings.allow_message, files: block.settings.allow_files, id: 'tackquote-quote-drawer' %}
 
   <div
-    class="tackquote-fab-wrap"
-    style="display:contents;--tq-x:{{ block.settings.offset_x }}px;--tq-y:{{ block.settings.offset_y }}px;--tq-z:{{ block.settings.z_index }}"
+  class="tackquote-fab-wrap"
+  style="display:contents;--tq-x:{{ block.settings.offset_x }}px;--tq-y:{{ block.settings.offset_y }}px;--tq-z:{{ block.settings.z_index }}"
   >
-    <button
-      type="button"
-      class="tackquote-fab"
+  <button
+  type="button"
+  class="tackquote-fab"
   data-tackquote-fab
   data-tq-root
   data-tackquote-open
@@ -69,31 +69,31 @@
   data-tackquote-count-label="{{ 'tackquote.quote.count_label' | t | escape }}"
   {{ fab_attrs }}
   {{ tq_attrs }}
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 3.5h6v3H9zM7.5 5H5v15.5h14V5h-2.5M8.5 11h7M8.5 14.5h7M8.5 18h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <span class="tackquote-fab__label{% if block.settings.icon_only %} tackquote-vh{% endif %}">{{ label }}</span>
-      {%- if block.settings.show_count -%}
-        <span class="tackquote-count" data-tackquote-count aria-hidden="true" hidden>0</span>
-      {%- endif -%}
-    </button>
-    <span class="tackquote-vh" aria-live="polite" data-tackquote-live="{{ 'tackquote.quote.count' | t | escape }}"></span>
+  >
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 3.5h6v3H9zM7.5 5H5v15.5h14V5h-2.5M8.5 11h7M8.5 14.5h7M8.5 18h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <span class="tackquote-fab__label{% if block.settings.icon_only %} tackquote-vh{% endif %}">{{ label }}</span>
+  {%- if block.settings.show_count -%}
+  <span class="tackquote-count" data-tackquote-count aria-hidden="true" hidden>0</span>
+  {%- endif -%}
+  </button>
+  <span class="tackquote-vh" aria-live="polite" data-tackquote-live="{{ 'tackquote.quote.count' | t | escape }}"></span>
   </div>
 
   {%- if block.settings.header_icon -%}
-    <template data-tackquote-hicon>
-      <button
-        type="button"
-        class="tackquote-hicon"
+  <template data-tackquote-hicon>
+  <button
+  type="button"
+  class="tackquote-hicon"
   data-tq-root
   data-tackquote-open
   data-tackquote-page="{{ quote_page | escape }}"
   data-tackquote-label="{{ label | escape }}"
   data-tackquote-count-label="{{ 'tackquote.quote.count_label' | t | escape }}"
-        aria-label="{{ label | escape }}"
-      >
-        <span class="tackquote-count" data-tackquote-count aria-hidden="true" hidden>0</span>
-      </button>
-    </template>
+  aria-label="{{ label | escape }}"
+  >
+  <span class="tackquote-count" data-tackquote-count aria-hidden="true" hidden>0</span>
+  </button>
+  </template>
   {%- endif -%}
 
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
@@ -103,8 +103,8 @@
   <script src="{{ 'tackquote-fab.js' | asset_url }}" defer></script>
 {%- elsif request.design_mode and proxy_path == blank -%}
   <div class="tackquote-setup" role="note">
-    <strong>{{ 'tackquote.setup.title' | t }}</strong>
-    <p>{{ 'tackquote.setup.proxy' | t }}</p>
+  <strong>{{ 'tackquote.setup.title' | t }}</strong>
+  <p>{{ 'tackquote.setup.proxy' | t }}</p>
   </div>
 {%- endif -%}
 

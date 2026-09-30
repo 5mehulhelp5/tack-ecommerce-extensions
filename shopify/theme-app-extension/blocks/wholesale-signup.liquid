@@ -10,15 +10,15 @@
   {% render 'tackquote-setup', attrs: block.shopify_attributes %}
 {%- else -%}
   {%- liquid
-    assign no_form_message = ''
-    if request.design_mode
-      assign no_form_message = 'tackquote.signup.no_form' | t
-    endif
+  assign no_form_message = ''
+  if request.design_mode
+  assign no_form_message = 'tackquote.signup.no_form' | t
+  endif
   -%}
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
-    class="tackquote-block tackquote-signup"
+  class="tackquote-block tackquote-signup"
   data-tackquote-mode="signup"
   data-tackquote-proxy="{{ proxy_path | escape }}"
   data-tackquote-form="{{ form_slug | escape }}"
@@ -43,34 +43,34 @@
   {{ tq_attrs }}
   {{ block.shopify_attributes }}
   >
-    <h3 class="tackquote-signup__heading">
-      {%- # README.md, Liquid design notes: wholesale-signup.liquid (3) -%}
-      {%- assign tackquote_label = block.settings.heading | strip -%}
-      {%- if tackquote_label == blank or tackquote_label == 'Apply for a wholesale account' -%}
-        {%- assign tackquote_label = 'tackquote.signup.heading' | t -%}
-      {%- endif -%}
+  <h3 class="tackquote-signup__heading">
+  {%- # README.md, Liquid design notes: wholesale-signup.liquid (3) -%}
+  {%- assign tackquote_label = block.settings.heading | strip -%}
+  {%- if tackquote_label == blank or tackquote_label == 'Apply for a wholesale account' -%}
+  {%- assign tackquote_label = 'tackquote.signup.heading' | t -%}
+  {%- endif -%}
   {{ tackquote_label }}
-    </h3>
+  </h3>
 
-    {%- if block.settings.intro != blank -%}
-      <div class="tackquote-signup__intro">{{ block.settings.intro }}</div>
-    {%- endif -%}
+  {%- if block.settings.intro != blank -%}
+  <div class="tackquote-signup__intro">{{ block.settings.intro }}</div>
+  {%- endif -%}
 
-    {%- if customer or request.design_mode -%}
-      <div class="tackquote-signup__body" data-tackquote-signup-body role="status" aria-live="polite">
-        <p class="tackquote-signup__loading">{{ 'tackquote.signup.loading' | t }}</p>
-      </div>
-    {%- else -%}
-      <div class="tackquote-signup__signin">
-        <p>{{ 'tackquote.signup.sign_in_first' | t }}</p>
-        <p>
-          <a class="button" href="{{ routes.storefront_login_url | default: routes.account_login_url }}">{{ 'tackquote.signup.sign_in' | t }}</a>
-          {%- if routes.account_register_url != blank %}
-            <a class="button button--secondary" href="{{ routes.account_register_url }}">{{ 'tackquote.signup.create_account' | t }}</a>
-          {%- endif %}
-        </p>
-      </div>
-    {%- endif -%}
+  {%- if customer or request.design_mode -%}
+  <div class="tackquote-signup__body" data-tackquote-signup-body role="status" aria-live="polite">
+  <p class="tackquote-signup__loading">{{ 'tackquote.signup.loading' | t }}</p>
+  </div>
+  {%- else -%}
+  <div class="tackquote-signup__signin">
+  <p>{{ 'tackquote.signup.sign_in_first' | t }}</p>
+  <p>
+  <a class="button" href="{{ routes.storefront_login_url | default: routes.account_login_url }}">{{ 'tackquote.signup.sign_in' | t }}</a>
+  {%- if routes.account_register_url != blank %}
+  <a class="button button--secondary" href="{{ routes.account_register_url }}">{{ 'tackquote.signup.create_account' | t }}</a>
+  {%- endif %}
+  </p>
+  </div>
+  {%- endif -%}
   </div>
 
   <script src="{{ 'tackquote-signup-fields.js' | asset_url }}" defer></script>

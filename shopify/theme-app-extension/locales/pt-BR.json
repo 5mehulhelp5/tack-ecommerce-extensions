@@ -63,12 +63,16 @@
       "cart_empty": "Seu carrinho está vazio.",
       "cart_failed": "Não foi possível ler seu carrinho. Tente novamente.",
       "fab_label": "Orçamento",
-      "target_price": "Seu preço-alvo (por unidade)",
+      "target_price": "Preço que você está pedindo (por unidade)",
       "editor_view": "Ver orçamento aparece aqui quando o orçamento tiver itens.",
       "card_failed": "Não foi possível adicionar esse item. Tente novamente.",
       "files": "Anexar arquivos (opcional)",
       "files_help": "Até 3 arquivos PDF, JPEG ou PNG, 5 MB cada.",
-      "files_max": "Anexe no máximo 3 arquivos."
+      "files_max": "Anexe no máximo 3 arquivos.",
+      "out_of_stock": "Esgotado — solicitação de orçamento",
+      "price": "Preço",
+      "your_price": "Seu preço",
+      "subtotal": "Subtotal estimado: {amount}. Seu orçamento confirma o preço final."
     },
     "signup": {
       "loading": "Carregando o formulário de solicitação",
@@ -109,7 +113,8 @@
       "heading_applied": "Preços de atacado por quantidade, aplicados no checkout",
       "caption_applied": "Preço de atacado por unidade conforme a quantidade, aplicado no checkout",
       "price_applied": "Seu preço por unidade",
-      "applied_note": "Aplicado no checkout."
+      "applied_note": "Aplicado no checkout.",
+      "heading": "Preços de atacado por quantidade"
     },
     "badge": {
       "label": "Sua faixa de preço",

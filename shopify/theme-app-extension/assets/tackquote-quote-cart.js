@@ -33,17 +33,44 @@
    * selling plans); with `replace` the second would overwrite the first. The
    * 100-line cap is then counted on the aggregated lines, in the merge.
    */
-  ns.cartLines = (items) => {
+  ns.cartLines = (items, cur) => {
     const by = new Map();
     for (const i of items || []) {
       const id = String(i.variant_id);
       const q = Number(i.quantity) > 0 ? Number(i.quantity) : 0;
       const had = by.get(id);
       if (had) had.quantity += q;
-      else by.set(id, { variantId: id, name: i.title || i.product_title, sku: i.sku || '', quantity: q });
+      else by.set(id, { variantId: id, name: i.title || i.product_title, sku: i.sku || '', quantity: q, unit: typeof i.price === 'number' ? i.price / 100 : undefined, cur });
     }
     return Array.from(by.values()).filter((l) => l.quantity > 0);
   };
+
+  /**
+   * Pure. A sold-out variant is QUOTABLE by default (B2B backorders run through
+   * quotes); only the merchant's "Disable the button" setting refuses it.
+   * Returns 'ok' (in stock or unknown), 'quote' or 'disable'.
+   */
+  ns.soldOut = (variant, mode) => {
+    if (!variant || variant.available !== false) return 'ok';
+    return mode === 'disable' ? 'disable' : 'quote';
+  };
+  /**
+   * Pure: attach the DISPLAY prices to a line (never sent; see
+   * tackquote-quote-lines.js): the variant's storefront price (Liquid cents ->
+   * major units), plus the buyer's TackQuote wholesale price and quantity-break
+   * rungs when the price blocks on this page already answered for this SKU.
+   */
+  ns.productLine = (line, variant, cur) => {
+    const out = Object.assign({}, line, { cur: cur || undefined });
+    if (variant && typeof variant.price === 'number') out.unit = variant.price / 100;
+    const w = ns.wholesale && ns.wholesale[line.sku];
+    if (w && (!cur || w.currency === cur)) out.wprice = w.amount;
+    const b = ns.breaks && ns.breaks[line.sku];
+    if (b && (!cur || b.currency === cur)) out.tiers = b.rows;
+    return out;
+  };
+  /** Pure: a quoted sold-out line says so, for the buyer and the seller. */
+  ns.soldOutName = (name, state, label) => (state === 'quote' && label ? `${name} (${label})` : name);
 
   const paint = (n) => {
     const c = typeof n === 'number' ? n : ns.quoteCount();
@@ -88,22 +115,35 @@
       const status = root.querySelector('[data-tackquote-status]');
       if (!proxy || !button) return;
       const variants = ns.variants(root);
+      const mode = root.dataset.tackquoteSoldOut;
+      const current = () => ns.findVariant(variants, ns.variantId(root));
+      // "Disable the button": disabled (the theme's Sold out look) while the
+      // selected variant is unavailable, and live across variant changes.
+      const sync = () => {
+        const off = ns.soldOut(current(), mode) === 'disable';
+        button.disabled = off;
+        status.textContent = off ? root.dataset.msgUnavailable || '' : '';
+      };
+      sync();
+      ns.onChange(root, sync);
 
       button.addEventListener('click', () => {
         const q = ns.quote;
         const el = q && q.drawer();
         if (!el) return;
-        const variant = ns.findVariant(variants, ns.variantId(root));
-        if (variant && variant.available === false) {
-          status.textContent = el.dataset.msgUnavailable;
-          return;
-        }
-        const item = {
-          variantId: ns.variantId(root),
-          name: ns.label(root, variant),
-          sku: variant ? variant.sku : '',
-          quantity: ns.quantity(root),
-        };
+        const variant = current();
+        const state = ns.soldOut(variant, mode);
+        if (state === 'disable') return;
+        const item = ns.productLine(
+          {
+            variantId: ns.variantId(root),
+            name: ns.soldOutName(ns.label(root, variant), state, root.dataset.msgOutOfStock),
+            sku: variant ? variant.sku : '',
+            quantity: ns.quantity(root),
+          },
+          variant,
+          ns.pageCurrency(root),
+        );
         const ctx = {
           proxy,
           currency: root.dataset.tackquoteCurrency,
@@ -146,7 +186,7 @@
           return r.json();
         })
         .then((cart) => {
-          const lines = ns.cartLines(cart.items);
+          const lines = ns.cartLines(cart.items, cart.currency);
           if (!lines.length) {
             status.textContent = d.msgCartEmpty;
             return;

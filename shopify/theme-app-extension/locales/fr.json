@@ -63,12 +63,16 @@
       "cart_empty": "Votre panier est vide.",
       "cart_failed": "Votre panier n’a pas pu être lu. Veuillez réessayer.",
       "fab_label": "Devis",
-      "target_price": "Votre prix cible (à l’unité)",
+      "target_price": "Prix que vous demandez (à l’unité)",
       "editor_view": "Voir le devis s’affiche ici dès que le devis contient des articles.",
       "card_failed": "Cet article n’a pas pu être ajouté. Veuillez réessayer.",
       "files": "Joindre des fichiers (facultatif)",
       "files_help": "Jusqu’à 3 fichiers PDF, JPEG ou PNG, 5 Mo chacun.",
-      "files_max": "Veuillez joindre 3 fichiers au maximum."
+      "files_max": "Veuillez joindre 3 fichiers au maximum.",
+      "out_of_stock": "En rupture — demande de devis",
+      "price": "Prix",
+      "your_price": "Votre prix",
+      "subtotal": "Sous-total estimé : {amount}. Votre devis confirme le prix final."
     },
     "signup": {
       "loading": "Chargement du formulaire de demande",
@@ -109,7 +113,8 @@
       "heading_applied": "Prix professionnels par quantité, appliqués au paiement",
       "caption_applied": "Prix professionnel unitaire selon la quantité, appliqué au paiement",
       "price_applied": "Votre prix unitaire",
-      "applied_note": "Appliqué au paiement."
+      "applied_note": "Appliqué au paiement.",
+      "heading": "Prix de gros par quantité"
     },
     "badge": {
       "label": "Votre niveau tarifaire",

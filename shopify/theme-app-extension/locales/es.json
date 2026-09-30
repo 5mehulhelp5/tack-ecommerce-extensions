@@ -63,12 +63,16 @@
       "cart_empty": "Tu carrito está vacío.",
       "cart_failed": "No hemos podido leer tu carrito. Inténtalo de nuevo.",
       "fab_label": "Presupuesto",
-      "target_price": "Tu precio objetivo (por unidad)",
+      "target_price": "Precio que pides (por unidad)",
       "editor_view": "Ver presupuesto aparece aquí cuando el presupuesto tiene artículos.",
       "card_failed": "No hemos podido añadir ese artículo. Inténtalo de nuevo.",
       "files": "Adjuntar archivos (opcional)",
       "files_help": "Hasta 3 archivos PDF, JPEG o PNG, de 5 MB cada uno.",
-      "files_max": "Adjunta como máximo 3 archivos."
+      "files_max": "Adjunta como máximo 3 archivos.",
+      "out_of_stock": "Agotado — solicitud de presupuesto",
+      "price": "Precio",
+      "your_price": "Tu precio",
+      "subtotal": "Subtotal estimado: {amount}. Tu presupuesto confirma el precio final."
     },
     "signup": {
       "loading": "Cargando el formulario de solicitud",
@@ -109,7 +113,8 @@
       "heading_applied": "Precios mayoristas por cantidad, aplicados en el pago",
       "caption_applied": "Precio mayorista por unidad según la cantidad, aplicado en el pago",
       "price_applied": "Tu precio por unidad",
-      "applied_note": "Aplicado en el pago."
+      "applied_note": "Aplicado en el pago.",
+      "heading": "Precios mayoristas por cantidad"
     },
     "badge": {
       "label": "Tu nivel de precios",

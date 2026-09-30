@@ -24,13 +24,16 @@
     "c": {
       "proxy": "Avanzate: prefisso URL dell’app",
       "proxy_info": "Lascialo così. Cambialo solo se hai rinominato il proxy dell’app TackQuote in Shopify (Impostazioni, App e canali di vendita, TackQuote, Proxy app).",
-      "target": "Chiedi un prezzo target",
+      "target": "Consenti all’acquirente di indicare il prezzo che chiede",
       "target_info": "Aggiunge un campo facoltativo Il tuo prezzo target a ogni riga. Viene inviato solo ciò che scrive l’acquirente, mai il prezzo del negozio.",
       "message": "Consenti agli acquirenti di aggiungere un messaggio",
       "files": "Consenti agli acquirenti di allegare file",
       "files_info": "Fino a 3 file PDF, JPEG o PNG da 5 MB ciascuno.",
       "quote_page": "Pagina del preventivo (facoltativa)",
-      "quote_page_info": "Scegli la pagina con il blocco Pagina del preventivo per aprirla al posto del pop-up."
+      "quote_page_info": "Scegli la pagina con il blocco Pagina del preventivo per aprirla al posto del pop-up.",
+      "soldout": "Quando la variante è esaurita",
+      "soldout_allow": "Consenti le richieste di preventivo",
+      "soldout_disable": "Disattiva il pulsante"
     },
     "p": {
       "buyer_group_badge_1": "Mostra il gruppo acquirenti TackQuote del cliente connesso, per esempio “Livello 2”. Chi non è connesso, non è collegato a un acquirente TackQuote o non appartiene a nessun gruppo non vede nulla.",

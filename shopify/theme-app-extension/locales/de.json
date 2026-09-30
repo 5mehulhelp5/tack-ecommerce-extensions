@@ -63,12 +63,16 @@
       "cart_empty": "Ihr Warenkorb ist leer.",
       "cart_failed": "Ihr Warenkorb konnte nicht gelesen werden. Bitte versuchen Sie es erneut.",
       "fab_label": "Angebot",
-      "target_price": "Ihr Wunschpreis (pro Stück)",
+      "target_price": "Von Ihnen gewünschter Preis (pro Stück)",
       "editor_view": "Angebot ansehen erscheint hier, sobald die Anfrage Artikel enthält.",
       "card_failed": "Der Artikel konnte nicht hinzugefügt werden. Bitte versuchen Sie es erneut.",
       "files": "Dateien anhängen (optional)",
       "files_help": "Bis zu 3 PDF-, JPEG- oder PNG-Dateien, je 5 MB.",
-      "files_max": "Bitte hängen Sie höchstens 3 Dateien an."
+      "files_max": "Bitte hängen Sie höchstens 3 Dateien an.",
+      "out_of_stock": "Nicht vorrätig — Angebotsanfrage",
+      "price": "Preis",
+      "your_price": "Ihr Preis",
+      "subtotal": "Geschätzte Zwischensumme: {amount}. Ihr Angebot bestätigt den endgültigen Preis."
     },
     "signup": {
       "loading": "Antragsformular wird geladen",
@@ -109,7 +113,8 @@
       "heading_applied": "Großhandelsstaffelpreise, angewendet an der Kasse",
       "caption_applied": "Großhandelspreis pro Stück nach Menge, angewendet an der Kasse",
       "price_applied": "Ihr Preis pro Stück",
-      "applied_note": "Angewendet an der Kasse."
+      "applied_note": "Angewendet an der Kasse.",
+      "heading": "Großhandels-Mengenpreise"
     },
     "badge": {
       "label": "Ihre Preisstufe",

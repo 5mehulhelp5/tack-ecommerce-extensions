@@ -3,7 +3,7 @@
   assign variant = product.selected_or_first_available_variant
   assign auto_heading = false
   if block.settings.heading == blank or block.settings.heading == 'Your quoted wholesale price'
-    assign auto_heading = true
+  assign auto_heading = true
   endif
 -%}
 
@@ -20,7 +20,7 @@
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
-    class="tackquote-block tackquote-price"
+  class="tackquote-block tackquote-price"
   data-tackquote-mode="price"
   data-tackquote-proxy="{{ proxy_path | escape }}"
   data-tackquote-variant="{{ variant.id }}"
@@ -47,17 +47,17 @@
   {{ tq_attrs }}
   {{ block.shopify_attributes }}
   >
-    {% render 'tackquote-selection', product: product %}
-    <h3 class="tackquote-price__heading">
-      {%- if auto_heading -%}
+  {% render 'tackquote-selection', product: product %}
+  <h3 class="tackquote-price__heading">
+  {%- if auto_heading -%}
   {{ 'tackquote.price.heading_quote' | t }}
-      {%- else -%}
+  {%- else -%}
   {{ block.settings.heading }}
-      {%- endif -%}
-    </h3>
-    <div class="tackquote-price__body" data-tackquote-price-body role="status" aria-live="polite">
-      <p class="tackquote-price__loading">{{ 'tackquote.price.loading' | t }}</p>
-    </div>
+  {%- endif -%}
+  </h3>
+  <div class="tackquote-price__body" data-tackquote-price-body role="status" aria-live="polite">
+  <p class="tackquote-price__loading">{{ 'tackquote.price.loading' | t }}</p>
+  </div>
   </div>
 
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
