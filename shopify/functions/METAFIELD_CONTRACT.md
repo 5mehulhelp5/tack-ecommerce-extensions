@@ -422,7 +422,7 @@ Customization renames, sorts and hides; the delivery-class discount prices.
 | `p` | `pct` only (required there): 0 to 100 percent of the subtotal, 4 decimals |
 | `tr` | `tier` only (required there): 1 to 50 `[min, max or null, amount]`, inclusive both ends, `max >= min` |
 | `m` | option titles the rule targets (case-insensitive "contains"), 1 to 20 of 1 to 100 characters. Absent: the default option, the cheapest |
-| `n` | rename the targeted options to this title (1 to 100 characters) |
+| `n` | new title for the targeted options (1 to 100 characters). Shopify always prepends the carrier name and the API cannot remove it, so "Wholesale ground" shows as e.g. "UPS Wholesale ground" (Delivery Customization "Limitations", https://shopify.dev/docs/apps/build/checkout/delivery-shipping/delivery-options/build-function) |
 | `h` | hide options whose titles match, 1 to 20 |
 | `s` | `"price"`: sort the options by price, ascending |
 

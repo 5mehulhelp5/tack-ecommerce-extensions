@@ -458,6 +458,39 @@ Adding it re-prompts every existing install (section 2, "Re-authorization").
 Checkout pricing does not need it and keeps working until the merchant
 approves; the extras report `needs_scopes` until then.
 
+### 7.2a Scope: `read_companies` (owner approved 2026-09-30)
+
+Not used by any Function or block here. The TackQuote API reads Shopify B2B
+companies when it creates a draft order, so an order for a buyer who is a
+company contact is placed for that company location and carries its payment
+terms (main repository: `shopify-draft-order-terms.ts`, and
+`docs/integrations/SHOPIFY.md` section 7). The reads are
+`Customer.companyContactProfiles`, `CompanyContact.roleAssignments` and
+`CompanyLocation.buyerExperienceConfiguration.paymentTermsTemplate`, for which
+`validate_graphql_codeblocks` (Admin 2026-07) reports "Required scopes:
+read_customers, read_companies". Read-only; no company mutation is called.
+https://shopify.dev/docs/api/usage/access-scopes
+
+It is declared OPTIONAL (App Store requirement 3.2 recommends optional scopes
+for what not every merchant needs; Shopify B2B is Plus-only), so no install is
+re-prompted. The merchant allows it from the embedded app, which calls App
+Bridge `shopify.scopes.request(['read_companies'])`; that only works for a
+scope in `optional_scopes`
+(https://shopify.dev/docs/apps/build/authentication-authorization/manage-access-scopes).
+`shopify app config validate --json` (CLI 4.8.2) returned `"valid": true`.
+
+```toml
+scopes = "write_app_proxy,write_customers,write_delivery_customizations,write_discounts,write_draft_orders,read_orders,write_orders,write_products,write_validations"
+optional_scopes = [ "read_companies" ]
+```
+
+Fields read: `Customer.companyContactProfiles { id company { id }
+roleAssignments { companyLocation { id } } }` and `CompanyLocation { id
+company { id } buyerExperienceConfiguration { paymentTermsTemplate { id name
+dueInDays paymentTermsType } } }`. No contact names, emails or phones. Until
+the merchant allows it, the API reads the granted scopes
+(`currentAppInstallation.accessScopes`) and creates draft orders exactly as before.
+
 ### 7.3 Definitions
 
 ```toml

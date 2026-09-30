@@ -409,3 +409,112 @@ fn a_huge_cart_stays_under_the_output_limit_and_keeps_every_emitted_group_cheape
         assert_eq!(visible[0], handle(g, 0), "group {g}: {ops:?}");
     }
 }
+
+// ---- App Store 1.1.10, per delivery group ------------------------------------------
+//
+// "Shipping must default to the lowest-priced option"
+// (https://shopify.dev/docs/apps/launch/shopify-app-store/best-practices), and
+// DeliveryOptionMoveOperation: "The cheapest shipping delivery option must
+// always be the first option selected"
+// (https://shopify.dev/docs/api/functions/2026-07/delivery-customization).
+// Checked per group, across several groups in one cart, with pickup in the mix.
+
+#[test]
+fn no_group_ever_gets_a_pricier_option_first_or_loses_every_option() {
+    let perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+    let base = [("std", "Standard", "10.0"), ("exp", "Express", "25.0"), ("frt", "LTL Freight", "60.0")];
+    let cost = |h: &str| -> Option<f64> {
+        base.iter().find(|b| h.ends_with(b.0)).map(|b| b.2.parse::<f64>().unwrap())
+    };
+    // Every hide list, including one that matches EVERY shipping title.
+    let hides: [Option<Value>; 5] = [
+        None,
+        Some(json!(["standard"])),
+        Some(json!(["express", "freight"])),
+        Some(json!(["standard", "express", "freight"])),
+        Some(json!(["pick up"])),
+    ];
+    // Where a pickup option sits in each of the three groups: none, first, middle.
+    let layouts: [Option<usize>; 3] = [None, Some(0), Some(1)];
+    let mut checked = 0;
+    for p in perms {
+        for h in &hides {
+            for sort in [false, true] {
+                // One cart, three groups, same rule: a group's operations must
+                // hold on their own, whatever the others need.
+                let mut groups = Vec::new();
+                let mut lists: Vec<Vec<String>> = Vec::new();
+                for (g, layout) in layouts.iter().enumerate() {
+                    let mut options: Vec<Value> = Vec::new();
+                    let mut handles: Vec<String> = Vec::new();
+                    for &i in &p {
+                        let handle = format!("g{g}-{}", base[i].0);
+                        options.push(opt(&handle, base[i].1, base[i].2));
+                        handles.push(handle);
+                    }
+                    if let Some(at) = layout {
+                        let handle = format!("g{g}-pk");
+                        options.insert(*at, pickup(&handle));
+                        handles.insert(*at, handle);
+                    }
+                    groups.push(json!({ "deliveryAddress": { "countryCode": "US" }, "deliveryOptions": options }));
+                    lists.push(handles);
+                }
+                let mut rule = json!({ "a": ["gold"], "t": "none", "n": "Wholesale" });
+                if let Some(h) = h {
+                    rule["h"] = h.clone();
+                }
+                if sort {
+                    rule["s"] = json!("price");
+                }
+                let mut input = In::new(rules(rule), vec![]);
+                input.groups = groups;
+                let all_ops = input.ops();
+
+                for (g, handles) in lists.iter().enumerate() {
+                    let prefix = format!("g{g}-");
+                    let ops: Vec<String> = all_ops.iter().filter(|o| o.contains(&prefix)).cloned().collect();
+                    let refs: Vec<&str> = handles.iter().map(|s| s.as_str()).collect();
+                    let visible = apply(&refs, &ops);
+                    let ctx = format!("group {g} {p:?} {h:?} sort={sort} {ops:?}");
+                    let cheapest = format!("g{g}-std");
+                    // Never every option hidden, and never the cheapest shipping option.
+                    assert!(!visible.is_empty(), "{ctx}");
+                    assert!(visible.contains(&cheapest), "{ctx}");
+                    // Pickup is never hidden or moved.
+                    assert!(!ops.iter().any(|o| o.contains("-pk")), "{ctx}");
+                    // Whatever is first after the operations: if the operations
+                    // changed it, it costs no more than the cheapest shipping
+                    // option (it is that option, or the free pickup that a hide
+                    // uncovered).
+                    if visible[0] != handles[0] {
+                        let first_cost = if visible[0].ends_with("-pk") { Some(0.0) } else { cost(&visible[0]) };
+                        assert!(first_cost <= cost(&cheapest), "{ctx}");
+                    }
+                    // Only the cheapest is ever moved to the front.
+                    for o in &ops {
+                        if let Some(m) = o.strip_prefix("move:") {
+                            if m.ends_with("@0") {
+                                assert_eq!(m, format!("{cheapest}@0"), "{ctx}");
+                            }
+                        }
+                    }
+                    // A group of shipping options only: the cheapest IS first.
+                    if layouts[g].is_none() {
+                        assert_eq!(visible[0], cheapest, "{ctx}");
+                    }
+                    // No visible SHIPPING option ahead of the cheapest is one the
+                    // operations moved there.
+                    let first_shipping = visible.iter().find(|x| !x.ends_with("-pk")).unwrap();
+                    if first_shipping != &cheapest {
+                        let moved_ahead = ops.iter().any(|o| o.starts_with(&format!("move:{first_shipping}@")));
+                        assert!(!moved_ahead, "{ctx}");
+                        assert!(cost(first_shipping) > cost(&cheapest), "{ctx}");
+                    }
+                    checked += 1;
+                }
+            }
+        }
+    }
+    assert_eq!(checked, 6 * 5 * 2 * 3);
+}
