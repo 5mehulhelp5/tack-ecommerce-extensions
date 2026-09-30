@@ -1,0 +1,4 @@
+{
+  "name": "TackQuote wholesale shipping rates",
+  "description": "Charges signed-in wholesale buyers their TackQuote shipping rate at checkout, as a discount on the shipping option. It never raises a price."
+}

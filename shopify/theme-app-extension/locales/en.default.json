@@ -48,7 +48,10 @@
       "success": "Thanks. We have your request and will reply with a quote.",
       "failure": "We could not send that. Please try again.",
       "close": "Close",
-      "required": "Please add your name and email."
+      "required": "Please add your name and email.",
+      "add_button": "Add to Quote",
+      "request_button": "Request a Quote",
+      "helper": "Buying in volume? Ask us for a price."
     },
     "signup": {
       "loading": "Loading the application form",
@@ -59,6 +62,7 @@
       "success": "Thanks. Your wholesale application is with us and we will be in touch.",
       "error": "We could not send that. Please try again.",
       "required": "Please complete the required fields.",
+      "heading": "Apply for a wholesale account",
       "sign_in_first": "Sign in to your account to apply. Your application is then linked to your account, so your wholesale prices appear as soon as it is approved.",
       "sign_in": "Sign in",
       "create_account": "Create an account",
@@ -124,7 +128,8 @@
       "success": "Thanks — your application has been received and is under review.",
       "already_pending": "You already have an application under review. We will be in touch.",
       "too_large": "That is too long to send. Please shorten the notes and try again.",
-      "error": "We could not send your application. Please try again shortly."
+      "error": "We could not send your application. Please try again shortly.",
+      "heading": "Apply for net terms"
     },
     "currency": {
       "applied": "Your wholesale price is applied at checkout.",
@@ -162,6 +167,9 @@
       "added_cart": "Added to your cart.",
       "cart_failed": "Your cart could not be updated. Please try again.",
       "quote_failed": "Your quote list is full, or the quote form is not available on this page."
+    },
+    "visibility": {
+      "editor_note": "This product is restricted to TackQuote buyer groups. Only buyers who may purchase it see this block; other shoppers see nothing here, and checkout refuses the product for them."
     }
   }
 }

@@ -1,0 +1,4 @@
+{
+  "name": "Precios mayoristas de TackQuote",
+  "description": "Aplica en el pago el precio de TackQuote y los descuentos por volumen de cada comprador mayorista con sesión iniciada, como descuento sobre el precio de venta al público."
+}

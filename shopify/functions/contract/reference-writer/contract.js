@@ -1,5 +1,8 @@
-// TackQuote checkout-pricing metafield contract, version 1: WRITER-SIDE
-// validator.
+// TackQuote checkout metafield contract, version 2: WRITER-SIDE validator.
+//
+// Version 2 ADDS Product `$app:visibility` and DeliveryCustomization /
+// DiscountAutomaticApp `$app:shipping_rules` (envelope `"v": 2`). Every v1
+// metafield is unchanged and keeps `"v": 1`.
 //
 // This is the full-document validator the TackQuote push pipeline must be
 // equivalent to. It is not shipped in a function. The functions read with
@@ -16,6 +19,8 @@
 // ever defaulted. A malformed price book must never turn into a price.
 
 export const CONTRACT_VERSION = 1;
+// The envelope version of the metafields contract v2 introduced.
+export const CONTRACT_V2 = 2;
 
 // Shopify Functions receive null for any metafield value over 10,000 bytes.
 // https://shopify.dev/docs/apps/build/metafields/metafield-limits
@@ -426,4 +431,265 @@ export function createOmissionLog() {
       return line.length > 900 ? `${line.slice(0, 897)}...` : line;
     },
   };
+}
+
+// ---- contract v2 ---------------------------------------------------------------------
+
+const MAX_AUDIENCES = 50;
+const MAX_RULES = 50;
+const MAX_COUNTRIES = 250;
+const MAX_TITLE_MATCHES = 20;
+const MAX_TITLE_LENGTH = 100;
+// shipping_rules.percentage is DECIMAL(8,4): 0..100 with four decimals.
+const MAX_PERCENT_UNITS = 100 * UNIT;
+const COUNTRY_RE = /^[A-Z]{2}$/;
+
+function v2(jv) {
+  return isPlainObject(jv) && jv.v === CONTRACT_V2;
+}
+
+function charLength(s) {
+  return [...s].length;
+}
+
+// 1..50 distinct audience keys; "*" allowed.
+function parseAudienceList(list) {
+  if (!Array.isArray(list) || list.length === 0 || list.length > MAX_AUDIENCES) return null;
+  const out = [];
+  for (const k of list) {
+    if (!isAudienceKey(k) || charLength(k) > MAX_KEY_LENGTH || out.indexOf(k) !== -1) return null;
+    out.push(k);
+  }
+  return out;
+}
+
+// Product $app:visibility
+//   { "v":2, "a":["gold","*"] }  only linked buyers in these audiences may buy
+//   { "v":2, "d":["*"] }         linked buyers in these audiences may not
+export function parseVisibility(raw) {
+  if (raw === null || raw === undefined) return ABSENT;
+  const jv = coerce(raw);
+  if (jv === undefined) return malformed('not_json');
+  if (!v2(jv)) return malformed('version');
+  if (!onlyKeys(jv, ['v', 'a', 'd'])) return malformed('unknown_key');
+  let allow = null;
+  if (jv.a !== undefined) {
+    allow = parseAudienceList(jv.a);
+    if (allow === null) return malformed('allow');
+  }
+  let deny = null;
+  if (jv.d !== undefined) {
+    deny = parseAudienceList(jv.d);
+    if (deny === null) return malformed('deny');
+  }
+  if (allow === null && deny === null) return malformed('empty');
+  return { status: 'ok', visibility: { allow, deny } };
+}
+
+// Customer $app:groups (v2) - the buyer's audience codes and nothing else,
+// readable by the storefront so the theme can apply catalog visibility.
+//   { "v":2, "g":["gold","net30"] }   a set; order carries no meaning
+export function parseGroups(raw) {
+  if (raw === null || raw === undefined) return ABSENT;
+  const jv = coerce(raw);
+  if (jv === undefined) return malformed('not_json');
+  if (!v2(jv)) return malformed('version');
+  if (!onlyKeys(jv, ['v', 'g'])) return malformed('unknown_key');
+  if (!Array.isArray(jv.g) || jv.g.length > MAX_GROUPS) return malformed('groups');
+  const groups = [];
+  for (const g of jv.g) {
+    if (!isAudienceKey(g) || g === WILDCARD || groups.indexOf(g) !== -1) return malformed('groups');
+    groups.push(g);
+  }
+  return { status: 'ok', groups };
+}
+
+// `buyer` is null for a guest and for a customer who is not linked.
+export function isEntitled(visibility, buyer) {
+  const audiences = buyer ? buyer.groups.concat([WILDCARD]) : [];
+  if (visibility.deny && buyer && audiences.some((k) => visibility.deny.indexOf(k) !== -1)) return false;
+  if (!visibility.allow) return true;
+  if (!buyer) return false;
+  return audiences.some((k) => visibility.allow.indexOf(k) !== -1);
+}
+
+function parseTitleList(list) {
+  if (!Array.isArray(list) || list.length === 0 || list.length > MAX_TITLE_MATCHES) return null;
+  const out = [];
+  for (const t of list) {
+    if (typeof t !== 'string' || t.trim() === '' || charLength(t) > MAX_TITLE_LENGTH) return null;
+    out.push(t.toLowerCase());
+  }
+  return out;
+}
+
+const RULE_KEYS = ['a', 'k', 't', 'f', 'fa', 'p', 'tr', 'm', 'n', 'h', 's'];
+
+export function parseShippingRule(r) {
+  if (!isPlainObject(r) || !onlyKeys(r, RULE_KEYS)) return null;
+  const audiences = parseAudienceList(r.a);
+  if (audiences === null) return null;
+
+  let countries = null;
+  if (r.k !== undefined) {
+    if (!Array.isArray(r.k) || r.k.length === 0 || r.k.length > MAX_COUNTRIES) return null;
+    countries = [];
+    for (const c of r.k) {
+      if (typeof c !== 'string' || !COUNTRY_RE.test(c) || countries.indexOf(c) !== -1) return null;
+      countries.push(c);
+    }
+  }
+
+  const money = (v) => (v === undefined ? undefined : priceToUnits(v));
+  const flat = money(r.f);
+  const freeAbove = money(r.fa);
+  if (flat === null || freeAbove === null) return null;
+
+  let kind;
+  switch (r.t) {
+    case 'none':
+      if (flat !== undefined || freeAbove !== undefined || r.p !== undefined || r.tr !== undefined) return null;
+      kind = { type: 'none' };
+      break;
+    case 'free':
+      if (flat !== undefined || r.p !== undefined || r.tr !== undefined) return null;
+      kind = { type: 'free' };
+      break;
+    case 'flat':
+      if (flat === undefined || r.p !== undefined || r.tr !== undefined) return null;
+      kind = { type: 'flat', amount: flat };
+      break;
+    case 'pct': {
+      if (flat !== undefined || r.tr !== undefined) return null;
+      const units = priceToUnits(r.p);
+      if (units === null || units > MAX_PERCENT_UNITS) return null;
+      kind = { type: 'pct', units };
+      break;
+    }
+    case 'tier': {
+      if (flat !== undefined || r.p !== undefined) return null;
+      if (!Array.isArray(r.tr) || r.tr.length === 0 || r.tr.length > MAX_TIERS_PER_LIST) return null;
+      const tiers = [];
+      for (const e of r.tr) {
+        if (!Array.isArray(e) || e.length !== 3) return null;
+        const min = priceToUnits(e[0]);
+        if (min === null) return null;
+        let max = null;
+        if (e[1] !== null) {
+          max = priceToUnits(e[1]);
+          if (max === null || max < min) return null;
+        }
+        const amount = priceToUnits(e[2]);
+        if (amount === null) return null;
+        tiers.push([min, max, amount]);
+      }
+      kind = { type: 'tier', tiers };
+      break;
+    }
+    default:
+      return null;
+  }
+
+  let matches = null;
+  if (r.m !== undefined) {
+    matches = parseTitleList(r.m);
+    if (matches === null) return null;
+  }
+  let hide = null;
+  if (r.h !== undefined) {
+    hide = parseTitleList(r.h);
+    if (hide === null) return null;
+  }
+  let rename = null;
+  if (r.n !== undefined) {
+    if (typeof r.n !== 'string' || r.n.trim() === '' || charLength(r.n) > MAX_TITLE_LENGTH) return null;
+    rename = r.n;
+  }
+  let sortByPrice = false;
+  if (r.s !== undefined) {
+    if (r.s !== 'price') return null;
+    sortByPrice = true;
+  }
+  return {
+    audiences,
+    countries,
+    kind,
+    freeAbove: freeAbove === undefined ? null : freeAbove,
+    matches,
+    rename,
+    hide,
+    sortByPrice,
+  };
+}
+
+function hasPresentation(rule) {
+  return rule.rename !== null || rule.hide !== null || rule.sortByPrice;
+}
+
+// DeliveryCustomization / DiscountAutomaticApp $app:shipping_rules
+//   { "v":2, "c":"USD", "r":[ rule, ... ] }   rules in TackQuote priority order
+export function parseShippingRules(raw) {
+  if (raw === null || raw === undefined) return ABSENT;
+  const jv = coerce(raw);
+  if (jv === undefined) return malformed('not_json');
+  if (!v2(jv)) return malformed('version');
+  if (!onlyKeys(jv, ['v', 'c', 'r'])) return malformed('unknown_key');
+  if (!isCurrency(jv.c)) return malformed('currency');
+  if (!Array.isArray(jv.r) || jv.r.length === 0 || jv.r.length > MAX_RULES) return malformed('rules');
+  const rules = [];
+  for (const r of jv.r) {
+    const rule = parseShippingRule(r);
+    if (rule === null) return malformed('rule');
+    rules.push(rule);
+  }
+  return { status: 'ok', currency: jv.c, rules };
+}
+
+// The function-side resolution (contract.rs `resolve_shipping`), for tests
+// and for the TackQuote conformance check. `facts.subtotal` is in presentment
+// units. Returns { rate: {index, amount} | null, presentation: index | null },
+// or null on a currency mismatch.
+export function resolveShipping(doc, buyer, facts) {
+  if (toPresentment(0, doc.currency, facts.presentment, facts.rate) === null) return null;
+  const conv = (u) => toPresentment(u, doc.currency, facts.presentment, facts.rate);
+  const audiences = buyer.groups.concat([WILDCARD]);
+  const subtotal = facts.subtotal;
+  let rate = null;
+  let presentation = null;
+  for (let i = 0; i < doc.rules.length; i++) {
+    const rule = doc.rules[i];
+    if (!audiences.some((k) => rule.audiences.indexOf(k) !== -1)) continue;
+    if (rule.countries !== null && (!facts.country || rule.countries.indexOf(facts.country) === -1)) continue;
+    let amount; // undefined: rule does not apply; null: applies without a rate
+    const k = rule.kind;
+    if (k.type === 'none') amount = null;
+    else if (rule.freeAbove !== null && subtotal >= conv(rule.freeAbove)) amount = 0;
+    else if (k.type === 'free') amount = rule.freeAbove !== null ? undefined : 0;
+    else if (k.type === 'pct') amount = Number((BigInt(Math.max(0, subtotal)) * BigInt(k.units) + 500000n) / 1000000n);
+    else if (k.type === 'tier') {
+      const t = k.tiers.find(([min, max]) => subtotal >= conv(min) && (max === null || subtotal <= conv(max)));
+      amount = t ? conv(t[2]) : undefined;
+    } else amount = conv(k.amount);
+    if (amount === undefined) continue;
+    if (rate === null && amount !== null) rate = { index: i, amount };
+    if (presentation === null && hasPresentation(rule)) presentation = i;
+    if (rate !== null && presentation !== null) break;
+  }
+  return { rate, presentation };
+}
+
+// Case-insensitive "contains"; needles are already lower-cased.
+export function titleMatches(title, needles) {
+  if (typeof title !== 'string') return false;
+  const t = title.toLowerCase();
+  return needles.some((n) => t.indexOf(n) !== -1);
+}
+
+// Index of the cheapest option; ties keep the earlier one.
+export function cheapestIndex(costs) {
+  let best = null;
+  costs.forEach((c, i) => {
+    if (best === null || c < costs[best]) best = i;
+  });
+  return best;
 }

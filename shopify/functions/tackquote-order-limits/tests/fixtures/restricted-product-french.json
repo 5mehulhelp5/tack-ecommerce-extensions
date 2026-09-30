@@ -1,0 +1,104 @@
+{
+  "payload": {
+    "export": "cart_validations_generate_run",
+    "target": "cart.validations.generate.run",
+    "input": {
+      "presentmentCurrencyRate": "1.0",
+      "localization": {
+        "language": {
+          "isoCode": "FR"
+        }
+      },
+      "buyerJourney": {
+        "step": "CHECKOUT_COMPLETION"
+      },
+      "validation": {
+        "cartLimits": {
+          "jsonValue": {
+            "v": 1,
+            "c": "USD",
+            "l": {
+              "minTotal": 100
+            }
+          }
+        }
+      },
+      "cart": {
+        "cost": {
+          "subtotalAmount": {
+            "amount": "96.0",
+            "currencyCode": "USD"
+          }
+        },
+        "buyerIdentity": {
+          "customer": {
+            "buyer": {
+              "jsonValue": {
+                "v": 1,
+                "g": [
+                  "GOLD"
+                ]
+              }
+            }
+          }
+        },
+        "lines": [
+          {
+            "quantity": 13,
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "id": "gid://shopify/ProductVariant/11",
+              "title": "Large",
+              "product": {
+                "id": "gid://shopify/Product/7000",
+                "title": "Work Glove",
+                "visibility": {
+                  "jsonValue": {
+                    "v": 2,
+                    "a": [
+                      "platinum"
+                    ]
+                  }
+                }
+              },
+              "orderLimits": {
+                "jsonValue": {
+                  "v": 1,
+                  "l": {
+                    "GOLD": {
+                      "min": 12,
+                      "max": 480,
+                      "step": 12
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "output": {
+      "operations": [
+        {
+          "validationAdd": {
+            "errors": [
+              {
+                "message": "« Work Glove » n’est pas disponible pour votre compte. Retirez-le de votre panier pour continuer.",
+                "target": "$.cart"
+              },
+              {
+                "message": "La quantité de « Work Glove - Large » doit être un multiple de 12.",
+                "target": "$.cart"
+              },
+              {
+                "message": "Le montant de la commande doit être d’au moins 100,00 USD.",
+                "target": "$.cart"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

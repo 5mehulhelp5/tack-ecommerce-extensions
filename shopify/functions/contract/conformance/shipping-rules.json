@@ -1,0 +1,113 @@
+{
+  "about": "Shared conformance corpus for $app:shipping_rules resolution (contract v2). The JS reference (reference-writer/conformance.test.mjs), the Rust reader (tackquote-wholesale-shipping tests) and TackQuote's own evaluateShippingRules (main repo, checkout-extras conformance spec) must all agree on every case. subtotal is in the presentment currency; expect.rate is [rule index, amount in presentment currency] or null; expect.presentation is a rule index or null; expect null means a currency mismatch.",
+  "cases": [
+    {
+      "name": "flat rate for a group",
+      "doc": { "v": 2, "c": "USD", "r": [{ "a": ["gold"], "t": "flat", "f": 7.5 }] },
+      "groups": ["gold"], "subtotal": 120, "currency": "USD", "rate": 1, "country": "US",
+      "expect": { "rate": [0, 7.5], "presentation": null }
+    },
+    {
+      "name": "free above met beats the flat amount",
+      "doc": { "v": 2, "c": "USD", "r": [{ "a": ["*"], "t": "flat", "f": 7.5, "fa": 100 }] },
+      "groups": [], "subtotal": 100, "currency": "USD", "rate": 1, "country": "US",
+      "expect": { "rate": [0, 0], "presentation": null }
+    },
+    {
+      "name": "free above unmet charges the flat amount",
+      "doc": { "v": 2, "c": "USD", "r": [{ "a": ["*"], "t": "flat", "f": 7.5, "fa": 100 }] },
+      "groups": [], "subtotal": 99.99, "currency": "USD", "rate": 1, "country": "US",
+      "expect": { "rate": [0, 7.5], "presentation": null }
+    },
+    {
+      "name": "free with an unmet threshold falls through to the next rule",
+      "doc": { "v": 2, "c": "USD", "r": [
+        { "a": ["gold"], "t": "free", "fa": 500, "n": "Free wholesale shipping" },
+        { "a": ["gold"], "t": "flat", "f": 12, "n": "Wholesale ground" }
+      ] },
+      "groups": ["gold"], "subtotal": 250, "currency": "USD", "rate": 1, "country": "US",
+      "expect": { "rate": [1, 12], "presentation": 1 }
+    },
+    {
+      "name": "percentage of the subtotal, rounded to four places",
+      "doc": { "v": 2, "c": "USD", "r": [{ "a": ["gold"], "t": "pct", "p": 1.2345 }] },
+      "groups": ["gold"], "subtotal": 250, "currency": "USD", "rate": 1, "country": "US",
+      "expect": { "rate": [0, 3.0863], "presentation": null }
+    },
+    {
+      "name": "tiered, inclusive upper bound",
+      "doc": { "v": 2, "c": "USD", "r": [{ "a": ["gold"], "t": "tier", "tr": [[0, 250, 6], [250.0001, null, 2]] }] },
+      "groups": ["gold"], "subtotal": 250, "currency": "USD", "rate": 1, "country": "US",
+      "expect": { "rate": [0, 6], "presentation": null }
+    },
+    {
+      "name": "tiered with no holding tier does not apply",
+      "doc": { "v": 2, "c": "USD", "r": [
+        { "a": ["gold"], "t": "tier", "tr": [[1000, null, 0]] },
+        { "a": ["gold"], "t": "flat", "f": 9 }
+      ] },
+      "groups": ["gold"], "subtotal": 250, "currency": "USD", "rate": 1, "country": "US",
+      "expect": { "rate": [1, 9], "presentation": null }
+    },
+    {
+      "name": "country-restricted rule skipped for another country",
+      "doc": { "v": 2, "c": "USD", "r": [
+        { "a": ["*"], "k": ["CA"], "t": "free" },
+        { "a": ["*"], "t": "flat", "f": 20 }
+      ] },
+      "groups": [], "subtotal": 50, "currency": "USD", "rate": 1, "country": "US",
+      "expect": { "rate": [1, 20], "presentation": null }
+    },
+    {
+      "name": "country-restricted rule skipped for an unknown destination",
+      "doc": { "v": 2, "c": "USD", "r": [
+        { "a": ["*"], "k": ["US"], "t": "free" },
+        { "a": ["*"], "t": "flat", "f": 20 }
+      ] },
+      "groups": [], "subtotal": 50, "currency": "USD", "rate": 1, "country": null,
+      "expect": { "rate": [1, 20], "presentation": null }
+    },
+    {
+      "name": "a none rule presents but never prices",
+      "doc": { "v": 2, "c": "USD", "r": [
+        { "a": ["gold"], "t": "none", "h": ["express"] },
+        { "a": ["gold"], "t": "free" }
+      ] },
+      "groups": ["gold"], "subtotal": 10, "currency": "USD", "rate": 1, "country": "US",
+      "expect": { "rate": [1, 0], "presentation": 0 }
+    },
+    {
+      "name": "another group's rule does not apply",
+      "doc": { "v": 2, "c": "USD", "r": [
+        { "a": ["silver"], "t": "free", "n": "Silver" },
+        { "a": ["*"], "t": "flat", "f": 4 }
+      ] },
+      "groups": ["gold"], "subtotal": 10, "currency": "USD", "rate": 1, "country": "US",
+      "expect": { "rate": [1, 4], "presentation": null }
+    },
+    {
+      "name": "presentment conversion of amounts and thresholds",
+      "doc": { "v": 2, "c": "USD", "r": [{ "a": ["gold"], "t": "flat", "f": 4, "fa": 500 }] },
+      "groups": ["gold"], "subtotal": 674.99, "currency": "CAD", "rate": 1.35, "country": "CA",
+      "expect": { "rate": [0, 5.4], "presentation": null }
+    },
+    {
+      "name": "threshold met after conversion",
+      "doc": { "v": 2, "c": "USD", "r": [{ "a": ["gold"], "t": "flat", "f": 4, "fa": 500 }] },
+      "groups": ["gold"], "subtotal": 675, "currency": "CAD", "rate": 1.35, "country": "CA",
+      "expect": { "rate": [0, 0], "presentation": null }
+    },
+    {
+      "name": "shop currency written as the presentment currency is a mismatch",
+      "doc": { "v": 2, "c": "USD", "r": [{ "a": ["gold"], "t": "free" }] },
+      "groups": ["gold"], "subtotal": 10, "currency": "CAD", "rate": 1, "country": "CA",
+      "expect": null
+    },
+    {
+      "name": "no rule applies",
+      "doc": { "v": 2, "c": "USD", "r": [{ "a": ["silver"], "t": "free" }] },
+      "groups": ["gold"], "subtotal": 10, "currency": "USD", "rate": 1, "country": "US",
+      "expect": { "rate": null, "presentation": null }
+    }
+  ]
+}

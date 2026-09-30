@@ -62,7 +62,13 @@
     {{ block.shopify_attributes }}
   >
     <h3 class="tackquote-signup__heading">
-      {{ block.settings.heading | default: 'Apply for a wholesale account' }}
+      {%- comment -%}The schema default is English. Left as it is (or blank), the
+      shopper's language is used instead; a merchant's own wording is kept.{%- endcomment -%}
+      {%- assign tackquote_label = block.settings.heading | strip -%}
+      {%- if tackquote_label == blank or tackquote_label == 'Apply for a wholesale account' -%}
+        {%- assign tackquote_label = 'tackquote.signup.heading' | t -%}
+      {%- endif -%}
+      {{ tackquote_label }}
     </h3>
 
     {%- if block.settings.intro != blank -%}

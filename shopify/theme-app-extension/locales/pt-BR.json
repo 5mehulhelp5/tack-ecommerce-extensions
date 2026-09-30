@@ -1,0 +1,128 @@
+{
+  "tackquote": {
+    "setup": {
+      "title": "O TackQuote ainda não está configurado",
+      "proxy": "Defina o prefixo de URL do app nas configurações deste bloco para que ele consiga acessar o TackQuote. Até lá, ele fica oculto para os clientes."
+    },
+    "price": {
+      "loading": "Verificando seu preço de atacado",
+      "anonymous": "Entre na sua conta para ver seu preço de atacado, disponível em um orçamento.",
+      "login": "Entrar",
+      "unlinked": "Sua conta ainda não está vinculada aos preços de atacado. Solicite um orçamento e nós configuramos isso para você.",
+      "unpriced": "Ainda não há preço de atacado definido para este item. Solicite um orçamento para receber um preço.",
+      "each": "cada",
+      "quote_note": "Seu preço de atacado, disponível em um orçamento. Adicione este item a um orçamento para solicitá-lo.",
+      "list_note": "Preço de tabela, não uma tarifa negociada.",
+      "error": "Não foi possível carregar seu preço agora.",
+      "heading_quote": "Seu preço de atacado em orçamento",
+      "heading_applied": "Seu preço de atacado",
+      "anonymous_applied": "Entre na sua conta para ver seu preço de atacado.",
+      "applied_note": "Seu preço de atacado, aplicado no checkout."
+    },
+    "diagnostics": {
+      "password": "Esta loja é protegida por senha, e a solicitação foi enviada para a página de senha em vez do TackQuote. Lojas de desenvolvimento são sempre protegidas por senha, e isso não pode ser desativado. Visualize a loja real e digite a senha (Loja virtual → Preferências). Lá, os preços aparecem normalmente.",
+      "not_json": "Quem respondeu a {path} não foi o TackQuote: veio uma página HTML em vez de dados. Normalmente é a página de senha da loja e, às vezes, um tema ou outro app usando esse caminho.",
+      "not_found": "A Shopify retornou 404 para {path}. O subcaminho do proxy do app não corresponde à configuração Caminho do proxy do app deste bloco. Verifique Configurações → Apps e canais de vendas → TackQuote → Proxy do app.",
+      "auth": "A Shopify encaminhou a solicitação, mas o TackQuote recusou a assinatura. Normalmente isso significa que o app foi reinstalado e o segredo armazenado está desatualizado. Conecte a loja novamente.",
+      "server": "O TackQuote respondeu {status}. Não há nada de errado com este bloco; tente novamente em instantes.",
+      "timeout": "O TackQuote não respondeu em 2,5 segundos, então o preço foi ignorado para não deixar a página lenta.",
+      "failed": "A solicitação para {path} falhou antes de chegar ao TackQuote.",
+      "not_connected": "Esta loja não está conectada a nenhuma conta do TackQuote. Conecte-a em TackQuote → Connections → Shopify e recarregue o editor.",
+      "no_sku": "Esta variante não tem SKU. O TackQuote calcula preços e aplica regras por SKU, então adicione um no admin da Shopify → Produtos → este produto → Variantes. Até lá, os clientes não veem nada aqui.",
+      "no_limits": "Nenhum limite de pedido se aplica a este produto. Defina-os em TackQuote → Order Limits. Os clientes não veem nada aqui até que uma regra se aplique."
+    },
+    "quote": {
+      "added": "Adicionado à sua solicitação de orçamento.",
+      "already": "Já está na sua solicitação de orçamento.",
+      "unavailable": "Esta variante não está disponível.",
+      "title": "Sua solicitação de orçamento",
+      "empty": "Sua solicitação de orçamento ainda está vazia.",
+      "remove": "Remover",
+      "quantity": "Quantidade",
+      "name": "Nome completo",
+      "email": "E-mail",
+      "company": "Empresa",
+      "message": "Algo que devemos saber?",
+      "submit": "Enviar solicitação de orçamento",
+      "sending": "Enviando",
+      "success": "Obrigado. Recebemos sua solicitação e responderemos com um orçamento.",
+      "failure": "Não foi possível enviar. Tente novamente.",
+      "close": "Fechar",
+      "required": "Informe seu nome e e-mail.",
+      "add_button": "Adicionar ao orçamento",
+      "request_button": "Solicitar orçamento",
+      "helper": "Comprando em volume? Peça um preço para nós."
+    },
+    "signup": {
+      "loading": "Carregando o formulário de solicitação",
+      "unavailable": "O formulário de solicitação de conta de atacado não está disponível no momento.",
+      "no_form": "Nenhum formulário de atacado está ativado ainda. Crie ou ative um em TackQuote → Settings → Wholesale → Forms e recarregue o editor. Até lá, os clientes veem um aviso curto de que as solicitações não estão abertas.",
+      "submit": "Enviar solicitação",
+      "submitting": "Enviando sua solicitação",
+      "success": "Obrigado. Recebemos sua solicitação de conta de atacado e entraremos em contato.",
+      "error": "Não foi possível enviar. Tente novamente.",
+      "required": "Preencha os campos obrigatórios.",
+      "heading": "Solicite uma conta de atacado",
+      "sign_in_first": "Entre na sua conta para fazer a solicitação. Ela fica vinculada à sua conta, e seus preços de atacado aparecem assim que ela for aprovada.",
+      "sign_in": "Entrar",
+      "create_account": "Criar uma conta"
+    },
+    "quantity_breaks": {
+      "loading": "Carregando os preços de atacado por quantidade",
+      "caption": "Preço de atacado por unidade conforme a quantidade, disponível em um orçamento",
+      "quantity": "Quantidade",
+      "price": "Preço unitário orçado",
+      "list_note": "Preços de tabela, não uma tarifa negociada.",
+      "empty": "Não há preços de atacado por quantidade publicados para este item.",
+      "anonymous": "Entre na sua conta para ver seus preços de atacado por quantidade.",
+      "login": "Entrar",
+      "unlinked": "Sua conta ainda não está vinculada aos preços de atacado. Solicite um orçamento e nós configuramos isso para você.",
+      "error": "Não foi possível carregar os preços por quantidade agora.",
+      "heading_quote": "Preços de atacado por quantidade, disponíveis em um orçamento",
+      "heading_applied": "Preços de atacado por quantidade, aplicados no checkout",
+      "caption_applied": "Preço de atacado por unidade conforme a quantidade, aplicado no checkout",
+      "price_applied": "Seu preço por unidade",
+      "applied_note": "Aplicado no checkout."
+    },
+    "badge": {
+      "label": "Sua faixa de preço",
+      "empty": "Nenhum grupo de compradores se aplica a este cliente."
+    },
+    "order_limits": {
+      "qty_min": "Pedido mínimo: {min} unidades",
+      "qty_max": "Pedido máximo: {max} unidades",
+      "qty_range": "Peça entre {min} e {max} unidades",
+      "total_min": "Valor mínimo do pedido: {min}",
+      "total_max": "Valor máximo do pedido: {max}",
+      "total_range": "Valor do pedido entre {min} e {max}",
+      "items_min": "Mínimo de {min} itens por pedido",
+      "items_max": "Máximo de {max} itens por pedido",
+      "items_range": "Entre {min} e {max} itens por pedido",
+      "account_note": "Com base na sua conta.",
+      "loading": "Verificando os limites de pedido deste produto",
+      "empty": "Nenhum pedido mínimo se aplica a este produto.",
+      "error": "Os pedidos mínimos não estão disponíveis no momento.",
+      "enforced_note": "Aplicado no checkout."
+    },
+    "credit": {
+      "sign_in": "Entre na sua conta para solicitar pagamento a prazo.",
+      "label_business": "Razão social",
+      "label_email": "E-mail de contato",
+      "label_phone": "Telefone de contato",
+      "label_tax_id": "CNPJ / identificação fiscal",
+      "label_limit": "Limite de crédito solicitado",
+      "label_terms": "Prazo de pagamento solicitado (dias)",
+      "label_notes": "Algo mais que devemos saber",
+      "submit": "Enviar solicitação",
+      "submitting": "Enviando sua solicitação…",
+      "success": "Obrigado — recebemos sua solicitação e ela está em análise.",
+      "already_pending": "Você já tem uma solicitação em análise. Entraremos em contato.",
+      "too_large": "O texto é longo demais para enviar. Encurte as observações e tente novamente.",
+      "error": "Não foi possível enviar sua solicitação. Tente novamente em instantes.",
+      "heading": "Solicite pagamento a prazo"
+    },
+    "visibility": {
+      "editor_note": "Este produto é restrito a grupos de compradores do TackQuote. Somente compradores autorizados a comprá-lo veem este bloco; os demais clientes não veem nada aqui, e o checkout recusa o produto para eles."
+    }
+  }
+}

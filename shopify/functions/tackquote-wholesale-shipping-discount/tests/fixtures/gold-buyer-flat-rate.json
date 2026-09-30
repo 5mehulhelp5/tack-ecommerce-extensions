@@ -1,0 +1,114 @@
+{
+  "payload": {
+    "export": "cart_delivery_options_discounts_generate_run",
+    "target": "cart.delivery-options.discounts.generate.run",
+    "input": {
+      "presentmentCurrencyRate": "1.0",
+      "localization": {
+        "language": {
+          "isoCode": "DE"
+        }
+      },
+      "discount": {
+        "discountClasses": [
+          "SHIPPING"
+        ],
+        "shippingRules": {
+          "jsonValue": {
+            "v": 2,
+            "c": "USD",
+            "r": [
+              {
+                "a": [
+                  "gold"
+                ],
+                "t": "flat",
+                "f": 4.5,
+                "fa": 500
+              }
+            ]
+          }
+        }
+      },
+      "cart": {
+        "cost": {
+          "subtotalAmount": {
+            "amount": "250.0",
+            "currencyCode": "USD"
+          }
+        },
+        "buyerIdentity": {
+          "customer": {
+            "buyer": {
+              "jsonValue": {
+                "v": 1,
+                "g": [
+                  "gold"
+                ]
+              }
+            }
+          }
+        },
+        "deliveryGroups": [
+          {
+            "deliveryAddress": {
+              "countryCode": "US"
+            },
+            "deliveryOptions": [
+              {
+                "handle": "dc4b9f18d30098469af5fabec87f3434-3da105a249c8aa8bffc74a78b7c66138",
+                "title": "LTL Freight",
+                "deliveryMethodType": "SHIPPING",
+                "cost": {
+                  "amount": "60.0"
+                }
+              },
+              {
+                "handle": "dc4b9f18d30098469af5fabec87f3434-b514e01af8655a9229f7a04405396118",
+                "title": "Express",
+                "deliveryMethodType": "SHIPPING",
+                "cost": {
+                  "amount": "25.0"
+                }
+              },
+              {
+                "handle": "dc4b9f18d30098469af5fabec87f3434-7bf1540a5810819fcc43fd9808d43db9",
+                "title": "Standard",
+                "deliveryMethodType": "SHIPPING",
+                "cost": {
+                  "amount": "10.0"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "output": {
+      "operations": [
+        {
+          "deliveryDiscountsAdd": {
+            "candidates": [
+              {
+                "message": "Großhandelsversand",
+                "targets": [
+                  {
+                    "deliveryOption": {
+                      "handle": "dc4b9f18d30098469af5fabec87f3434-7bf1540a5810819fcc43fd9808d43db9"
+                    }
+                  }
+                ],
+                "value": {
+                  "fixedAmount": {
+                    "amount": "5.5"
+                  }
+                }
+              }
+            ],
+            "selectionStrategy": "ALL"
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "name": "Tarifas de envío mayorista de TackQuote",
+  "description": "Cobra en el pago la tarifa de envío de TackQuote a los compradores mayoristas con sesión iniciada, como descuento sobre la opción de envío. Nunca aumenta un precio."
+}

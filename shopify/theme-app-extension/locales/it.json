@@ -1,0 +1,128 @@
+{
+  "tackquote": {
+    "setup": {
+      "title": "TackQuote non è ancora configurato",
+      "proxy": "Imposta il prefisso URL dell’app nelle impostazioni di questo blocco, così che possa raggiungere TackQuote. Fino ad allora resta nascosto ai clienti."
+    },
+    "price": {
+      "loading": "Verifica del tuo prezzo all’ingrosso in corso",
+      "anonymous": "Accedi per vedere il tuo prezzo all’ingrosso, disponibile su preventivo.",
+      "login": "Accedi",
+      "unlinked": "Il tuo account non è ancora collegato ai prezzi all’ingrosso. Richiedi un preventivo e ce ne occuperemo noi.",
+      "unpriced": "Per questo articolo non è ancora stato impostato un prezzo all’ingrosso. Richiedi un preventivo per ottenere un prezzo.",
+      "each": "cad.",
+      "quote_note": "Il tuo prezzo all’ingrosso, disponibile su preventivo. Aggiungi questo articolo a un preventivo per richiederlo.",
+      "list_note": "Prezzo di listino, non una tariffa negoziata.",
+      "error": "Al momento non è stato possibile caricare il tuo prezzo.",
+      "heading_quote": "Il tuo prezzo all’ingrosso su preventivo",
+      "heading_applied": "Il tuo prezzo all’ingrosso",
+      "anonymous_applied": "Accedi per vedere il tuo prezzo all’ingrosso.",
+      "applied_note": "Il tuo prezzo all’ingrosso, applicato al checkout."
+    },
+    "diagnostics": {
+      "password": "Questo negozio è protetto da password e la richiesta è arrivata alla pagina della password anziché a TackQuote. I negozi di sviluppo sono sempre protetti da password e non è possibile disattivarla. Apri l’anteprima del negozio reale e inserisci la password (Negozio online → Preferenze). Lì i prezzi vengono mostrati normalmente.",
+      "not_json": "A {path} non ha risposto TackQuote, ma una pagina HTML invece dei dati. Di solito è la pagina della password del negozio, a volte un tema o un’altra app che usa quel percorso.",
+      "not_found": "Shopify ha restituito 404 per {path}. Il sottopercorso del proxy dell’app non corrisponde all’impostazione Percorso del proxy dell’app di questo blocco. Controlla Impostazioni → App e canali di vendita → TackQuote → Proxy dell’app.",
+      "auth": "Shopify ha inoltrato la richiesta, ma TackQuote ha rifiutato la firma. Di solito significa che l’app è stata reinstallata e il segreto salvato non è più valido. Ricollega il negozio.",
+      "server": "TackQuote ha risposto {status}. Il blocco non ha problemi; riprova tra poco.",
+      "timeout": "TackQuote non ha risposto entro 2,5 secondi, quindi il prezzo è stato omesso per non rallentare la pagina.",
+      "failed": "La richiesta a {path} non è riuscita prima di raggiungere TackQuote.",
+      "not_connected": "Questo negozio non è collegato a nessun account TackQuote. Collegalo da TackQuote → Connections → Shopify, poi ricarica l’editor.",
+      "no_sku": "Questa variante non ha uno SKU. TackQuote calcola i prezzi e applica le regole in base allo SKU: aggiungine uno nel pannello di controllo Shopify → Prodotti → questo prodotto → Varianti. Fino ad allora i clienti qui non vedono nulla.",
+      "no_limits": "A questo prodotto non si applica alcun limite d’ordine. Impostali in TackQuote → Order Limits. I clienti qui non vedono nulla finché non si applica una regola."
+    },
+    "quote": {
+      "added": "Aggiunto alla tua richiesta di preventivo.",
+      "already": "Già presente nella tua richiesta di preventivo.",
+      "unavailable": "Questa variante non è disponibile.",
+      "title": "La tua richiesta di preventivo",
+      "empty": "La tua richiesta di preventivo è ancora vuota.",
+      "remove": "Rimuovi",
+      "quantity": "Quantità",
+      "name": "Nome e cognome",
+      "email": "Email",
+      "company": "Azienda",
+      "message": "C’è qualcosa che dovremmo sapere?",
+      "submit": "Invia richiesta di preventivo",
+      "sending": "Invio in corso",
+      "success": "Grazie. Abbiamo ricevuto la tua richiesta e ti risponderemo con un preventivo.",
+      "failure": "Invio non riuscito. Riprova.",
+      "close": "Chiudi",
+      "required": "Inserisci il tuo nome e la tua email.",
+      "add_button": "Aggiungi al preventivo",
+      "request_button": "Richiedi un preventivo",
+      "helper": "Acquisti grandi quantità? Chiedici un prezzo."
+    },
+    "signup": {
+      "loading": "Caricamento del modulo di richiesta",
+      "unavailable": "Il modulo di richiesta per l’account all’ingrosso non è disponibile al momento.",
+      "no_form": "Nessun modulo all’ingrosso è ancora attivo. Creane o attivane uno in TackQuote → Settings → Wholesale → Forms, poi ricarica l’editor. Fino ad allora i clienti vedono una breve nota che indica che le richieste non sono aperte.",
+      "submit": "Invia richiesta",
+      "submitting": "Invio della richiesta in corso",
+      "success": "Grazie. Abbiamo ricevuto la tua richiesta di account all’ingrosso e ti contatteremo.",
+      "error": "Invio non riuscito. Riprova.",
+      "required": "Compila i campi obbligatori.",
+      "heading": "Richiedi un account all’ingrosso",
+      "sign_in_first": "Accedi al tuo account per inviare la richiesta. Verrà collegata al tuo account e i tuoi prezzi all’ingrosso compariranno non appena sarà approvata.",
+      "sign_in": "Accedi",
+      "create_account": "Crea un account"
+    },
+    "quantity_breaks": {
+      "loading": "Caricamento dei prezzi all’ingrosso per quantità",
+      "caption": "Prezzo all’ingrosso per unità in base alla quantità, disponibile su preventivo",
+      "quantity": "Quantità",
+      "price": "Prezzo unitario a preventivo",
+      "list_note": "Prezzi di listino, non una tariffa negoziata.",
+      "empty": "Per questo articolo non sono pubblicati prezzi all’ingrosso per quantità.",
+      "anonymous": "Accedi per vedere i tuoi prezzi all’ingrosso per quantità.",
+      "login": "Accedi",
+      "unlinked": "Il tuo account non è ancora collegato ai prezzi all’ingrosso. Richiedi un preventivo e ce ne occuperemo noi.",
+      "error": "Al momento non è stato possibile caricare i prezzi per quantità.",
+      "heading_quote": "Prezzi all’ingrosso per quantità, disponibili su preventivo",
+      "heading_applied": "Prezzi all’ingrosso per quantità, applicati al checkout",
+      "caption_applied": "Prezzo all’ingrosso per unità in base alla quantità, applicato al checkout",
+      "price_applied": "Il tuo prezzo unitario",
+      "applied_note": "Applicato al checkout."
+    },
+    "badge": {
+      "label": "La tua fascia di prezzo",
+      "empty": "A questo cliente non si applica alcun gruppo di acquirenti."
+    },
+    "order_limits": {
+      "qty_min": "Ordine minimo: {min} unità",
+      "qty_max": "Ordine massimo: {max} unità",
+      "qty_range": "Ordina tra {min} e {max} unità",
+      "total_min": "Importo minimo dell’ordine: {min}",
+      "total_max": "Importo massimo dell’ordine: {max}",
+      "total_range": "Importo dell’ordine tra {min} e {max}",
+      "items_min": "Almeno {min} articoli per ordine",
+      "items_max": "Al massimo {max} articoli per ordine",
+      "items_range": "Tra {min} e {max} articoli per ordine",
+      "account_note": "In base al tuo account.",
+      "loading": "Verifica dei limiti d’ordine per questo prodotto",
+      "empty": "A questo prodotto non si applica alcun ordine minimo.",
+      "error": "Gli ordini minimi non sono disponibili al momento.",
+      "enforced_note": "Applicato al checkout."
+    },
+    "credit": {
+      "sign_in": "Accedi al tuo account per richiedere il pagamento dilazionato.",
+      "label_business": "Ragione sociale",
+      "label_email": "Email di contatto",
+      "label_phone": "Telefono di contatto",
+      "label_tax_id": "Partita IVA / codice fiscale",
+      "label_limit": "Fido richiesto",
+      "label_terms": "Termini di pagamento richiesti (giorni)",
+      "label_notes": "Altre informazioni utili",
+      "submit": "Invia richiesta",
+      "submitting": "Invio della richiesta in corso…",
+      "success": "Grazie — abbiamo ricevuto la tua richiesta, che è in fase di valutazione.",
+      "already_pending": "Hai già una richiesta in valutazione. Ti contatteremo.",
+      "too_large": "Il testo è troppo lungo per essere inviato. Accorcia le note e riprova.",
+      "error": "Non è stato possibile inviare la tua richiesta. Riprova tra poco.",
+      "heading": "Richiedi il pagamento dilazionato"
+    },
+    "visibility": {
+      "editor_note": "Questo prodotto è riservato a gruppi di acquirenti TackQuote. Solo gli acquirenti autorizzati ad acquistarlo vedono questo blocco; gli altri clienti qui non vedono nulla e il checkout rifiuta il prodotto."
+    }
+  }
+}

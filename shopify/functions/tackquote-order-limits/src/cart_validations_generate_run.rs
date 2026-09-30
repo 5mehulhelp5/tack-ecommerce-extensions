@@ -30,15 +30,26 @@
 // Every error targets `$.cart`, the only cart-level target in the documented
 // list (https://shopify.dev/docs/api/functions/2026-07/cart-and-checkout-validation).
 //
-// Guests and unlinked customers get no errors. Anything malformed is omitted
-// and logged, never defaulted: a broken limit is not a limit.
+// Catalog visibility (contract v2). A product whose `$app:visibility` does not
+// entitle this buyer blocks checkout with a message that names it, at EVERY
+// step including CART_INTERACTION: unlike a minimum, adding more cannot fix it,
+// so refusing the add is the right place. This is the one rule that also
+// applies to guests and unlinked customers: an allow-list (`a`) is exactly
+// "only these linked buyers" (`is_entitled` in contract.rs).
+//
+// Messages are written in the checkout language (`localization`), see i18n.rs.
+//
+// Guests and unlinked customers get no order-limit errors. Anything malformed
+// is omitted and logged, never defaulted: a broken limit is not a limit, and a
+// broken visibility rule is not a restriction.
 
 use super::schema;
 use crate::contract::{
-    amount_to_units, read_buyer, read_order_limits, read_shop_limits, resolve_customer_limit,
-    resolve_product_limit, to_presentment, units_to_f64, variant_key, CartLimits, LimitEntry,
-    Omissions, OrderLimits, Parsed,
+    amount_to_units, is_entitled, read_buyer, read_order_limits, read_shop_limits, read_visibility,
+    resolve_customer_limit, resolve_product_limit, to_presentment, units_to_f64, variant_key, Buyer,
+    CartLimits, LimitEntry, Omissions, OrderLimits, Parsed,
 };
+use crate::i18n::{message, Msg};
 use shopify_function::prelude::*;
 use shopify_function::Result;
 use std::collections::{BTreeMap, BTreeSet};
@@ -105,9 +116,15 @@ fn label(product: &str, variant: Option<&String>) -> String {
     }
 }
 
-fn money(units: i64, currency: &str) -> String {
+/// "100.00 USD", with the decimal comma the checkout language writes.
+fn money(units: i64, currency: &str, lang: &str) -> String {
     let v = units_to_f64(units);
-    format!("{v:.2} {currency}")
+    let s = format!("{v:.2} {currency}");
+    if crate::i18n::decimal_comma(lang) {
+        s.replacen('.', ",", 1)
+    } else {
+        s
+    }
 }
 
 /// Deduplicated, capped problem list. A problem is keyed by (variant, rule,
@@ -135,23 +152,27 @@ impl Problems {
         }
     }
 
-    fn finish(mut self) -> Vec<String> {
+    fn finish(mut self, lang: &str) -> Vec<String> {
         if self.unlisted > 0 {
             self.listed.pop();
             let more = self.unlisted + 1;
-            self.listed.push(format!(
-                "{more} more order-limit problems. Adjust the quantities above, then review your cart again."
-            ));
+            self.listed.push(message(lang, Msg::More, None, &more.to_string()));
         }
         self.listed
     }
 }
 
-fn check_entry(p: &mut Problems, e: &LimitEntry, num: u64, v: &Variant, qty: i64, enforce: Enforce) {
+/// Rule ids in the problem key. Per variant: 1-3. Per cart: 10-15. Per
+/// product: 20 (visibility), keyed by the numeric product id.
+const RULE_VISIBILITY: u8 = 20;
+
+#[allow(clippy::too_many_arguments)]
+fn check_entry(p: &mut Problems, e: &LimitEntry, num: u64, v: &Variant, qty: i64, enforce: Enforce, lang: &str) {
     let name = || label(v.product().title(), v.title());
+    let say = |m: Msg, n: i64| message(lang, m, Some(&name()), &n.to_string());
     if let Some(max) = e.max {
         if qty > max {
-            p.add((num, 1, max), || format!("Quantity for \"{}\" must be at most {max}.", name()));
+            p.add((num, 1, max), || say(Msg::Max, max));
         }
     }
     if enforce == Enforce::MaximumsOnly {
@@ -159,12 +180,12 @@ fn check_entry(p: &mut Problems, e: &LimitEntry, num: u64, v: &Variant, qty: i64
     }
     if let Some(min) = e.min {
         if qty < min {
-            p.add((num, 2, min), || format!("Quantity for \"{}\" must be at least {min}.", name()));
+            p.add((num, 2, min), || say(Msg::Min, min));
         }
     }
     if let Some(step) = e.step {
         if qty % step != 0 {
-            p.add((num, 3, step), || format!("Quantity for \"{}\" must be a multiple of {step}.", name()));
+            p.add((num, 3, step), || say(Msg::Step, step));
         }
     }
 }
@@ -175,6 +196,7 @@ struct CartFacts<'a> {
     rate: f64,
     qty: i64,
     unique: i64,
+    lang: &'a str,
 }
 
 fn check_cart(
@@ -187,18 +209,18 @@ fn check_cart(
     who: &str,
 ) {
     let counts = [
-        (10u8, l.max_qty, true, facts.qty, "Order may contain at most {} items."),
-        (11, l.max_unique, true, facts.unique, "Order may include at most {} unique products."),
-        (12, l.min_qty, false, facts.qty, "Order must contain at least {} items."),
-        (13, l.min_unique, false, facts.unique, "Order must include at least {} unique products."),
+        (10u8, l.max_qty, true, facts.qty, Msg::MaxItems),
+        (11, l.max_unique, true, facts.unique, Msg::MaxUnique),
+        (12, l.min_qty, false, facts.qty, Msg::MinItems),
+        (13, l.min_unique, false, facts.unique, Msg::MinUnique),
     ];
-    for (rule, limit, is_max, actual, template) in counts {
+    for (rule, limit, is_max, actual, msg) in counts {
         let Some(limit) = limit else { continue };
         if !is_max && enforce == Enforce::MaximumsOnly {
             continue;
         }
         if (is_max && actual > limit) || (!is_max && actual < limit) {
-            p.add((CART, rule, limit), || template.replace("{}", &limit.to_string()));
+            p.add((CART, rule, limit), || message(facts.lang, msg, None, &limit.to_string()));
         }
     }
 
@@ -214,7 +236,7 @@ fn check_cart(
     if let Some(max) = l.max_total {
         match convert(max) {
             Some(max) if subtotal > max => p.add((CART, 14, max), || {
-                format!("Order total must be at most {}.", money(max, facts.currency))
+                message(facts.lang, Msg::MaxTotal, None, &money(max, facts.currency, facts.lang))
             }),
             Some(_) => {}
             None => omitted.add(&format!("{who}_currency_mismatch"), None),
@@ -226,7 +248,7 @@ fn check_cart(
     if let Some(min) = l.min_total {
         match convert(min) {
             Some(min) if subtotal < min => p.add((CART, 15, min), || {
-                format!("Order total must be at least {}.", money(min, facts.currency))
+                message(facts.lang, Msg::MinTotal, None, &money(min, facts.currency, facts.lang))
             }),
             Some(_) => {}
             None => omitted.add(&format!("{who}_currency_mismatch"), None),
@@ -238,18 +260,51 @@ fn check_cart(
 pub fn compute(input: &Input) -> (Output, Omissions) {
     let mut omitted = Omissions::default();
 
-    // Guest: no buyer identity or no customer. Normal, not logged.
-    let customer = match input.cart().buyer_identity().and_then(|b| b.customer()) {
-        Some(c) => c,
-        None => return (empty(), omitted),
-    };
-    let buyer = match read_buyer(customer.buyer().map(|m| m.json_value())) {
-        Parsed::Ok(b) => b,
-        Parsed::Absent => return (empty(), omitted),
-        Parsed::Malformed(reason) => {
+    let lang = input.localization().language().iso_code().as_str();
+    let enforce = enforcement(input.buyer_journey().step());
+    let mut problems = Problems::default();
+
+    // Guest (no buyer identity or no customer) or unlinked: normal, not
+    // logged. They still meet catalog visibility, but no order limits.
+    let customer = input.cart().buyer_identity().and_then(|b| b.customer());
+    let buyer: Option<Buyer> = match customer.map(|c| read_buyer(c.buyer().map(|m| m.json_value()))) {
+        Some(Parsed::Ok(b)) => Some(b),
+        None | Some(Parsed::Absent) => None,
+        Some(Parsed::Malformed(reason)) => {
             omitted.add(&format!("buyer_{reason}"), None);
-            return (empty(), omitted);
+            None
         }
+    };
+    let signed_in = customer.is_some();
+
+    // Catalog visibility, once per product.
+    let mut seen_products: BTreeSet<u64> = BTreeSet::new();
+    for line in input.cart().lines() {
+        let Merchandise::ProductVariant(v) = line.merchandise() else { continue };
+        let product = v.product();
+        let Some(pnum) = variant_key(product.id().as_str()).and_then(|k| k.parse::<u64>().ok()) else {
+            omitted.add("product_id", None);
+            continue;
+        };
+        if !seen_products.insert(pnum) {
+            continue;
+        }
+        let vis = match read_visibility(product.visibility().map(|m| m.json_value())) {
+            Parsed::Ok(vis) => vis,
+            Parsed::Absent => continue,
+            Parsed::Malformed(reason) => {
+                omitted.add(&format!("visibility_{reason}"), variant_key(product.id().as_str()));
+                continue;
+            }
+        };
+        if !is_entitled(&vis, buyer.as_ref()) {
+            let msg = if buyer.is_none() && !signed_in { Msg::RestrictedGuest } else { Msg::Restricted };
+            problems.add((pnum, RULE_VISIBILITY, 0), || message(lang, msg, Some(product.title()), ""));
+        }
+    }
+
+    let Some(buyer) = buyer else {
+        return (finish(problems, lang), omitted);
     };
 
     let shop = match read_shop_limits(input.validation().cart_limits().map(|m| m.json_value())) {
@@ -260,8 +315,6 @@ pub fn compute(input: &Input) -> (Output, Omissions) {
             None
         }
     };
-
-    let enforce = enforcement(input.buyer_journey().step());
 
     // Quantities are per VARIANT, summed across lines: one variant can sit on
     // two lines (different line attributes), and 6 + 6 is an order of 12.
@@ -299,8 +352,6 @@ pub fn compute(input: &Input) -> (Output, Omissions) {
         );
     }
 
-    let mut problems = Problems::default();
-
     let shop_default = shop.as_ref().and_then(|s| s.defaults);
     for (&num, line) in &variants {
         // A malformed entry drops that dimension for this variant. It never
@@ -315,7 +366,7 @@ pub fn compute(input: &Input) -> (Output, Omissions) {
             None
         });
         for e in [product, customer].iter().flatten() {
-            check_entry(&mut problems, e, num, line.variant, line.qty, enforce);
+            check_entry(&mut problems, e, num, line.variant, line.qty, enforce, lang);
         }
     }
 
@@ -327,6 +378,7 @@ pub fn compute(input: &Input) -> (Output, Omissions) {
         rate,
         qty: total_qty,
         unique: variants.len() as i64,
+        lang,
     };
     if let Some(s) = &shop {
         if let Some(l) = &s.cart {
@@ -337,21 +389,22 @@ pub fn compute(input: &Input) -> (Output, Omissions) {
         check_cart(&mut problems, &mut omitted, l, buyer.currency.as_deref(), &facts, enforce, "buyer");
     }
 
-    let errors = problems.finish();
+    (finish(problems, lang), omitted)
+}
+
+fn finish(problems: Problems, lang: &str) -> Output {
+    let errors = problems.finish(lang);
     if errors.is_empty() {
-        return (empty(), omitted);
+        return empty();
     }
-    (
-        Output {
-            operations: vec![schema::Operation::ValidationAdd(schema::ValidationAddOperation {
-                errors: errors
-                    .into_iter()
-                    .map(|message| schema::ValidationError { message, target: TARGET.to_string() })
-                    .collect(),
-            })],
-        },
-        omitted,
-    )
+    Output {
+        operations: vec![schema::Operation::ValidationAdd(schema::ValidationAddOperation {
+            errors: errors
+                .into_iter()
+                .map(|message| schema::ValidationError { message, target: TARGET.to_string() })
+                .collect(),
+        })],
+    }
 }
 
 #[cfg(test)]

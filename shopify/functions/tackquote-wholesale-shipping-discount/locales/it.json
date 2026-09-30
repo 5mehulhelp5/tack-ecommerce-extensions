@@ -1,0 +1,4 @@
+{
+  "name": "Tariffe di spedizione all’ingrosso TackQuote",
+  "description": "Applica al checkout la tariffa di spedizione TackQuote agli acquirenti all’ingrosso che hanno effettuato l’accesso, come sconto sull’opzione di spedizione. Non aumenta mai un prezzo."
+}

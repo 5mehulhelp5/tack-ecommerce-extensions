@@ -7,7 +7,12 @@ import { copyFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const FUNCTION_DIRS = ['tackquote-wholesale-pricing', 'tackquote-order-limits'];
+export const FUNCTION_DIRS = [
+  'tackquote-wholesale-pricing',
+  'tackquote-order-limits',
+  'tackquote-wholesale-shipping',
+  'tackquote-wholesale-shipping-discount',
+];
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const CANONICAL = join(ROOT, 'contract', 'contract.rs');
 export const copyPath = (dir) => join(ROOT, dir, 'src', 'contract.rs');

@@ -1,0 +1,4 @@
+{
+  "name": "Limites de pedido TackQuote",
+  "description": "Aplica no checkout, inclusive no checkout expresso, as quantidades mínimas e máximas, os múltiplos de embalagem, os pedidos mínimos e os produtos exclusivos para atacado definidos no TackQuote."
+}

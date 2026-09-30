@@ -1,4 +1,4 @@
 {
   "name": "TackQuote order limits",
-  "description": "Enforces TackQuote minimum and maximum quantities, case-pack multiples and order minimums for signed-in wholesale buyers, including in express checkouts."
+  "description": "Enforces TackQuote minimum and maximum quantities, case-pack multiples, order minimums and wholesale-only products at checkout, including in express checkouts."
 }

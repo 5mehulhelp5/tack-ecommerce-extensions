@@ -1,0 +1,128 @@
+{
+  "tackquote": {
+    "setup": {
+      "title": "TackQuote is nog niet ingesteld",
+      "proxy": "Stel in de instellingen van dit blok het app-URL-voorvoegsel in, zodat het blok TackQuote kan bereiken. Tot die tijd is het verborgen voor klanten."
+    },
+    "price": {
+      "loading": "Je groothandelsprijs wordt gecontroleerd",
+      "anonymous": "Log in om je groothandelsprijs te zien, beschikbaar via een offerte.",
+      "login": "Inloggen",
+      "unlinked": "Je account is nog niet gekoppeld aan groothandelsprijzen. Vraag een offerte aan en wij regelen het.",
+      "unpriced": "Voor dit artikel is nog geen groothandelsprijs ingesteld. Vraag een offerte aan voor een prijs.",
+      "each": "per stuk",
+      "quote_note": "Je groothandelsprijs, beschikbaar via een offerte. Voeg dit artikel toe aan een offerte om hem aan te vragen.",
+      "list_note": "Catalogusprijs, geen onderhandeld tarief.",
+      "error": "Je prijs kon op dit moment niet worden geladen.",
+      "heading_quote": "Je groothandelsprijs op offerte",
+      "heading_applied": "Je groothandelsprijs",
+      "anonymous_applied": "Log in om je groothandelsprijs te zien.",
+      "applied_note": "Je groothandelsprijs, toegepast bij het afrekenen."
+    },
+    "diagnostics": {
+      "password": "Deze winkel is met een wachtwoord beveiligd en het verzoek kwam op de wachtwoordpagina terecht in plaats van bij TackQuote. Ontwikkelwinkels zijn altijd met een wachtwoord beveiligd en dat kan niet worden uitgeschakeld. Bekijk een voorbeeld van de echte winkel en voer het wachtwoord in (Onlinewinkel → Voorkeuren). Daar worden de prijzen normaal weergegeven.",
+      "not_json": "Niet TackQuote maar iets anders beantwoordde {path}: een HTML-pagina in plaats van gegevens. Meestal de wachtwoordpagina van de winkel, soms een thema of een andere app die dat pad gebruikt.",
+      "not_found": "Shopify gaf 404 terug voor {path}. Het subpad van de app-proxy komt niet overeen met de instelling App-proxypad van dit blok. Controleer Instellingen → Apps en verkoopkanalen → TackQuote → App-proxy.",
+      "auth": "Shopify stuurde het verzoek door, maar TackQuote weigerde de handtekening. Meestal is de app opnieuw geïnstalleerd en is het opgeslagen geheim verouderd. Koppel de winkel opnieuw.",
+      "server": "TackQuote antwoordde {status}. Er is niets mis met dit blok; probeer het zo opnieuw.",
+      "timeout": "TackQuote antwoordde niet binnen 2,5 seconden, dus de prijs is overgeslagen om de pagina niet te vertragen.",
+      "failed": "Het verzoek naar {path} mislukte voordat het TackQuote bereikte.",
+      "not_connected": "Deze winkel is niet gekoppeld aan een TackQuote-account. Koppel hem via TackQuote → Connections → Shopify en laad de editor daarna opnieuw.",
+      "no_sku": "Deze variant heeft geen SKU. TackQuote berekent prijzen en past regels toe op basis van de SKU, dus voeg er een toe in het Shopify-beheercentrum → Producten → dit product → Varianten. Tot die tijd zien klanten hier niets.",
+      "no_limits": "Voor dit product gelden geen bestellimieten. Stel ze in via TackQuote → Order Limits. Klanten zien hier niets zolang er geen regel van toepassing is."
+    },
+    "quote": {
+      "added": "Toegevoegd aan je offerteaanvraag.",
+      "already": "Staat al in je offerteaanvraag.",
+      "unavailable": "Deze variant is niet beschikbaar.",
+      "title": "Je offerteaanvraag",
+      "empty": "Je offerteaanvraag is nog leeg.",
+      "remove": "Verwijderen",
+      "quantity": "Aantal",
+      "name": "Volledige naam",
+      "email": "E-mail",
+      "company": "Bedrijf",
+      "message": "Is er iets wat we moeten weten?",
+      "submit": "Offerteaanvraag versturen",
+      "sending": "Bezig met versturen",
+      "success": "Bedankt. We hebben je aanvraag ontvangen en sturen je een offerte.",
+      "failure": "Versturen is mislukt. Probeer het opnieuw.",
+      "close": "Sluiten",
+      "required": "Vul je naam en e-mailadres in.",
+      "add_button": "Toevoegen aan offerte",
+      "request_button": "Offerte aanvragen",
+      "helper": "Koop je in grote aantallen? Vraag ons om een prijs."
+    },
+    "signup": {
+      "loading": "Aanvraagformulier wordt geladen",
+      "unavailable": "Het aanvraagformulier voor een groothandelsaccount is op dit moment niet beschikbaar.",
+      "no_form": "Er is nog geen groothandelsformulier ingeschakeld. Maak of activeer er een via TackQuote → Settings → Wholesale → Forms en laad de editor daarna opnieuw. Tot die tijd zien klanten een korte melding dat aanvragen niet open zijn.",
+      "submit": "Aanvraag versturen",
+      "submitting": "Je aanvraag wordt verstuurd",
+      "success": "Bedankt. We hebben je aanvraag voor een groothandelsaccount ontvangen en nemen contact met je op.",
+      "error": "Versturen is mislukt. Probeer het opnieuw.",
+      "required": "Vul de verplichte velden in.",
+      "heading": "Een groothandelsaccount aanvragen",
+      "sign_in_first": "Log in op je account om een aanvraag te doen. Die wordt dan aan je account gekoppeld, zodat je groothandelsprijzen verschijnen zodra hij is goedgekeurd.",
+      "sign_in": "Inloggen",
+      "create_account": "Account aanmaken"
+    },
+    "quantity_breaks": {
+      "loading": "Staffelprijzen voor de groothandel worden geladen",
+      "caption": "Groothandelsprijs per stuk naar aantal, beschikbaar via een offerte",
+      "quantity": "Aantal",
+      "price": "Offerteprijs per stuk",
+      "list_note": "Catalogusprijzen, geen onderhandeld tarief.",
+      "empty": "Voor dit artikel zijn geen staffelprijzen voor de groothandel gepubliceerd.",
+      "anonymous": "Log in om je staffelprijzen voor de groothandel te zien.",
+      "login": "Inloggen",
+      "unlinked": "Je account is nog niet gekoppeld aan groothandelsprijzen. Vraag een offerte aan en wij regelen het.",
+      "error": "De staffelprijzen konden op dit moment niet worden geladen.",
+      "heading_quote": "Staffelprijzen voor de groothandel, beschikbaar via een offerte",
+      "heading_applied": "Staffelprijzen voor de groothandel, toegepast bij het afrekenen",
+      "caption_applied": "Groothandelsprijs per stuk naar aantal, toegepast bij het afrekenen",
+      "price_applied": "Je prijs per stuk",
+      "applied_note": "Toegepast bij het afrekenen."
+    },
+    "badge": {
+      "label": "Je prijsniveau",
+      "empty": "Voor deze klant geldt geen kopersgroep."
+    },
+    "order_limits": {
+      "qty_min": "Minimale bestelling: {min} stuks",
+      "qty_max": "Maximale bestelling: {max} stuks",
+      "qty_range": "Bestel tussen {min} en {max} stuks",
+      "total_min": "Minimaal bestelbedrag: {min}",
+      "total_max": "Maximaal bestelbedrag: {max}",
+      "total_range": "Bestelbedrag tussen {min} en {max}",
+      "items_min": "Minimaal {min} artikelen per bestelling",
+      "items_max": "Maximaal {max} artikelen per bestelling",
+      "items_range": "Tussen {min} en {max} artikelen per bestelling",
+      "account_note": "Op basis van je account.",
+      "loading": "Bestellimieten voor dit product worden gecontroleerd",
+      "empty": "Voor dit product geldt geen minimale bestelling.",
+      "error": "Minimale bestellingen zijn op dit moment niet beschikbaar.",
+      "enforced_note": "Gehandhaafd bij het afrekenen."
+    },
+    "credit": {
+      "sign_in": "Log in op je account om betalen op rekening aan te vragen.",
+      "label_business": "Officiële bedrijfsnaam",
+      "label_email": "Contact-e-mail",
+      "label_phone": "Contacttelefoon",
+      "label_tax_id": "Btw-nummer",
+      "label_limit": "Gewenste kredietlimiet",
+      "label_terms": "Gewenste betalingstermijn (dagen)",
+      "label_notes": "Wat we verder nog moeten weten",
+      "submit": "Aanvraag versturen",
+      "submitting": "Je aanvraag wordt verstuurd…",
+      "success": "Bedankt — je aanvraag is ontvangen en wordt beoordeeld.",
+      "already_pending": "Je hebt al een aanvraag in behandeling. We nemen contact met je op.",
+      "too_large": "Dat is te lang om te versturen. Maak de opmerkingen korter en probeer het opnieuw.",
+      "error": "Je aanvraag kon niet worden verstuurd. Probeer het zo opnieuw.",
+      "heading": "Betalen op rekening aanvragen"
+    },
+    "visibility": {
+      "editor_note": "Dit product is beperkt tot TackQuote-kopersgroepen. Alleen kopers die het mogen kopen, zien dit blok; andere klanten zien hier niets, en bij het afrekenen wordt het product voor hen geweigerd."
+    }
+  }
+}

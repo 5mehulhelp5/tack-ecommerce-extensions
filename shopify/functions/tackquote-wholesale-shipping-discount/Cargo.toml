@@ -1,0 +1,21 @@
+[package]
+name = "tackquote-wholesale-shipping-discount"
+version = "1.0.0"
+edition = "2021"
+
+# Same dependencies and release profile as Shopify's official Rust function
+# template (Shopify/extensions-templates, functions-*-rs/Cargo.toml.liquid,
+# commit 9cae73f, 2026-09-24).
+[dependencies]
+shopify_function = "2.1.0"
+
+# Tests only: parse the shared conformance corpus. Shopify's own Rust
+# examples use serde_json as a dev-dependency
+# (https://shopify.dev/docs/apps/build/discounts/network-access?extension=rust).
+[dev-dependencies]
+serde_json = "1.0"
+
+[profile.release]
+lto = true
+opt-level = "z"
+strip = true

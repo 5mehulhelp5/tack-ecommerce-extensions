@@ -3,6 +3,15 @@
   assign variant = product.selected_or_first_available_variant
 -%}
 
+{%- comment -%}
+  Catalog visibility: a product restricted to TackQuote buyer groups offers
+  no price, break, limit or quote control to a shopper who may not buy it.
+  The rule, and why, is in snippets/tackquote-visibility.liquid.
+{%- endcomment -%}
+{%- capture tackquote_access -%}{% render 'tackquote-visibility', product: product %}{%- endcapture -%}
+{%- assign tackquote_access = tackquote_access | strip -%}
+{%- unless tackquote_access == 'hidden' -%}
+{{ tackquote_access }}
 {%- if proxy_path == blank -%}
   {%- if request.design_mode -%}
     <div class="tackquote-setup" {{ block.shopify_attributes }}>
@@ -26,7 +35,13 @@
       class="tackquote-button tackquote-button--{{ block.settings.button_style }}{% if block.settings.button_style == 'theme' %} button btn{% endif %}"
       data-tackquote-action="add"
     >
-      {{ block.settings.button_label | default: 'Add to Quote' }}
+      {%- comment -%}The schema default is English. Left as it is (or blank), the
+      shopper's language is used instead; a merchant's own wording is kept.{%- endcomment -%}
+      {%- assign tackquote_label = block.settings.button_label | strip -%}
+      {%- if tackquote_label == blank or tackquote_label == 'Add to Quote' -%}
+        {%- assign tackquote_label = 'tackquote.quote.add_button' | t -%}
+      {%- endif -%}
+      {{ tackquote_label }}
     </button>
     <p class="tackquote-status" data-tackquote-status role="status" aria-live="polite"></p>
   </div>
@@ -34,6 +49,7 @@
   {% render 'tackquote-drawer' %}
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
 {%- endif -%}
+{%- endunless -%}
 
 {% schema %}
 {

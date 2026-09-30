@@ -1,0 +1,4 @@
+{
+  "name": "TackQuote Bestellgrenzen",
+  "description": "Setzt an der Kasse, auch beim Express-Checkout, die in TackQuote festgelegten Mindest- und Höchstmengen, Verpackungseinheiten, Mindestbestellwerte und Produkte nur für Geschäftskunden durch."
+}

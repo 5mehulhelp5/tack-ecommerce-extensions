@@ -14,13 +14,17 @@
 // so a writer can never emit something the functions would reject.
 
 import {
+  CONTRACT_V2,
   CONTRACT_VERSION,
   FUNCTION_METAFIELD_MAX_BYTES,
   UNIT,
   parseBuyer,
+  parseGroups,
   parseOrderLimits,
   parsePriceTiers,
+  parseShippingRules,
   parseShopLimits,
+  parseVisibility,
 } from './contract.js';
 
 export class ContractSizeError extends Error {
@@ -120,4 +124,54 @@ export function encodeShopLimits(input) {
   if (input.cart) obj.l = cartLimits(input.cart);
   if (input.defaults) obj.d = limitEntry(input.defaults);
   return finish('cart_limits', obj, parseShopLimits);
+}
+
+// ---- contract v2 ---------------------------------------------------------------------
+
+/**
+ * Product $app:visibility.
+ * @param {{allow?: string[] | null, deny?: string[] | null}} input
+ */
+export function encodeVisibility(input) {
+  const obj = { v: CONTRACT_V2 };
+  // Audience lists are sets: sorted, so an unchanged rule writes the same bytes.
+  if (input.allow && input.allow.length) obj.a = [...new Set(input.allow)].sort();
+  if (input.deny && input.deny.length) obj.d = [...new Set(input.deny)].sort();
+  return finish('visibility', obj, parseVisibility);
+}
+
+/**
+ * Customer $app:groups: the buyer's audience codes (tier + buyer-group codes,
+ * lower-cased). A set: sorted and deduplicated, so unchanged membership writes
+ * the same bytes.
+ * @param {{groups: string[]}} input
+ */
+export function encodeGroups(input) {
+  return finish('groups', { v: CONTRACT_V2, g: [...new Set(input.groups)].sort() }, parseGroups);
+}
+
+/**
+ * DeliveryCustomization / DiscountAutomaticApp $app:shipping_rules. `rules`
+ * stay in the order given: that order IS TackQuote's priority (first match
+ * wins), so it is never sorted.
+ * @param {{currency: string, rules: Array<object>}} input
+ */
+export function encodeShippingRules(input) {
+  const rules = input.rules.map((r) => {
+    const out = { a: [...new Set(r.audiences)].sort() };
+    if (r.countries && r.countries.length) out.k = [...new Set(r.countries.map((c) => c.toUpperCase()))].sort();
+    out.t = r.type;
+    if (r.type === 'flat') out.f = price(r.flatAmount);
+    if (r.freeAbove !== undefined && r.freeAbove !== null && r.type !== 'none') out.fa = price(r.freeAbove);
+    if (r.type === 'pct') out.p = price(r.percentage);
+    if (r.type === 'tier') {
+      out.tr = r.tiers.map((t) => [price(t.min), t.max === undefined || t.max === null ? null : price(t.max), price(t.amount)]);
+    }
+    if (r.matches && r.matches.length) out.m = r.matches.slice();
+    if (r.rename) out.n = r.rename;
+    if (r.hide && r.hide.length) out.h = r.hide.slice();
+    if (r.sortByPrice) out.s = 'price';
+    return out;
+  });
+  return finish('shipping_rules', { v: CONTRACT_V2, c: input.currency, r: rules }, parseShippingRules);
 }

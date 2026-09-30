@@ -1,0 +1,4 @@
+{
+  "name": "Límites de pedido de TackQuote",
+  "description": "Aplica en el pago, también en el pago exprés, las cantidades mínimas y máximas, los múltiplos por caja, los mínimos de pedido y los productos solo para mayoristas definidos en TackQuote."
+}

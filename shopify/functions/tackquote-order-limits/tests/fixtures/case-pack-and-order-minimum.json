@@ -4,6 +4,11 @@
     "target": "cart.validations.generate.run",
     "input": {
       "presentmentCurrencyRate": "1.0",
+      "localization": {
+        "language": {
+          "isoCode": "EN"
+        }
+      },
       "buyerJourney": {
         "step": "CHECKOUT_COMPLETION"
       },
@@ -45,7 +50,9 @@
               "id": "gid://shopify/ProductVariant/11",
               "title": "Large",
               "product": {
-                "title": "Work Glove"
+                "id": "gid://shopify/Product/7000",
+                "title": "Work Glove",
+                "visibility": null
               },
               "orderLimits": {
                 "jsonValue": {
