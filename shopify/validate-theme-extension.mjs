@@ -186,6 +186,8 @@ export const EXPECTED_TEMPLATES = {
   // customer accounts get the net-terms customer-account extension instead
   // (shopify/customer-account-net-terms), which runs alongside this block.
   'credit-application.liquid': ['page'],
+  // Wave 3. A buyer orders by SKU from a product page or a dedicated page.
+  'quick-order.liquid': ['product', 'page'],
 };
 
 /**

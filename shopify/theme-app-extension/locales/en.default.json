@@ -126,6 +126,32 @@
       "editor_guests": "Shoppers who are not signed in will not see prices. The theme editor always shows them.",
       "editor_tag": "Shoppers without this customer tag will not see prices:",
       "editor_bad_selectors": "The extra price selectors were ignored because they contain braces, semicolons or @."
+    },
+    "quick_order": {
+      "help": "One item per line: SKU, then quantity. For example ABC-100, 12",
+      "placeholder": "ABC-100, 12",
+      "check": "Check items",
+      "add_cart": "Add all to cart",
+      "add_quote": "Add all to quote",
+      "col_sku": "SKU",
+      "col_item": "Item",
+      "col_qty": "Quantity",
+      "col_price": "Price",
+      "not_found": "Not found in this store",
+      "price_at_checkout": "Your price is shown at checkout",
+      "limit_min": "Minimum {n} for this item",
+      "limit_max": "Maximum {n} for this item",
+      "empty": "Add at least one SKU.",
+      "too_many": "Up to 50 items at a time. The first 50 were checked.",
+      "bad_lines": "Some lines could not be read and were skipped: {lines}",
+      "loading": "Checking your items",
+      "unlinked": "Your account is not linked to wholesale ordering yet. Request a quote and we will set it up.",
+      "sign_in": "Sign in to your trade account to order by SKU.",
+      "login": "Sign in",
+      "error": "We could not check those items just now. Please try again.",
+      "added_cart": "Added to your cart.",
+      "cart_failed": "Your cart could not be updated. Please try again.",
+      "quote_failed": "Your quote list is full, or the quote form is not available on this page."
     }
   }
 }
