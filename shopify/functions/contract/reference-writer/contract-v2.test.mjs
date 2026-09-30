@@ -73,16 +73,14 @@ describe('Product $app:visibility', () => {
 });
 
 describe('Customer $app:groups', () => {
-  test('keeps $app:buyer g order and carries nothing else', () => {
-    const buyer = JSON.parse(encodeBuyer({ groups: ['book:1', 'gold', 'net30'], currency: 'USD', prices: { 1: [[1, 2]] } }));
-    const groups = encodeGroups({ groups: buyer.g });
-    assert.equal(groups, '{"v":2,"g":["book:1","gold","net30"]}');
-    assert.deepEqual(parseGroups(groups), { status: 'ok', groups: buyer.g });
+  test('is a sorted set of codes and carries nothing else', () => {
+    const groups = encodeGroups({ groups: ['net30', 'gold', 'net30'] });
+    assert.equal(groups, '{"v":2,"g":["gold","net30"]}');
+    assert.deepEqual(parseGroups(groups), { status: 'ok', groups: ['gold', 'net30'] });
   });
 
   test('the wildcard and duplicates are not groups', () => {
     assert.throws(() => encodeGroups({ groups: ['*'] }), ContractShapeError);
-    assert.throws(() => encodeGroups({ groups: ['a', 'a'] }), ContractShapeError);
     assert.deepEqual(parseGroups({ v: 2, g: ['a'], p: {} }), { status: 'malformed', reason: 'unknown_key' });
   });
 });

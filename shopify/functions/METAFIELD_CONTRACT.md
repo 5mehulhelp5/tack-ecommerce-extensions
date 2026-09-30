@@ -469,8 +469,12 @@ the rate is a discount.
 
 ### 2.8 `Customer` `$app:groups` (v2)
 
-The buyer-group codes of the same customer's `$app:buyer` `g`, in the same
-order, and nothing else. It exists for one reason: the theme's product blocks
+The buyer's audience codes, and nothing else: the buyer's `tier` and the
+`code` of every buyer group the buyer or the buyer's company belongs to, each
+lower-cased (the same derivation as `CatalogService.resolveGroupCodes`, and
+the same codes `$app:buyer` `g` carries, without its price-book keys). The
+order carries no meaning: the only question asked of it is "is this code in
+the list". It exists for one reason: the theme's product blocks
 must apply catalog visibility, and `$app:buyer` is never exposed to the
 storefront because it carries the buyer's own prices. `$app:groups` is
 declared `access.storefront = "public_read"`; Liquid's `customer` object is
@@ -478,11 +482,12 @@ only ever the signed-in customer, so a buyer can read their own group codes
 and nobody else's. No Function reads it: they read `$app:buyer`.
 
 ```json
-{ "v": 2, "g": ["book:3f1c", "gold", "net30"] }
+{ "v": 2, "g": ["gold", "net30", "tier-a"] }
 ```
 
-Same rules as `$app:buyer` `g` (no `"*"`, no duplicates, at most 50, each 1 to
-100 characters), plus `"v": 2` and no other key. It is written, and deleted on
+Same shape rules as `$app:buyer` `g` (no `"*"`, no duplicates, at most 50,
+each 1 to 100 characters), plus `"v": 2` and no other key. The writer sorts
+it, so an unchanged membership writes the same bytes. It is written, and deleted on
 unlink, together with `$app:buyer`.
 
 ## 3. Size budget

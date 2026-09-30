@@ -141,12 +141,13 @@ export function encodeVisibility(input) {
 }
 
 /**
- * Customer $app:groups: exactly `g` of the same customer's $app:buyer, in the
- * same order, so the storefront and checkout agree on who a buyer is.
+ * Customer $app:groups: the buyer's audience codes (tier + buyer-group codes,
+ * lower-cased). A set: sorted and deduplicated, so unchanged membership writes
+ * the same bytes.
  * @param {{groups: string[]}} input
  */
 export function encodeGroups(input) {
-  return finish('groups', { v: CONTRACT_V2, g: input.groups.slice() }, parseGroups);
+  return finish('groups', { v: CONTRACT_V2, g: [...new Set(input.groups)].sort() }, parseGroups);
 }
 
 /**

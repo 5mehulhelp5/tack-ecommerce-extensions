@@ -486,9 +486,9 @@ export function parseVisibility(raw) {
   return { status: 'ok', visibility: { allow, deny } };
 }
 
-// Customer $app:groups (v2) - the buyer-group codes of $app:buyer and nothing
-// else, readable by the storefront so the theme can apply catalog visibility.
-//   { "v":2, "g":["gold","net30"] }   same codes, same order as $app:buyer g
+// Customer $app:groups (v2) - the buyer's audience codes and nothing else,
+// readable by the storefront so the theme can apply catalog visibility.
+//   { "v":2, "g":["gold","net30"] }   a set; order carries no meaning
 export function parseGroups(raw) {
   if (raw === null || raw === undefined) return ABSENT;
   const jv = coerce(raw);
