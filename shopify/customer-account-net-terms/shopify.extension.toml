@@ -26,6 +26,7 @@ api_version = "2026-07"
 type = "ui_extension"
 name = "TackQuote net terms"
 handle = "tackquote-net-terms"
+uid = "526a3d9e-e399-98ee-e6cd-c1533bd6946036928f18"
 
 [[extensions.targeting]]
 module = "./src/ProfileBlock.jsx"

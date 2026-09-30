@@ -5,6 +5,7 @@
   "license": "MIT",
   "description": "TackQuote customer-account UI extension: apply for net payment terms and see the application status.",
   "dependencies": {
+    "@preact/signals": "^2.11.3",
     "@shopify/ui-extensions": "~2026.7.0",
     "preact": "^10.10.0"
   }

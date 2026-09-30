@@ -2,3 +2,6 @@
 .DS_Store
 # Build output from scripts/package-all.sh and the per-plugin builders.
 dist/
+
+# Per-extension installs for the Shopify CLI build (never committed)
+node_modules/
