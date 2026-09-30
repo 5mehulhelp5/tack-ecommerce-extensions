@@ -156,7 +156,8 @@ export const EXPECTED_TEMPLATES = {
   // The only block that is not about the item being viewed. A buyer's group is
   // a fact about their ACCOUNT, so it is equally meaningful beside a product,
   // in the cart, and on a wholesale landing page.
-  'buyer-group-badge.liquid': ['product', 'cart', 'page'],
+  // Wave 1 widened it to collection and home pages as well (234302c).
+  'buyer-group-badge.liquid': ['product', 'collection', 'index', 'cart', 'page'],
   // Added 2026-09-05 with the block itself. `product` only: an order MINIMUM is
   // a statement about ordering THIS item, and the API route it calls takes a
   // sku/productId pair. On a cart template it would have nothing to ask about.
@@ -165,7 +166,10 @@ export const EXPECTED_TEMPLATES = {
   // about the ACCOUNT, not the item being viewed — merchants put it on a
   // dedicated page, and `customers/account` is where a signed-in wholesale
   // buyer would look for it. Same reasoning as wholesale-signup.
-  'credit-application.liquid': ['page', 'customers/account'],
+  // Wave 1 (234302c) narrowed it to `page`; signed-in customers on NEW
+  // customer accounts get the net-terms customer-account extension instead
+  // (shopify/customer-account-net-terms), which runs alongside this block.
+  'credit-application.liquid': ['page'],
 };
 
 describe('the shipped blocks', () => {
@@ -328,7 +332,9 @@ describe('the order-limits block matches the API wire contract', () => {
     // survived deletion of the guard — because the same comparison appears in
     // the design-mode branch a few lines below. An assertion that a string
     // exists somewhere in a file is not an assertion about control flow.
-    assert.match(limits, /if \(data\.status !== 'limited' \|\| !Array\.isArray\(data\.limits\)/);
+    // Wave 1 moved the guard into the pure `ns.limitsView`; the list view is
+    // reached ONLY for status 'limited' with a non-empty array.
+    assert.match(limits, /if \(s === 'limited' && Array\.isArray\(data\.limits\) && data\.limits\.length\) return 'list';/);
   });
 
   test('claims "based on your account" only when the server says accountSpecific', () => {

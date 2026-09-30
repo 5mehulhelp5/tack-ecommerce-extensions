@@ -1,32 +1,13 @@
 /*
- * The volume/tier pricing table block.
- *
- * A READ, so it works exactly like `tackquote-price.js` and for the same
- * reasons: the request goes to the MERCHANT's own domain at the app proxy path,
- * Shopify signs the shop and the logged-in customer id with the app secret, and
- * no tenant id travels from this page at all. The identity is asserted by
- * Shopify, never by this file.
- *
+ * The volume/tier pricing table block. A READ, like `tackquote-price.js`: the
+ * request goes to the merchant's own domain at the app proxy path and Shopify
+ * signs the shop and customer; no tenant id travels from this page.
  * https://shopify.dev/docs/apps/build/online-store/app-proxies/authenticate-app-proxies
  *
- * The three resilience rules from `tackquote-price.js` are not restated here in
- * full; they are the same rules and this file obeys them:
- *
- *   1. Every request has a deadline (`ns.fetchJson`).
- *   2. A failure REMOVES the block rather than printing an error beside a
- *      product. Suspended in the theme editor, where a merchant needs to see it
- *      failing and a shopper does not.
- *   3. Cache first, revalidate behind it, with the customer marker in the key.
- *
- * ---------------------------------------------------------------------------
- * Why the table is built from a `<table>` and not a stack of divs
- * ---------------------------------------------------------------------------
- * A quantity-break ladder is tabular data: two columns with a shared header,
- * where a row means nothing without its column. A screen reader user navigating
- * a grid of divs hears a list of unattached numbers. `<caption>` carries the
- * heading so the table is self-describing when a reader lands on it out of
- * context, and `scope` on the header cells is what lets the reader announce
- * "Quantity 10, Price $9.00" rather than reading the two columns separately.
+ * Same resilience rules as the price block: a deadline on every request, a
+ * failure removes the block (except in the theme editor), cache first.
+ * A real <table> with <caption> and scoped headers, so a screen reader announces
+ * "Quantity 10, Price 9.00" instead of two unattached columns.
  */
 (window.TackQuoteQ = window.TackQuoteQ || []).push((ns) => {
   /** Matches the price block. B2B contract prices change on the order of weeks. */
@@ -38,8 +19,10 @@
    * prompt), `unlinked` a customer with no wholesale link (a quote CTA). Only a
    * real fetch failure reaches `standDown`, and only the merchant sees why.
    */
-  ns.breaksView = (data, designMode) => {
+  ns.breaksView = (data, designMode, pageCurrency) => {
     const s = data && data.status;
+    // Never a ladder in another currency than the page shows (Wave 3).
+    if (ns.currencyView(data, pageCurrency) === 'mismatch') return 'currency';
     if (s === 'priced') return 'table';
     if (s === 'anonymous') return 'login';
     if (s === 'unlinked') {
@@ -73,17 +56,6 @@
       if (className) p.className = className;
       p.textContent = text;
       return p;
-    }
-
-    function money(amount, currency) {
-      try {
-        return new Intl.NumberFormat(document.documentElement.lang || 'en', {
-          style: 'currency',
-          currency: currency || 'USD',
-        }).format(amount);
-      } catch (_err) {
-        return `${String(amount)} ${String(currency || '')}`;
-      }
     }
 
     /* Rule 2. No answer, so get out of the way — hiding rather than emptying,
@@ -130,7 +102,7 @@
         // each price STARTS, because that is the only thing it can state without
         // inventing the top of a band. The last rung has no top at all.
         tr.appendChild(cell('th', `${row.minQty}+`, 'row'));
-        tr.appendChild(cell('td', money(row.unitPrice, data.currency)));
+        tr.appendChild(cell('td', ns.money(row.unitPrice, data.currency)));
         bodyEl.appendChild(tr);
       });
       el.appendChild(bodyEl);
@@ -144,7 +116,7 @@
       if (h && root.dataset.tackquoteAutoHeading === 'true') {
         h.textContent = applied ? root.dataset.msgHeadingApplied : root.dataset.msgHeadingQuote;
       }
-      const view = ns.breaksView(data, designMode);
+      const view = ns.breaksView(data, designMode, ns.pageCurrency(root));
       if (view === 'hide') {
         root.hidden = true;
         return;
@@ -164,6 +136,10 @@
       }
       if (view === 'unlinked') {
         show(line(root.dataset.msgUnlinked));
+        return;
+      }
+      if (view === 'currency') {
+        show(line(applied ? root.dataset.msgCurrencyApplied : root.dataset.msgCurrencyQuote, 'tackquote-breaks__note'));
         return;
       }
       if (view === 'not-connected') {
@@ -197,14 +173,14 @@
         return;
       }
 
-      const cacheKey = `tiers:${customerMarker}:${proxy}:${sku}`;
+      const cacheKey = `tiers:${customerMarker}:${proxy}:${ns.pageCurrency(root)}:${sku}`;
       const cached = ns.cache.read(cacheKey);
       const token = ++inFlight;
 
       // Rule 3, first half: paint what we already know before asking anything.
       if (cached) render(cached);
 
-      ns.fetchJson(`${proxy}/quantity-breaks?sku=${encodeURIComponent(sku)}`)
+      ns.fetchJson(`${proxy}/quantity-breaks?sku=${encodeURIComponent(sku)}${ns.currencyQuery(root)}`)
         .then((data) => {
           // A slow reply for a variant the shopper has already navigated away
           // from must not overwrite a newer one.

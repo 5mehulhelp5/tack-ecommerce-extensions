@@ -50,6 +50,9 @@
     data-msg-heading-applied="{{ 'tackquote.price.heading_applied' | t | escape }}"
     data-tackquote-auto-heading="{{ auto_heading }}"
     data-msg-error="{{ 'tackquote.price.error' | t | escape }}"
+    data-tackquote-currency="{{ cart.currency.iso_code }}"
+    data-msg-currency-applied="{{ 'tackquote.currency.applied' | t | escape }}"
+    data-msg-currency-quote="{{ 'tackquote.currency.quote' | t | escape }}"
     {{ tackquote_diagnostics }}
     {{ block.shopify_attributes }}
   >

@@ -6,7 +6,7 @@
 // `ns.breaksView`, `ns.limitsView` — which is exactly the logic that decides
 // what a guest, an unlinked buyer and a merchant in the theme editor see.
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -82,14 +82,13 @@ test('explain: each failure maps to its own merchant diagnostic', () => {
   assert.equal(ns.explain(root, e('boom'), '/apps/t'), 'fail /apps/t');
 });
 
-test('every storefront asset stays under the 10 KB theme-check threshold', () => {
-  for (const f of [
-    'tackquote-shared.js',
-    'tackquote-price.js',
-    'tackquote-quantity-breaks.js',
-    'tackquote-order-limits.js',
-    'tackquote-signup.js',
-  ]) {
-    assert.ok(readFileSync(join(ASSETS, f)).length < 10_000, `${f} is over 10 KB`);
+test('every storefront asset stays under 10,000 bytes (the theme-check threshold)', () => {
+  // EVERY file in assets/, not a hand-kept list: a new runtime or stylesheet
+  // must not be able to slip past the gate by not being named here.
+  const files = readdirSync(ASSETS);
+  assert.ok(files.length >= 9, 'asset listing looks wrong');
+  for (const f of files) {
+    const size = readFileSync(join(ASSETS, f)).length;
+    assert.ok(size < 10_000, `${f} is ${size} B, over 10,000 B`);
   }
 });

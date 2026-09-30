@@ -115,6 +115,10 @@
       "already_pending": "You already have an application under review. We will be in touch.",
       "too_large": "That is too long to send. Please shorten the notes and try again.",
       "error": "We could not send your application. Please try again shortly."
+    },
+    "currency": {
+      "applied": "Your wholesale price is applied at checkout.",
+      "quote": "Your wholesale price in your currency is available on a quote."
     }
   }
 }
