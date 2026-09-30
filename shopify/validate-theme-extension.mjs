@@ -813,3 +813,44 @@ describe('schema translations', () => {
     }
   });
 });
+
+// ── The app-proxy prefix must survive the trailing-slash trim ────────────────
+// Liquid's `remove_last: '/'` removes the LAST '/' ANYWHERE, so the default
+// '/apps/tackquote' became '/appstackquote' and every storefront call 404'd on
+// live stores from 2026-08-28 until 2026-10-01. `split: '/' | join: '/'` drops
+// only a trailing slash (Liquid's split discards trailing empty fields).
+describe('app proxy prefix trim', () => {
+  const liquidSplitJoin = (s) => {
+    const parts = s.split('/');
+    while (parts.length && parts[parts.length - 1] === '') parts.pop();
+    return parts.join('/');
+  };
+  const liquidRemoveLast = (s, sub) => {
+    const i = s.lastIndexOf(sub);
+    return i < 0 ? s : s.slice(0, i) + s.slice(i + sub.length);
+  };
+  test('the old filter really mangled the default (control)', () => {
+    assert.equal(liquidRemoveLast('/apps/tackquote', '/'), '/appstackquote');
+  });
+  test('split/join keeps the default and drops only a trailing slash', () => {
+    assert.equal(liquidSplitJoin('/apps/tackquote'), '/apps/tackquote');
+    assert.equal(liquidSplitJoin('/apps/tackquote/'), '/apps/tackquote');
+    assert.equal(liquidSplitJoin('/apps/custom-proxy'), '/apps/custom-proxy');
+  });
+  test('no block trims the proxy path with remove_last', () => {
+    const offenders = [];
+    for (const f of fs.readdirSync(BLOCKS_DIR).filter((x) => x.endsWith('.liquid'))) {
+      const src = fs.readFileSync(path.join(BLOCKS_DIR, f), 'utf8');
+      if (/proxy_path[^\n]*remove_last:\s*'\/'/.test(src)) offenders.push(f);
+    }
+    assert.deepEqual(offenders, []);
+  });
+  test('every block that reads proxy_path trims it with split/join', () => {
+    const missing = [];
+    for (const f of fs.readdirSync(BLOCKS_DIR).filter((x) => x.endsWith('.liquid'))) {
+      const src = fs.readFileSync(path.join(BLOCKS_DIR, f), 'utf8');
+      if (/assign proxy_path\s*=/.test(src) && !/assign proxy_path\s*=[^\n]*split:\s*'\/'\s*\|\s*join:\s*'\/'/.test(src)) missing.push(f);
+    }
+    assert.deepEqual(missing, []);
+  });
+});

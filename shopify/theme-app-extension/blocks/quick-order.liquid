@@ -1,5 +1,5 @@
 {%- liquid
-  assign proxy_path = block.settings.proxy_path | strip | remove_last: '/'
+  assign proxy_path = block.settings.proxy_path | strip | split: '/' | join: '/'
   assign login_url = routes.storefront_login_url | default: routes.account_login_url
 -%}
 

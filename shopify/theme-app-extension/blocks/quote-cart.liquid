@@ -1,5 +1,5 @@
 {%- liquid
-  assign proxy_path = block.settings.proxy_path | strip | remove_last: '/'
+  assign proxy_path = block.settings.proxy_path | strip | split: '/' | join: '/'
   assign label_request = block.settings.request_label | strip
   if label_request == blank or label_request == 'Request a quote for your cart'
     assign label_request = 'tackquote.quote.cart_request' | t

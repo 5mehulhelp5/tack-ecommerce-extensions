@@ -1,5 +1,5 @@
 {%- liquid
-  assign proxy_path = block.settings.proxy_path | strip | remove_last: '/'
+  assign proxy_path = block.settings.proxy_path | strip | split: '/' | join: '/'
   assign form_slug = block.settings.form_slug | strip
 -%}
 

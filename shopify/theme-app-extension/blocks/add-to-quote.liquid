@@ -1,5 +1,5 @@
 {%- liquid
-  assign proxy_path = block.settings.proxy_path | strip | remove_last: '/'
+  assign proxy_path = block.settings.proxy_path | strip | split: '/' | join: '/'
   assign variant = product.selected_or_first_available_variant
 -%}
 
