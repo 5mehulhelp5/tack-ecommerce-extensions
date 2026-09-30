@@ -3,7 +3,7 @@
   assign variant = product.selected_or_first_available_variant
 -%}
 
-{%- # README.md, Liquid design notes: request-a-quote.liquid (1) -%}
+{%- # README notes: request-a-quote (1) -%}
 {%- capture tackquote_access -%}{% render 'tackquote-visibility', product: product %}{%- endcapture -%}
 {%- assign tackquote_access = tackquote_access | strip -%}
 {%- unless tackquote_access == 'hidden' -%}
@@ -43,7 +43,7 @@
   {{ tq_disabled }}
   data-tackquote-action="request"
   >
-  {%- # README.md, Liquid design notes: request-a-quote.liquid (2) -%}
+  {%- # README notes: request-a-quote (2) -%}
   {%- assign tackquote_label = block.settings.button_label | strip -%}
   {%- if tackquote_label == blank or tackquote_label == 'Request a Quote' -%}
   {%- assign tackquote_label = 'tackquote.quote.request_button' | t -%}

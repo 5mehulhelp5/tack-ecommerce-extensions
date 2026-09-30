@@ -1,5 +1,5 @@
 {%- comment -%}
-  README.md, Liquid design notes: tackquote-drawer.liquid (1).
+  README notes: tackquote-drawer (1).
   @param {string} proxy
   @param {boolean} [inline]
   @param {string} [attrs]
@@ -15,6 +15,7 @@
   aria-label="{{ title | escape }}"
   data-tackquote-proxy="{{ proxy | escape }}"
   data-tackquote-currency="{{ cart.currency.iso_code | default: shop.currency }}"
+  data-tackquote-money-format="{{ shop.money_format | escape }}" data-tackquote-shop-currency="{{ shop.currency }}"
   {% if customer %}data-tackquote-customer-name="{{ customer.name | escape }}" data-tackquote-customer-email="{{ customer.email | escape }}"{% endif %}
   data-msg-added="{{ 'tackquote.quote.added' | t | escape }}"
   data-msg-already="{{ 'tackquote.quote.already' | t | escape }}"

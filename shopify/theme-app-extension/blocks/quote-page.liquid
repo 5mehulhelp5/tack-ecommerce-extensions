@@ -2,7 +2,7 @@
   assign proxy_path = block.settings.proxy_path | strip | split: '/' | join: '/'
 -%}
 
-{%- # README.md, Liquid design notes: quote-page.liquid (1) -%}
+{%- # README notes: quote-page (1) -%}
 {%- if proxy_path == blank -%}
   {% render 'tackquote-setup', attrs: block.shopify_attributes %}
 {%- else -%}

@@ -20,6 +20,7 @@
   <div
   class="tackquote-block tackquote-qo"
   data-tackquote-mode="quick-order"
+  data-tackquote-money-format="{{ shop.money_format | escape }}" data-tackquote-shop-currency="{{ shop.currency }}"
   data-tackquote-proxy="{{ proxy_path | escape }}"
   data-tackquote-currency="{{ cart.currency.iso_code }}"
   data-tackquote-design="{% if request.design_mode %}true{% else %}false{% endif %}"

@@ -5,7 +5,7 @@
 {%- if proxy_path == blank -%}
   {% render 'tackquote-setup', attrs: block.shopify_attributes %}
 {%- else -%}
-  {%- # README.md, Liquid design notes: buyer-group-badge.liquid (1) -%}
+  {%- # README notes: buyer-group-badge (1) -%}
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div

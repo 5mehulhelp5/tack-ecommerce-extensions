@@ -50,11 +50,7 @@
       });
   };
 
-  /**
-   * Per-tab cache (sessionStorage: a price belongs to the authenticated session).
-   * Every access is wrapped because blocked site data throws on the accessor.
-   * Keys must carry the customer marker so a logout in the same tab cannot reuse a price.
-   */
+  /** Per-tab cache (a price belongs to the session); keys carry the customer marker. Blocked storage throws: wrapped. */
   ns.cache = {
     read: (key) => {
       try {
@@ -127,8 +123,36 @@
     return ns.format(root.dataset[key], { path, status: m });
   };
 
-  /** Intl money in the given ISO currency; a plain fallback if Intl refuses the code. */
+  /** Pure: `shop.money_format` (HTML stripped) with Shopify's placeholders; '' if unusable. */
+  ns.shopMoney = (amount, format) => {
+    const f = String(format || '')
+      .replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;/g, ' ');
+    const m = f.match(/\{\{\s*(\w+)\s*\}\}/);
+    const SEP = {
+      amount: [2, ',', '.'],
+      amount_no_decimals: [0, ',', '.'],
+      amount_with_comma_separator: [2, '.', ','],
+      amount_no_decimals_with_comma_separator: [0, '.', ','],
+      amount_with_apostrophe_separator: [2, "'", '.'],
+      amount_with_space_separator: [2, ' ', ','],
+      amount_no_decimals_with_space_separator: [0, ' ', ','],
+    };
+    const k = m && SEP[m[1]];
+    if (!k || !Number.isFinite(Number(amount))) return '';
+    const [whole, frac] = Number(amount).toFixed(k[0]).split('.');
+    const n = whole.replace(/\B(?=(\d{3})+(?!\d))/g, k[1]) + (frac ? k[2] + frac : '');
+    return f.replace(m[0], n);
+  };
+
+  /** Money: the shop's own format when `currency` is the shop's currency, else Intl. */
   ns.money = (amount, currency) => {
+    const src = document.querySelector('[data-tackquote-money-format]');
+    const d = src ? src.dataset : {};
+    if (d.tackquoteMoneyFormat && currency && currency === d.tackquoteShopCurrency) {
+      const out = ns.shopMoney(amount, d.tackquoteMoneyFormat);
+      if (out) return out;
+    }
     try {
       return new Intl.NumberFormat(document.documentElement.lang || 'en', {
         style: 'currency',
@@ -139,11 +163,7 @@
     }
   };
 
-  /*
-   * Presentment currency: Liquid `cart.currency.iso_code`, the customer's local
-   * currency (https://shopify.dev/docs/api/liquid/objects/cart). Sent with every
-   * price read so the server can refuse to price in another currency.
-   */
+  /* Presentment currency (Liquid cart.currency.iso_code), sent with every price read. */
   ns.pageCurrency = (root) => {
     const c = String(root.dataset.tackquoteCurrency || '').toUpperCase();
     return /^[A-Z]{3}$/.test(c) ? c : '';
@@ -153,11 +173,7 @@
     return c ? `&currency=${c}` : '';
   };
 
-  /*
-   * Pure. 'mismatch' when the server refused to price in the page currency, or
-   * when a priced answer carries a currency the page is not showing: a USD
-   * figure beside a EUR product is never rendered, whatever the server says.
-   */
+  /* Pure: 'mismatch' when the server refused the page currency or answered in another one. */
   ns.currencyView = (data, pageCurrency) => {
     if (!data) return 'ok';
     if (data.reason === 'currency_mismatch') return 'mismatch';
@@ -170,15 +186,8 @@
 
   ns.findVariant = (list, id) => list.filter((v) => String(v.id) === String(id))[0] || null;
 
-  /*
-   * Variant changes. No single cross-theme event exists, so combine: form
-   * change/input, popstate, a MutationObserver on the form's input[name="id"]
-   * `value` attribute (setAttribute only; a `.value =` assignment is invisible
-   * to it), and Horizon's `shopify:product:select` (StandardEvents.productSelect,
-   * dispatched before its section fetch resolves, so wait on `event.promise`).
-   * Dawn's own variant-change is an in-memory pub/sub, not a DOM event, so Dawn
-   * is covered by its bubbling `change` on input[name="id"]. Bursts coalesce.
-   */
+  /* Variant changes: form change/input, popstate, a MutationObserver on input[name="id"]'s value
+     attribute, and Horizon's `shopify:product:select` (await its `promise`). Bursts coalesce. */
   ns.onChange = (root, handler) => {
     let timer = null;
     const fire = () => {

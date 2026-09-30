@@ -5,7 +5,7 @@
 {%- if proxy_path == blank -%}
   {% render 'tackquote-setup', attrs: block.shopify_attributes %}
 {%- else -%}
-  {%- # README.md, Liquid design notes: credit-application.liquid (1) -%}
+  {%- # README notes: credit-application (1) -%}
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
@@ -31,7 +31,7 @@
   {{ block.shopify_attributes }}
   >
   <h3 class="tackquote-credit__heading">
-  {%- # README.md, Liquid design notes: credit-application.liquid (2) -%}
+  {%- # README notes: credit-application (2) -%}
   {%- assign tackquote_label = block.settings.heading | strip -%}
   {%- if tackquote_label == blank or tackquote_label == 'Apply for net terms' -%}
   {%- assign tackquote_label = 'tackquote.credit.heading' | t -%}

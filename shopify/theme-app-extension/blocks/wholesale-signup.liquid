@@ -3,9 +3,9 @@
   assign form_slug = block.settings.form_slug | strip
 -%}
 
-{%- # README.md, Liquid design notes: wholesale-signup.liquid (1) -%}
+{%- # README notes: wholesale-signup (1) -%}
 
-{%- # README.md, Liquid design notes: wholesale-signup.liquid (2) -%}
+{%- # README notes: wholesale-signup (2) -%}
 {%- if proxy_path == blank -%}
   {% render 'tackquote-setup', attrs: block.shopify_attributes %}
 {%- else -%}
@@ -44,7 +44,7 @@
   {{ block.shopify_attributes }}
   >
   <h3 class="tackquote-signup__heading">
-  {%- # README.md, Liquid design notes: wholesale-signup.liquid (3) -%}
+  {%- # README notes: wholesale-signup (3) -%}
   {%- assign tackquote_label = block.settings.heading | strip -%}
   {%- if tackquote_label == blank or tackquote_label == 'Apply for a wholesale account' -%}
   {%- assign tackquote_label = 'tackquote.signup.heading' | t -%}
