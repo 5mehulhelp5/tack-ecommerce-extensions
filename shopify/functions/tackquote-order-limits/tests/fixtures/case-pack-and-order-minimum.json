@@ -1,0 +1,86 @@
+{
+  "payload": {
+    "export": "cart_validations_generate_run",
+    "target": "cart.validations.generate.run",
+    "input": {
+      "presentmentCurrencyRate": "1.0",
+      "buyerJourney": {
+        "step": "CHECKOUT_COMPLETION"
+      },
+      "validation": {
+        "cartLimits": {
+          "jsonValue": {
+            "v": 1,
+            "c": "USD",
+            "l": {
+              "minTotal": 100
+            }
+          }
+        }
+      },
+      "cart": {
+        "cost": {
+          "subtotalAmount": {
+            "amount": "96.0",
+            "currencyCode": "USD"
+          }
+        },
+        "buyerIdentity": {
+          "customer": {
+            "buyer": {
+              "jsonValue": {
+                "v": 1,
+                "g": [
+                  "GOLD"
+                ]
+              }
+            }
+          }
+        },
+        "lines": [
+          {
+            "quantity": 13,
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "id": "gid://shopify/ProductVariant/11",
+              "title": "Large",
+              "product": {
+                "title": "Work Glove"
+              },
+              "orderLimits": {
+                "jsonValue": {
+                  "v": 1,
+                  "l": {
+                    "GOLD": {
+                      "min": 12,
+                      "max": 480,
+                      "step": 12
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "output": {
+      "operations": [
+        {
+          "validationAdd": {
+            "errors": [
+              {
+                "message": "Quantity for \"Work Glove - Large\" must be a multiple of 12.",
+                "target": "$.cart"
+              },
+              {
+                "message": "Order total must be at least 100.00 USD.",
+                "target": "$.cart"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

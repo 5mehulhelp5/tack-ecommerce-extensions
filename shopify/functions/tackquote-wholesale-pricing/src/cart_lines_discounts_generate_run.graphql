@@ -1,0 +1,42 @@
+# Validated against the functions_discount schema, API version 2026-07, with
+# the shopify-dev MCP validate_graphql_codeblocks tool (2026-09-30).
+# Rust requires the operation to be named `Input`.
+#
+# Input query limits (https://shopify.dev/docs/api/functions/2026-07):
+#   cost <= 30:   two metafield selections x 3, plus 7 leaves x 1 = 13
+#   size <= 3,000 bytes excluding comments
+#   metafield values over 10,000 bytes arrive as null (see METAFIELD_CONTRACT.md)
+query Input {
+  presentmentCurrencyRate
+  discount {
+    discountClasses
+  }
+  cart {
+    buyerIdentity {
+      customer {
+        buyer: metafield(namespace: "$app", key: "buyer") {
+          jsonValue
+        }
+      }
+    }
+    lines {
+      id
+      quantity
+      cost {
+        amountPerQuantity {
+          amount
+          currencyCode
+        }
+      }
+      merchandise {
+        __typename
+        ... on ProductVariant {
+          id
+          priceTiers: metafield(namespace: "$app", key: "price_tiers") {
+            jsonValue
+          }
+        }
+      }
+    }
+  }
+}

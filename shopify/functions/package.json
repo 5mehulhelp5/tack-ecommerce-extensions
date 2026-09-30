@@ -1,0 +1,13 @@
+{
+  "name": "@tack/shopify-functions",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "TackQuote Shopify Functions (Rust: wholesale pricing discount, order-limit validation) and the JS reference writer for their shared metafield contract.",
+  "scripts": {
+    "test": "node --test \"contract/reference-writer/*.test.mjs\" && npm run test:rust",
+    "test:rust": "cd tackquote-wholesale-pricing && cargo test && cd ../tackquote-order-limits && cargo test",
+    "sync-contract": "node scripts/sync-contract.mjs"
+  }
+}
