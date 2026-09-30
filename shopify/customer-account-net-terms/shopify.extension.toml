@@ -1,0 +1,36 @@
+# TackQuote net terms, for customers on NEW customer accounts (Wave 3).
+#
+# Runs alongside the theme app extension's Net Terms Application block (a page
+# block): that one serves stores whose customers apply from a storefront page,
+# this one appears on the customer's own Profile page.
+#
+# Target: customer-account.profile.block.render (Profile, default, a block the
+# merchant places in the customer accounts editor).
+# https://shopify.dev/docs/api/customer-account-ui-extensions/2026-07/targets/profile-page-default
+#
+# network_access: the extension calls the TackQuote API with a session token.
+# Shopify requires the partner to request network access before an extension
+# using it can be published (Partner Dashboard, API access, Allow network
+# access). Responses must carry Access-Control-Allow-Origin: * because
+# extension requests come from a web worker with no recognisable origin.
+# https://shopify.dev/docs/apps/build/customer-accounts/capabilities
+#
+# api_access stays false: nothing here queries the Storefront API.
+# The session token's `sub` (the signed-in customer) needs read access to
+# customers, which write_customers in shopify.app.toml already grants, plus
+# protected customer data approval.
+# https://shopify.dev/docs/api/customer-account-ui-extensions/2026-07/target-apis/platform-apis/session-token-api
+api_version = "2026-07"
+
+[[extensions]]
+type = "ui_extension"
+name = "TackQuote net terms"
+handle = "tackquote-net-terms"
+
+[[extensions.targeting]]
+module = "./src/ProfileBlock.jsx"
+target = "customer-account.profile.block.render"
+
+[extensions.capabilities]
+api_access = false
+network_access = true

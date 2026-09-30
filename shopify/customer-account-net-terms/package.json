@@ -1,0 +1,11 @@
+{
+  "name": "tackquote-net-terms",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "description": "TackQuote customer-account UI extension: apply for net payment terms and see the application status.",
+  "dependencies": {
+    "@shopify/ui-extensions": "~2026.7.0",
+    "preact": "^10.10.0"
+  }
+}
