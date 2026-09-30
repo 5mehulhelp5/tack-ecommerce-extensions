@@ -3,6 +3,15 @@
   assign variant = product.selected_or_first_available_variant
 -%}
 
+{%- comment -%}
+  Catalog visibility: a product restricted to TackQuote buyer groups offers
+  no price, break, limit or quote control to a shopper who may not buy it.
+  The rule, and why, is in snippets/tackquote-visibility.liquid.
+{%- endcomment -%}
+{%- capture tackquote_access -%}{% render 'tackquote-visibility', product: product %}{%- endcapture -%}
+{%- assign tackquote_access = tackquote_access | strip -%}
+{%- unless tackquote_access == 'hidden' -%}
+{{ tackquote_access }}
 {%- if proxy_path == blank -%}
   {%- if request.design_mode -%}
     <div class="tackquote-setup" {{ block.shopify_attributes }}>
@@ -55,6 +64,7 @@
 
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
 {%- endif -%}
+{%- endunless -%}
 
 {% schema %}
 {

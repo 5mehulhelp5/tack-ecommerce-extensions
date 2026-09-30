@@ -1,0 +1,117 @@
+{
+  "tackquote": {
+    "setup": {
+      "title": "TackQuote aún no está configurado",
+      "proxy": "Indica la ruta del proxy de la aplicación en la configuración de este bloque para que pueda conectarse con TackQuote. Mientras tanto, permanece oculto para los clientes."
+    },
+    "price": {
+      "loading": "Comprobando tu precio mayorista",
+      "anonymous": "Inicia sesión para ver tu precio mayorista, disponible en un presupuesto.",
+      "login": "Iniciar sesión",
+      "unlinked": "Tu cuenta aún no está vinculada a los precios mayoristas. Solicita un presupuesto y lo configuraremos.",
+      "unpriced": "Todavía no hay un precio mayorista para este artículo. Solicita un presupuesto para obtener un precio.",
+      "each": "por unidad",
+      "quote_note": "Tu precio mayorista, disponible en un presupuesto. Añade este artículo a un presupuesto para solicitarlo.",
+      "list_note": "Precio de catálogo, no una tarifa negociada.",
+      "error": "No hemos podido cargar tu precio en este momento.",
+      "heading": "Tu precio mayorista en presupuesto"
+    },
+    "diagnostics": {
+      "password": "Esta tienda está protegida con contraseña y la solicitud llegó a la página de contraseña en lugar de a TackQuote. Las tiendas de desarrollo siempre están protegidas con contraseña y no se puede desactivar. Abre la vista previa de la tienda real e introduce la contraseña (Tienda online → Preferencias). Allí los precios se muestran con normalidad.",
+      "not_json": "No fue TackQuote quien respondió a {path}: se recibió una página HTML en lugar de datos. Suele ser la página de contraseña de la tienda y, a veces, un tema u otra aplicación que usa esa ruta.",
+      "not_found": "Shopify devolvió un error 404 para {path}. La subruta del proxy de la aplicación no coincide con el ajuste Ruta del proxy de la aplicación de este bloque. Revisa Configuración → Aplicaciones y canales de ventas → TackQuote → Proxy de la aplicación.",
+      "auth": "Shopify reenvió la solicitud, pero TackQuote rechazó la firma. Normalmente significa que la aplicación se reinstaló y el secreto guardado ya no es válido. Vuelve a conectar la tienda.",
+      "server": "TackQuote respondió {status}. El bloque funciona correctamente; vuelve a intentarlo en unos momentos.",
+      "timeout": "TackQuote no respondió en 2,5 segundos, así que se omitió el precio para no retrasar la página.",
+      "failed": "La solicitud a {path} falló antes de llegar a TackQuote.",
+      "not_connected": "Esta tienda no está conectada a ninguna cuenta de TackQuote. Conéctala desde TackQuote → Connections → Shopify y vuelve a cargar el editor.",
+      "no_sku": "Esta variante no tiene SKU. TackQuote calcula precios y aplica reglas por SKU, así que añade uno en el panel de control de Shopify → Productos → este producto → Variantes. Hasta entonces, los clientes no ven nada aquí.",
+      "no_limits": "No hay límites de pedido para este producto. Defínelos en TackQuote → Order Limits. Los clientes no ven nada aquí hasta que se aplique una regla."
+    },
+    "quote": {
+      "added": "Añadido a tu solicitud de presupuesto.",
+      "already": "Ya está en tu solicitud de presupuesto.",
+      "unavailable": "Esta variante no está disponible.",
+      "title": "Tu solicitud de presupuesto",
+      "empty": "Tu solicitud de presupuesto aún está vacía.",
+      "remove": "Quitar",
+      "quantity": "Cantidad",
+      "name": "Nombre completo",
+      "email": "Correo electrónico",
+      "company": "Empresa",
+      "message": "¿Algo que debamos saber?",
+      "submit": "Enviar solicitud de presupuesto",
+      "sending": "Enviando",
+      "success": "Gracias. Hemos recibido tu solicitud y te responderemos con un presupuesto.",
+      "failure": "No se ha podido enviar. Inténtalo de nuevo.",
+      "close": "Cerrar",
+      "required": "Indica tu nombre y tu correo electrónico.",
+      "add_button": "Añadir al presupuesto",
+      "request_button": "Solicitar presupuesto",
+      "helper": "¿Compras por volumen? Pídenos un precio."
+    },
+    "signup": {
+      "loading": "Cargando el formulario de solicitud",
+      "unavailable": "El formulario de solicitud de cuenta mayorista no está disponible en este momento.",
+      "no_form": "Todavía no hay ningún formulario mayorista activado. Crea o activa uno en TackQuote → Settings → Wholesale → Forms y vuelve a cargar el editor. Mientras tanto, los clientes ven una breve nota indicando que las solicitudes no están abiertas.",
+      "submit": "Enviar solicitud",
+      "submitting": "Enviando tu solicitud",
+      "success": "Gracias. Hemos recibido tu solicitud de cuenta mayorista y nos pondremos en contacto contigo.",
+      "error": "No se ha podido enviar. Inténtalo de nuevo.",
+      "required": "Completa los campos obligatorios.",
+      "heading": "Solicita una cuenta mayorista"
+    },
+    "quantity_breaks": {
+      "loading": "Cargando los precios mayoristas por cantidad",
+      "caption": "Precio mayorista por unidad según la cantidad, disponible en un presupuesto",
+      "quantity": "Cantidad",
+      "price": "Precio unitario presupuestado",
+      "list_note": "Precios de catálogo, no una tarifa negociada.",
+      "empty": "No hay precios mayoristas por cantidad publicados para este artículo.",
+      "anonymous": "Inicia sesión para ver tus precios mayoristas por cantidad.",
+      "login": "Iniciar sesión",
+      "unlinked": "Tu cuenta aún no está vinculada a los precios mayoristas. Solicita un presupuesto y lo configuraremos.",
+      "error": "No hemos podido cargar los precios por cantidad en este momento.",
+      "heading": "Precios mayoristas por cantidad"
+    },
+    "badge": {
+      "label": "Tu nivel de precios",
+      "empty": "No se aplica ningún grupo de compradores a este cliente."
+    },
+    "order_limits": {
+      "qty_min": "Pedido mínimo: {min} unidades",
+      "qty_max": "Pedido máximo: {max} unidades",
+      "qty_range": "Pide entre {min} y {max} unidades",
+      "total_min": "Importe mínimo del pedido: {min}",
+      "total_max": "Importe máximo del pedido: {max}",
+      "total_range": "Importe del pedido entre {min} y {max}",
+      "items_min": "Mínimo {min} artículos por pedido",
+      "items_max": "Máximo {max} artículos por pedido",
+      "items_range": "Entre {min} y {max} artículos por pedido",
+      "account_note": "Según tu cuenta.",
+      "loading": "Comprobando los límites de pedido de este producto",
+      "empty": "Este producto no tiene pedido mínimo.",
+      "error": "Los pedidos mínimos no están disponibles en este momento."
+    },
+    "credit": {
+      "sign_in": "Inicia sesión en tu cuenta para solicitar pago aplazado.",
+      "label_business": "Razón social",
+      "label_email": "Correo electrónico de contacto",
+      "label_phone": "Teléfono de contacto",
+      "label_tax_id": "NIF / identificación fiscal",
+      "label_limit": "Límite de crédito solicitado",
+      "label_terms": "Plazo de pago solicitado (días)",
+      "label_notes": "Cualquier otra cosa que debamos saber",
+      "submit": "Enviar solicitud",
+      "submitting": "Enviando tu solicitud…",
+      "success": "Gracias — hemos recibido tu solicitud y la estamos revisando.",
+      "already_pending": "Ya tienes una solicitud en revisión. Nos pondremos en contacto contigo.",
+      "too_large": "El texto es demasiado largo para enviarlo. Acorta las notas e inténtalo de nuevo.",
+      "error": "No hemos podido enviar tu solicitud. Vuelve a intentarlo en unos momentos.",
+      "heading": "Solicita pago aplazado"
+    },
+    "visibility": {
+      "editor_note": "Este producto está restringido a grupos de compradores de TackQuote. Solo los compradores que pueden adquirirlo ven este bloque; el resto de los clientes no ve nada aquí y el pago les rechaza el producto."
+    }
+  }
+}

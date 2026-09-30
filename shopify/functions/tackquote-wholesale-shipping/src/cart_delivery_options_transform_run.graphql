@@ -1,0 +1,42 @@
+# Validated against the functions_delivery_customization schema, API version
+# 2026-07, with the shopify-dev MCP validate_graphql_codeblocks tool.
+# Rust requires the operation to be named `Input`.
+#
+# Input query limits (https://shopify.dev/docs/api/functions/2026-07):
+#   cost <= 30, size <= 3,000 bytes excluding comments.
+query Input {
+  presentmentCurrencyRate
+  deliveryCustomization {
+    shippingRules: metafield(namespace: "$app", key: "shipping_rules") {
+      jsonValue
+    }
+  }
+  cart {
+    cost {
+      subtotalAmount {
+        amount
+        currencyCode
+      }
+    }
+    buyerIdentity {
+      customer {
+        buyer: metafield(namespace: "$app", key: "buyer") {
+          jsonValue
+        }
+      }
+    }
+    deliveryGroups {
+      deliveryAddress {
+        countryCode
+      }
+      deliveryOptions {
+        handle
+        title
+        deliveryMethodType
+        cost {
+          amount
+        }
+      }
+    }
+  }
+}

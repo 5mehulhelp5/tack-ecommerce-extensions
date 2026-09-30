@@ -1,4 +1,4 @@
 {
   "name": "TackQuote wholesale pricing",
-  "description": "Applies each signed-in wholesale buyer's TackQuote price and quantity breaks at checkout, as a discount off the retail price."
+  "description": "Applies each signed-in wholesale buyer’s TackQuote price and quantity breaks at checkout, as a discount off the retail price."
 }

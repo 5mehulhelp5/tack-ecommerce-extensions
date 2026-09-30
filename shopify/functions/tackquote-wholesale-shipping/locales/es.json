@@ -1,0 +1,4 @@
+{
+  "name": "Envío mayorista de TackQuote",
+  "description": "Cambia el nombre, ordena u oculta las opciones de envío de los compradores mayoristas con sesión iniciada según las reglas de envío de TackQuote. La opción más económica siempre queda primera y seleccionada."
+}

@@ -1,0 +1,4 @@
+{
+  "name": "TackQuote wholesale shipping",
+  "description": "Renames, sorts or hides shipping options for signed-in wholesale buyers, following TackQuote shipping rules. The cheapest option always stays first and selected."
+}

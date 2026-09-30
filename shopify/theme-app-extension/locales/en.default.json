@@ -13,7 +13,8 @@
       "each": "each",
       "quote_note": "Your wholesale price, available on a quote. Add this item to a quote to request it.",
       "list_note": "List price, not a negotiated rate.",
-      "error": "We could not load your price just now."
+      "error": "We could not load your price just now.",
+      "heading": "Your quoted wholesale price"
     },
     "diagnostics": {
       "password": "This store is password protected, and the request was sent to the password page instead of TackQuote. Development stores are always password protected and it cannot be switched off. Preview the real storefront and enter the password (Online Store → Preferences). Prices resolve normally there.",
@@ -44,7 +45,10 @@
       "success": "Thanks. We have your request and will reply with a quote.",
       "failure": "We could not send that. Please try again.",
       "close": "Close",
-      "required": "Please add your name and email."
+      "required": "Please add your name and email.",
+      "add_button": "Add to Quote",
+      "request_button": "Request a Quote",
+      "helper": "Buying in volume? Ask us for a price."
     },
     "signup": {
       "loading": "Loading the application form",
@@ -54,7 +58,8 @@
       "submitting": "Sending your application",
       "success": "Thanks. Your wholesale application is with us and we will be in touch.",
       "error": "We could not send that. Please try again.",
-      "required": "Please complete the required fields."
+      "required": "Please complete the required fields.",
+      "heading": "Apply for a wholesale account"
     },
     "quantity_breaks": {
       "loading": "Loading wholesale quantity pricing",
@@ -66,7 +71,8 @@
       "anonymous": "Sign in to see your wholesale quantity pricing.",
       "login": "Sign in",
       "unlinked": "Your account is not linked to wholesale pricing yet. Request a quote and we will set it up.",
-      "error": "We could not load wholesale quantity pricing just now."
+      "error": "We could not load wholesale quantity pricing just now.",
+      "heading": "Wholesale quantity pricing"
     },
     "badge": {
       "label": "Your pricing tier",
@@ -101,7 +107,11 @@
       "success": "Thanks — your application has been received and is under review.",
       "already_pending": "You already have an application under review. We will be in touch.",
       "too_large": "That is too long to send. Please shorten the notes and try again.",
-      "error": "We could not send your application. Please try again shortly."
+      "error": "We could not send your application. Please try again shortly.",
+      "heading": "Apply for net terms"
+    },
+    "visibility": {
+      "editor_note": "This product is restricted to TackQuote buyer groups. Only buyers who may purchase it see this block; other shoppers see nothing here, and checkout refuses the product for them."
     }
   }
 }

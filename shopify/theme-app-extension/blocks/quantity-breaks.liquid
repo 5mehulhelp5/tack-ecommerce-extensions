@@ -3,6 +3,15 @@
   assign variant = product.selected_or_first_available_variant
 -%}
 
+{%- comment -%}
+  Catalog visibility: a product restricted to TackQuote buyer groups offers
+  no price, break, limit or quote control to a shopper who may not buy it.
+  The rule, and why, is in snippets/tackquote-visibility.liquid.
+{%- endcomment -%}
+{%- capture tackquote_access -%}{% render 'tackquote-visibility', product: product %}{%- endcapture -%}
+{%- assign tackquote_access = tackquote_access | strip -%}
+{%- unless tackquote_access == 'hidden' -%}
+{{ tackquote_access }}
 {%- if proxy_path == blank -%}
   {%- if request.design_mode -%}
     <div class="tackquote-setup" {{ block.shopify_attributes }}>
@@ -44,7 +53,13 @@
   >
     {% render 'tackquote-selection', product: product %}
     <h3 class="tackquote-breaks__heading">
-      {{ block.settings.heading | default: 'Wholesale quantity pricing' }}
+      {%- comment -%}The schema default is English. Left as it is (or blank), the
+      shopper's language is used instead; a merchant's own wording is kept.{%- endcomment -%}
+      {%- assign tackquote_label = block.settings.heading | strip -%}
+      {%- if tackquote_label == blank or tackquote_label == 'Wholesale quantity pricing' -%}
+        {%- assign tackquote_label = 'tackquote.quantity_breaks.heading' | t -%}
+      {%- endif -%}
+      {{ tackquote_label }}
     </h3>
     <div class="tackquote-breaks__body" data-tackquote-breaks-body role="status" aria-live="polite">
       <p class="tackquote-breaks__loading">{{ 'tackquote.quantity_breaks.loading' | t }}</p>
@@ -53,6 +68,7 @@
 
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
 {%- endif -%}
+{%- endunless -%}
 
 {% schema %}
 {

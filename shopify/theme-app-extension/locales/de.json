@@ -1,0 +1,117 @@
+{
+  "tackquote": {
+    "setup": {
+      "title": "TackQuote ist noch nicht eingerichtet",
+      "proxy": "Tragen Sie in den Einstellungen dieses Blocks den App-Proxy-Pfad ein, damit der Block TackQuote erreicht. Bis dahin ist er für Kunden ausgeblendet."
+    },
+    "price": {
+      "loading": "Ihr Großhandelspreis wird geprüft",
+      "anonymous": "Melden Sie sich an, um Ihren Großhandelspreis zu sehen, erhältlich per Angebot.",
+      "login": "Anmelden",
+      "unlinked": "Ihr Konto ist noch nicht mit Großhandelspreisen verknüpft. Fordern Sie ein Angebot an, dann richten wir das ein.",
+      "unpriced": "Für diesen Artikel ist noch kein Großhandelspreis hinterlegt. Fordern Sie ein Angebot für einen Preis an.",
+      "each": "pro Stück",
+      "quote_note": "Ihr Großhandelspreis, erhältlich per Angebot. Legen Sie diesen Artikel in eine Angebotsanfrage, um ihn anzufordern.",
+      "list_note": "Listenpreis, kein verhandelter Preis.",
+      "error": "Ihr Preis konnte gerade nicht geladen werden.",
+      "heading": "Ihr Großhandelspreis im Angebot"
+    },
+    "diagnostics": {
+      "password": "Dieser Shop ist passwortgeschützt, und die Anfrage ging an die Passwortseite statt an TackQuote. Entwicklungsshops sind immer passwortgeschützt, das lässt sich nicht abschalten. Öffnen Sie die Vorschau des echten Shops und geben Sie das Passwort ein (Onlineshop → Präferenzen). Dort werden die Preise normal angezeigt.",
+      "not_json": "Auf {path} hat nicht TackQuote geantwortet, sondern eine HTML-Seite statt Daten. Meist ist das die Passwortseite des Shops, gelegentlich ein Theme oder eine andere App, die diesen Pfad belegt.",
+      "not_found": "Shopify hat für {path} den Fehler 404 gemeldet. Der Unterpfad des App-Proxys stimmt nicht mit der Einstellung App-Proxy-Pfad dieses Blocks überein. Prüfen Sie Einstellungen → Apps und Vertriebskanäle → TackQuote → App-Proxy.",
+      "auth": "Shopify hat die Anfrage weitergeleitet, aber TackQuote hat die Signatur abgelehnt. Meist wurde die App neu installiert und das gespeicherte Secret ist veraltet. Verbinden Sie den Shop erneut.",
+      "server": "TackQuote hat mit {status} geantwortet. An diesem Block liegt es nicht; versuchen Sie es gleich noch einmal.",
+      "timeout": "TackQuote hat nicht innerhalb von 2,5 Sekunden geantwortet. Der Preis wurde ausgelassen, damit die Seite nicht langsamer lädt.",
+      "failed": "Die Anfrage an {path} ist fehlgeschlagen, bevor sie TackQuote erreicht hat.",
+      "not_connected": "Dieser Shop ist mit keinem TackQuote-Konto verbunden. Verbinden Sie ihn unter TackQuote → Connections → Shopify und laden Sie dann den Editor neu.",
+      "no_sku": "Diese Variante hat keine SKU. TackQuote berechnet Preise und wendet Regeln anhand der SKU an. Ergänzen Sie sie im Shopify-Adminbereich → Produkte → dieses Produkt → Varianten. Bis dahin sehen Kunden hier nichts.",
+      "no_limits": "Für dieses Produkt gelten keine Bestellgrenzen. Legen Sie sie unter TackQuote → Order Limits fest. Kunden sehen hier nichts, solange keine Regel greift."
+    },
+    "quote": {
+      "added": "Zu Ihrer Angebotsanfrage hinzugefügt.",
+      "already": "Bereits in Ihrer Angebotsanfrage.",
+      "unavailable": "Diese Variante ist nicht verfügbar.",
+      "title": "Ihre Angebotsanfrage",
+      "empty": "Ihre Angebotsanfrage ist noch leer.",
+      "remove": "Entfernen",
+      "quantity": "Menge",
+      "name": "Vollständiger Name",
+      "email": "E-Mail",
+      "company": "Unternehmen",
+      "message": "Möchten Sie uns noch etwas mitteilen?",
+      "submit": "Angebotsanfrage senden",
+      "sending": "Wird gesendet",
+      "success": "Vielen Dank. Ihre Anfrage ist bei uns eingegangen, wir melden uns mit einem Angebot.",
+      "failure": "Das Senden ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "close": "Schließen",
+      "required": "Bitte geben Sie Ihren Namen und Ihre E-Mail-Adresse an.",
+      "add_button": "Zum Angebot hinzufügen",
+      "request_button": "Angebot anfordern",
+      "helper": "Sie kaufen größere Mengen? Fragen Sie uns nach einem Preis."
+    },
+    "signup": {
+      "loading": "Antragsformular wird geladen",
+      "unavailable": "Das Antragsformular für Großhandelskunden ist gerade nicht verfügbar.",
+      "no_form": "Es ist noch kein Großhandelsformular aktiviert. Erstellen oder aktivieren Sie eines unter TackQuote → Settings → Wholesale → Forms und laden Sie dann den Editor neu. Bis dahin sehen Kunden einen kurzen Hinweis, dass derzeit keine Anträge möglich sind.",
+      "submit": "Antrag senden",
+      "submitting": "Ihr Antrag wird gesendet",
+      "success": "Vielen Dank. Ihr Antrag auf ein Großhandelskonto ist bei uns eingegangen, wir melden uns bei Ihnen.",
+      "error": "Das Senden ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "required": "Bitte füllen Sie die Pflichtfelder aus.",
+      "heading": "Großhandelskonto beantragen"
+    },
+    "quantity_breaks": {
+      "loading": "Großhandelsstaffelpreise werden geladen",
+      "caption": "Großhandelspreis pro Stück nach Menge, erhältlich per Angebot",
+      "quantity": "Menge",
+      "price": "Angebotspreis pro Stück",
+      "list_note": "Listenpreise, keine verhandelten Preise.",
+      "empty": "Für diesen Artikel sind keine Großhandelsstaffelpreise veröffentlicht.",
+      "anonymous": "Melden Sie sich an, um Ihre Großhandelsstaffelpreise zu sehen.",
+      "login": "Anmelden",
+      "unlinked": "Ihr Konto ist noch nicht mit Großhandelspreisen verknüpft. Fordern Sie ein Angebot an, dann richten wir das ein.",
+      "error": "Die Großhandelsstaffelpreise konnten gerade nicht geladen werden.",
+      "heading": "Großhandelsstaffelpreise"
+    },
+    "badge": {
+      "label": "Ihre Preisstufe",
+      "empty": "Für diesen Kunden gilt keine Käufergruppe."
+    },
+    "order_limits": {
+      "qty_min": "Mindestbestellmenge: {min} Stück",
+      "qty_max": "Höchstbestellmenge: {max} Stück",
+      "qty_range": "Bestellmenge zwischen {min} und {max} Stück",
+      "total_min": "Mindestbestellwert: {min}",
+      "total_max": "Höchstbestellwert: {max}",
+      "total_range": "Bestellwert zwischen {min} und {max}",
+      "items_min": "Mindestens {min} Artikel pro Bestellung",
+      "items_max": "Höchstens {max} Artikel pro Bestellung",
+      "items_range": "Zwischen {min} und {max} Artikeln pro Bestellung",
+      "account_note": "Gemäß Ihrem Konto.",
+      "loading": "Bestellgrenzen für dieses Produkt werden geprüft",
+      "empty": "Für dieses Produkt gelten keine Mindestbestellmengen.",
+      "error": "Die Mindestbestellmengen sind gerade nicht verfügbar."
+    },
+    "credit": {
+      "sign_in": "Melden Sie sich in Ihrem Konto an, um Zahlung auf Ziel zu beantragen.",
+      "label_business": "Offizieller Firmenname",
+      "label_email": "Kontakt-E-Mail",
+      "label_phone": "Kontakttelefon",
+      "label_tax_id": "Steuernummer",
+      "label_limit": "Gewünschtes Kreditlimit",
+      "label_terms": "Gewünschtes Zahlungsziel (Tage)",
+      "label_notes": "Weitere Informationen für uns",
+      "submit": "Antrag senden",
+      "submitting": "Ihr Antrag wird gesendet…",
+      "success": "Vielen Dank — Ihr Antrag ist eingegangen und wird geprüft.",
+      "already_pending": "Sie haben bereits einen Antrag in Prüfung. Wir melden uns bei Ihnen.",
+      "too_large": "Der Text ist zu lang zum Senden. Bitte kürzen Sie die Anmerkungen und versuchen Sie es erneut.",
+      "error": "Ihr Antrag konnte nicht gesendet werden. Bitte versuchen Sie es gleich noch einmal.",
+      "heading": "Zahlung auf Ziel beantragen"
+    },
+    "visibility": {
+      "editor_note": "Dieses Produkt ist auf TackQuote-Käufergruppen beschränkt. Nur Käufer, die es kaufen dürfen, sehen diesen Block; andere Kunden sehen hier nichts, und der Checkout lehnt das Produkt für sie ab."
+    }
+  }
+}

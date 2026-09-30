@@ -7,13 +7,22 @@ use serde_json::{json, Value};
 use shopify_function::run_function_with_input;
 
 fn line(variant: u64, qty: i32, limits: Option<Value>) -> Value {
+    product_line(variant, variant + 9000, qty, limits, None)
+}
+
+/// A line whose product (id `product`) carries `visibility`.
+fn product_line(variant: u64, product: u64, qty: i32, limits: Option<Value>, visibility: Option<Value>) -> Value {
     json!({
         "quantity": qty,
         "merchandise": {
             "__typename": "ProductVariant",
             "id": format!("gid://shopify/ProductVariant/{variant}"),
             "title": "Default Title",
-            "product": { "title": format!("P{variant}") },
+            "product": {
+                "id": format!("gid://shopify/Product/{product}"),
+                "title": format!("P{variant}"),
+                "visibility": visibility.map(|v| json!({ "jsonValue": v })),
+            },
             "orderLimits": limits.map(|l| json!({ "jsonValue": l })),
         }
     })
@@ -28,6 +37,7 @@ struct In {
     currency: &'static str,
     rate: &'static str,
     guest: bool,
+    lang: &'static str,
 }
 
 impl In {
@@ -41,6 +51,7 @@ impl In {
             currency: "USD",
             rate: "1.0",
             guest: false,
+            lang: "EN",
         }
     }
     fn json(&self) -> String {
@@ -51,6 +62,7 @@ impl In {
         };
         json!({
             "presentmentCurrencyRate": self.rate,
+            "localization": { "language": { "isoCode": self.lang } },
             "buyerJourney": { "step": self.step },
             "validation": { "cartLimits": self.shop.as_ref().map(|s| json!({ "jsonValue": s })) },
             "cart": {
@@ -337,4 +349,160 @@ fn exactly_max_errors_are_all_listed_and_one_more_becomes_a_count() {
     let e = run(MAX_ERRORS as u64 + 1);
     assert_eq!(e.len(), MAX_ERRORS);
     assert!(e[MAX_ERRORS - 1].starts_with("2 more order-limit problems."), "{}", e[MAX_ERRORS - 1]);
+}
+
+// ---- catalog visibility (contract v2) --------------------------------------------------
+
+fn allow(groups: &[&str]) -> Value {
+    json!({ "v": 2, "a": groups })
+}
+
+fn restricted_cart(buyer: Option<Value>, visibility: Value) -> In {
+    let mut i = In::new(json!({ "v": 1, "g": [] }), vec![product_line(21, 501, 1, None, Some(visibility))]);
+    i.buyer = buyer;
+    i
+}
+
+#[test]
+fn an_entitled_group_buys_a_restricted_product() {
+    let i = restricted_cart(Some(json!({ "v": 1, "g": ["SILVER", "GOLD"] })), allow(&["GOLD"]));
+    assert!(i.errors().is_empty());
+}
+
+#[test]
+fn a_linked_buyer_outside_the_allow_list_is_blocked_with_the_product_named() {
+    let i = restricted_cart(Some(buyer()), allow(&["platinum"]));
+    assert_eq!(i.errors(), vec!["\"P21\" is not available for your account. Remove it from your cart to continue."]);
+}
+
+#[test]
+fn the_wildcard_allows_any_linked_buyer_and_no_guest() {
+    assert!(restricted_cart(Some(buyer()), allow(&["*"])).errors().is_empty());
+    let mut guest = restricted_cart(None, allow(&["*"]));
+    guest.guest = true;
+    assert_eq!(
+        guest.errors(),
+        vec!["\"P21\" is available to approved wholesale accounts only. Sign in, or remove it from your cart."]
+    );
+}
+
+#[test]
+fn a_signed_in_customer_who_is_not_linked_is_told_about_their_account() {
+    let i = restricted_cart(None, allow(&["*"]));
+    assert_eq!(i.errors(), vec!["\"P21\" is not available for your account. Remove it from your cart to continue."]);
+}
+
+#[test]
+fn deny_wins_over_allow_and_a_deny_only_rule_leaves_retail_alone() {
+    let both = json!({ "v": 2, "a": ["*"], "d": ["GOLD"] });
+    assert_eq!(restricted_cart(Some(buyer()), both).errors().len(), 1);
+    // b2c_only: linked buyers may not buy it; guests may.
+    let retail = json!({ "v": 2, "d": ["*"] });
+    assert_eq!(restricted_cart(Some(buyer()), retail.clone()).errors().len(), 1);
+    let mut guest = restricted_cart(None, retail);
+    guest.guest = true;
+    assert!(guest.errors().is_empty());
+}
+
+#[test]
+fn visibility_blocks_even_at_cart_interaction() {
+    let mut i = restricted_cart(Some(buyer()), allow(&["platinum"]));
+    i.step = Some("CART_INTERACTION");
+    assert_eq!(i.errors().len(), 1);
+}
+
+#[test]
+fn two_variants_of_one_restricted_product_are_reported_once() {
+    let vis = allow(&["platinum"]);
+    let i = In::new(
+        buyer(),
+        vec![product_line(21, 501, 1, None, Some(vis.clone())), product_line(22, 501, 1, None, Some(vis))],
+    );
+    assert_eq!(i.errors().len(), 1);
+}
+
+#[test]
+fn malformed_visibility_is_omitted_and_logged_never_enforced() {
+    for (bad, reason) in [
+        (json!({ "v": 1, "a": ["gold"] }), "visibility_version=501;"),
+        (json!({ "v": 2 }), "visibility_empty=501;"),
+        (json!({ "v": 2, "a": [] }), "visibility_allow=501;"),
+        (json!({ "v": 2, "d": ["gold", "gold"] }), "visibility_deny=501;"),
+        (json!({ "v": 2, "a": ["gold"], "x": 1 }), "visibility_unknown_key=501;"),
+    ] {
+        let (out, omitted) = restricted_cart(Some(buyer()), bad.clone()).run();
+        assert!(out.operations.is_empty(), "{bad}");
+        assert!(omitted.render("t").contains(reason), "{bad}: {}", omitted.render("t"));
+    }
+}
+
+#[test]
+fn a_malformed_buyer_is_treated_as_not_linked_for_visibility() {
+    let (out, omitted) = restricted_cart(Some(json!({ "v": 1, "g": "gold" })), allow(&["gold"])).run();
+    assert_eq!(messages(&out).len(), 1);
+    assert!(omitted.render("t").contains("buyer_groups"));
+}
+
+#[test]
+fn visibility_and_limit_problems_are_listed_together() {
+    let i = In::new(
+        buyer(),
+        vec![product_line(21, 501, 1, None, Some(allow(&["platinum"]))), line(11, 11, Some(case_pack()))],
+    );
+    assert_eq!(i.errors().len(), 3);
+}
+
+// ---- messages in the checkout language ---------------------------------------------------
+
+#[test]
+fn every_message_exists_in_every_language_with_its_placeholders() {
+    use crate::i18n::{template, LANGUAGES};
+    use Msg::*;
+    let all = [Max, Min, Step, More, MaxItems, MaxUnique, MinItems, MinUnique, MaxTotal, MinTotal, RestrictedGuest, Restricted];
+    for lang in LANGUAGES {
+        for m in all {
+            let t = template(lang, m);
+            let named = matches!(m, Max | Min | Step | RestrictedGuest | Restricted);
+            assert_eq!(t.contains("{name}"), named, "{lang} {m:?}");
+            assert_eq!(t.contains("{n}"), !matches!(m, RestrictedGuest | Restricted), "{lang} {m:?}");
+            if lang != "EN" {
+                assert_ne!(t, template("EN", m), "{lang} {m:?} is untranslated");
+            }
+        }
+    }
+}
+
+#[test]
+fn a_french_checkout_gets_french_messages_with_french_quotes() {
+    let mut i = one_line(11, case_pack());
+    i.lang = "FR";
+    assert_eq!(i.errors(), vec![
+        "La quantité de « P11 » doit être d’au moins 12.",
+        "La quantité de « P11 » doit être un multiple de 12.",
+    ]);
+}
+
+#[test]
+fn an_unsupported_language_falls_back_to_english() {
+    let mut i = one_line(11, case_pack());
+    i.lang = "SV";
+    assert_eq!(i.errors()[0], "Quantity for \"P11\" must be at least 12.");
+}
+
+#[test]
+fn a_product_title_containing_a_placeholder_is_not_substituted() {
+    let mut l = line(11, 481, Some(case_pack()));
+    l["merchandise"]["product"]["title"] = json!("Bolt {n} pack");
+    let e = In::new(buyer(), vec![l]).errors();
+    assert_eq!(e[0], "Quantity for \"Bolt {n} pack\" must be at most 480.");
+}
+
+#[test]
+fn money_uses_the_decimal_comma_where_the_language_does() {
+    let mut i = In::new(buyer(), vec![line(11, 12, None)]);
+    i.shop = Some(json!({ "v": 1, "c": "USD", "l": { "minTotal": 250.5 } }));
+    i.lang = "DE";
+    assert_eq!(i.errors(), vec!["Der Bestellwert muss mindestens 250,50 USD betragen."]);
+    i.lang = "JA";
+    assert_eq!(i.errors(), vec!["ご注文の合計金額は250.50 USD以上にしてください。"]);
 }

@@ -1,0 +1,4 @@
+{
+  "name": "Limiti d’ordine TackQuote",
+  "description": "Applica al checkout, anche nel checkout rapido, le quantità minime e massime, i multipli di confezione, i minimi d’ordine e i prodotti riservati all’ingrosso definiti in TackQuote."
+}

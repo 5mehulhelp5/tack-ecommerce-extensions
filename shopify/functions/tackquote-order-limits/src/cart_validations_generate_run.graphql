@@ -3,10 +3,18 @@
 # Rust requires the operation to be named `Input`.
 #
 # Input query limits (https://shopify.dev/docs/api/functions/2026-07):
-#   cost <= 30:   three metafield selections x 3, plus 9 leaves x 1 = 18
+#   cost <= 30:   four metafield selections x 3, plus 11 leaves x 1 = 23
 #   size <= 3,000 bytes excluding comments
+#
+# Contract v2 adds the product's `$app:visibility` (catalog visibility) and
+# `localization` (the language checkout messages are written in).
 query Input {
   presentmentCurrencyRate
+  localization {
+    language {
+      isoCode
+    }
+  }
   buyerJourney {
     step
   }
@@ -37,7 +45,11 @@ query Input {
           id
           title
           product {
+            id
             title
+            visibility: metafield(namespace: "$app", key: "visibility") {
+              jsonValue
+            }
           }
           orderLimits: metafield(namespace: "$app", key: "order_limits") {
             jsonValue

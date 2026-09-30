@@ -1,0 +1,31 @@
+# TackQuote wholesale shipping: Delivery Customization Function (Rust).
+#
+# Generated with Shopify CLI 4.8.2:
+#   shopify app generate extension --template delivery_customization --flavor rust
+# and the `uid` below is the one that command wrote. Differences from the
+# template, each deliberate:
+#   - the input query reads the contract v2 `$app:shipping_rules` metafield
+#     (namespace "$app", as every TackQuote metafield) instead of the template's
+#     `$app:<handle>` / `function-configuration` pair;
+#   - no [extensions.ui.paths]: TackQuote configures the customization from its
+#     own app, it has no admin UI extension for it.
+# https://shopify.dev/docs/api/functions/2026-07/delivery-customization
+
+api_version = "2026-07"
+
+[[extensions]]
+name = "t:name"
+handle = "tackquote-wholesale-shipping"
+uid = "46b3782c-5662-afb3-2c29-1366b137bac83b402264"
+type = "function"
+description = "t:description"
+
+  [[extensions.targeting]]
+  target = "cart.delivery-options.transform.run"
+  input_query = "src/cart_delivery_options_transform_run.graphql"
+  export = "cart_delivery_options_transform_run"
+
+  [extensions.build]
+  command = "cargo build --target=wasm32-unknown-unknown --release"
+  path = "target/wasm32-unknown-unknown/release/tackquote-wholesale-shipping.wasm"
+  watch = [ "src/**/*.rs" ]

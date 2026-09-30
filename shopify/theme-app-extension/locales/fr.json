@@ -1,0 +1,117 @@
+{
+  "tackquote": {
+    "setup": {
+      "title": "TackQuote n’est pas encore configuré",
+      "proxy": "Indiquez le chemin du proxy d’application dans les paramètres de ce bloc pour qu’il puisse joindre TackQuote. D’ici là, il reste masqué pour les clients."
+    },
+    "price": {
+      "loading": "Vérification de votre prix professionnel",
+      "anonymous": "Connectez-vous pour voir votre prix professionnel, disponible sur devis.",
+      "login": "Se connecter",
+      "unlinked": "Votre compte n’est pas encore associé aux tarifs professionnels. Demandez un devis et nous nous en occupons.",
+      "unpriced": "Aucun prix professionnel n’est encore défini pour cet article. Demandez un devis pour obtenir un prix.",
+      "each": "l’unité",
+      "quote_note": "Votre prix professionnel, disponible sur devis. Ajoutez cet article à un devis pour le demander.",
+      "list_note": "Prix catalogue, pas un tarif négocié.",
+      "error": "Impossible de charger votre prix pour le moment.",
+      "heading": "Votre prix professionnel sur devis"
+    },
+    "diagnostics": {
+      "password": "Cette boutique est protégée par un mot de passe et la requête a abouti à la page du mot de passe au lieu de TackQuote. Les boutiques de développement sont toujours protégées par un mot de passe, sans possibilité de le désactiver. Prévisualisez la vraie boutique et saisissez le mot de passe (Boutique en ligne → Préférences). Les prix s’y affichent normalement.",
+      "not_json": "Ce n’est pas TackQuote qui a répondu à {path} : une page HTML plutôt que des données. En général, la page du mot de passe de la boutique, parfois un thème ou une autre application qui utilise ce chemin.",
+      "not_found": "Shopify a renvoyé une erreur 404 pour {path}. Le sous-chemin du proxy d’application ne correspond pas au paramètre Chemin du proxy d’application de ce bloc. Vérifiez Paramètres → Applications et canaux de vente → TackQuote → Proxy d’application.",
+      "auth": "Shopify a transmis la requête, mais TackQuote a refusé la signature. En général, l’application a été réinstallée et le secret enregistré n’est plus valide. Reconnectez la boutique.",
+      "server": "TackQuote a répondu {status}. Ce bloc n’est pas en cause ; réessayez dans un instant.",
+      "timeout": "TackQuote n’a pas répondu en 2,5 secondes : le prix a été ignoré pour ne pas ralentir la page.",
+      "failed": "La requête vers {path} a échoué avant d’atteindre TackQuote.",
+      "not_connected": "Cette boutique n’est connectée à aucun compte TackQuote. Connectez-la depuis TackQuote → Connections → Shopify, puis rechargez l’éditeur.",
+      "no_sku": "Cette variante n’a pas de SKU. TackQuote calcule les prix et applique les règles par SKU : ajoutez-en un dans l’admin Shopify → Produits → ce produit → Variantes. D’ici là, les clients ne voient rien ici.",
+      "no_limits": "Aucune limite de commande ne s’applique à ce produit. Définissez-les dans TackQuote → Order Limits. Les clients ne voient rien ici tant qu’aucune règle ne s’applique."
+    },
+    "quote": {
+      "added": "Ajouté à votre demande de devis.",
+      "already": "Déjà dans votre demande de devis.",
+      "unavailable": "Cette variante n’est pas disponible.",
+      "title": "Votre demande de devis",
+      "empty": "Votre demande de devis est vide pour le moment.",
+      "remove": "Retirer",
+      "quantity": "Quantité",
+      "name": "Nom complet",
+      "email": "E-mail",
+      "company": "Entreprise",
+      "message": "Quelque chose à nous préciser ?",
+      "submit": "Envoyer la demande de devis",
+      "sending": "Envoi en cours",
+      "success": "Merci. Nous avons bien reçu votre demande et vous répondrons avec un devis.",
+      "failure": "L’envoi a échoué. Veuillez réessayer.",
+      "close": "Fermer",
+      "required": "Veuillez indiquer votre nom et votre e-mail.",
+      "add_button": "Ajouter au devis",
+      "request_button": "Demander un devis",
+      "helper": "Vous achetez en volume ? Demandez-nous un prix."
+    },
+    "signup": {
+      "loading": "Chargement du formulaire de demande",
+      "unavailable": "Le formulaire de demande de compte professionnel n’est pas disponible pour le moment.",
+      "no_form": "Aucun formulaire professionnel n’est encore activé. Créez ou activez-en un dans TackQuote → Settings → Wholesale → Forms, puis rechargez l’éditeur. D’ici là, les clients voient une courte note indiquant que les demandes ne sont pas ouvertes.",
+      "submit": "Envoyer la demande",
+      "submitting": "Envoi de votre demande",
+      "success": "Merci. Nous avons bien reçu votre demande de compte professionnel et reviendrons vers vous.",
+      "error": "L’envoi a échoué. Veuillez réessayer.",
+      "required": "Veuillez remplir les champs obligatoires.",
+      "heading": "Demander un compte professionnel"
+    },
+    "quantity_breaks": {
+      "loading": "Chargement des prix professionnels par quantité",
+      "caption": "Prix professionnel unitaire selon la quantité, disponible sur devis",
+      "quantity": "Quantité",
+      "price": "Prix unitaire sur devis",
+      "list_note": "Prix catalogue, pas un tarif négocié.",
+      "empty": "Aucun prix professionnel par quantité n’est publié pour cet article.",
+      "anonymous": "Connectez-vous pour voir vos prix professionnels par quantité.",
+      "login": "Se connecter",
+      "unlinked": "Votre compte n’est pas encore associé aux tarifs professionnels. Demandez un devis et nous nous en occupons.",
+      "error": "Impossible de charger les prix par quantité pour le moment.",
+      "heading": "Prix professionnels par quantité"
+    },
+    "badge": {
+      "label": "Votre niveau tarifaire",
+      "empty": "Aucun groupe d’acheteurs ne s’applique à ce client."
+    },
+    "order_limits": {
+      "qty_min": "Commande minimale : {min} unités",
+      "qty_max": "Commande maximale : {max} unités",
+      "qty_range": "Commandez entre {min} et {max} unités",
+      "total_min": "Montant minimal de commande : {min}",
+      "total_max": "Montant maximal de commande : {max}",
+      "total_range": "Montant de commande entre {min} et {max}",
+      "items_min": "Au moins {min} articles par commande",
+      "items_max": "Au plus {max} articles par commande",
+      "items_range": "Entre {min} et {max} articles par commande",
+      "account_note": "Selon votre compte.",
+      "loading": "Vérification des limites de commande de ce produit",
+      "empty": "Aucun minimum de commande ne s’applique à ce produit.",
+      "error": "Les minimums de commande sont indisponibles pour le moment."
+    },
+    "credit": {
+      "sign_in": "Connectez-vous à votre compte pour demander un paiement à terme.",
+      "label_business": "Raison sociale",
+      "label_email": "E-mail de contact",
+      "label_phone": "Téléphone de contact",
+      "label_tax_id": "Numéro d’identification fiscale",
+      "label_limit": "Plafond de crédit demandé",
+      "label_terms": "Délai de paiement demandé (jours)",
+      "label_notes": "Autres informations utiles",
+      "submit": "Envoyer la demande",
+      "submitting": "Envoi de votre demande…",
+      "success": "Merci — votre demande a bien été reçue et est en cours d’examen.",
+      "already_pending": "Vous avez déjà une demande en cours d’examen. Nous reviendrons vers vous.",
+      "too_large": "Le texte est trop long pour être envoyé. Raccourcissez les remarques et réessayez.",
+      "error": "Impossible d’envoyer votre demande. Veuillez réessayer dans un instant.",
+      "heading": "Demander un paiement à terme"
+    },
+    "visibility": {
+      "editor_note": "Ce produit est réservé à des groupes d’acheteurs TackQuote. Seuls les acheteurs autorisés à l’acheter voient ce bloc ; les autres clients ne voient rien ici, et le paiement leur refuse ce produit."
+    }
+  }
+}

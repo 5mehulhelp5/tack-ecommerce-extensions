@@ -1,0 +1,31 @@
+# TackQuote wholesale shipping rates: Discount Function (Rust), delivery target.
+#
+# Generated with Shopify CLI 4.8.2:
+#   shopify app generate extension --template discount --flavor rust
+# and the `uid` below is the one that command wrote. Differences from the
+# template, each deliberate:
+#   - one target only. A Delivery Customization cannot set a price, so a
+#     wholesale shipping RATE is a delivery discount: this function lowers a
+#     shipping option to the TackQuote rate
+#     (https://shopify.dev/docs/api/functions/2026-07/discount). It never
+#     discounts products, so cart.lines.discounts.generate.run is not declared
+#     (tackquote-wholesale-pricing does that).
+#   - the input reads the contract v2 `$app:shipping_rules` on the discount.
+api_version = "2026-07"
+
+[[extensions]]
+name = "t:name"
+handle = "tackquote-wholesale-shipping-discount"
+uid = "156d5392-6bdc-0640-2c34-18eb10e59f3b0fb0f1e4"
+type = "function"
+description = "t:description"
+
+  [[extensions.targeting]]
+  target = "cart.delivery-options.discounts.generate.run"
+  input_query = "src/cart_delivery_options_discounts_generate_run.graphql"
+  export = "cart_delivery_options_discounts_generate_run"
+
+  [extensions.build]
+  command = "cargo build --target=wasm32-unknown-unknown --release"
+  path = "target/wasm32-unknown-unknown/release/tackquote-wholesale-shipping-discount.wasm"
+  watch = [ "src/**/*.rs" ]
