@@ -420,3 +420,127 @@ Pricing output grows with cart-line id length, because each discounted line
 is one target. The real length of production cart line ids is UNVERIFIED.
 With ~100-character ids and 200 lines at all-different amounts, output was
 15.0 kB of the 20 kB limit.
+
+## 7. Wave 4: wholesale shipping and catalog visibility (contract v2)
+
+Two more Functions ship from this directory, and the order-limits validation
+gains catalog visibility. The main repository's `shopify.app.toml` change below
+is committed on its `feat/wave4-checkout-extras` branch; it passed
+`shopify app config validate --json` (CLI 4.8.2, `"valid": true`), and
+`shopify app build` built all five extensions from a scratch copy.
+
+### 7.1 Symlinks
+
+```text
+extensions/tackquote-wholesale-shipping          -> ../../tack-ecommerce-extensions/shopify/functions/tackquote-wholesale-shipping
+extensions/tackquote-wholesale-shipping-discount -> ../../tack-ecommerce-extensions/shopify/functions/tackquote-wholesale-shipping-discount
+```
+
+Both `uid`s were written by `shopify app generate extension` (CLI 4.8.2) and
+are committed in each `shopify.extension.toml`.
+
+### 7.2 Scope: `write_delivery_customizations`, not `write_shipping`
+
+`deliveryCustomizationCreate` / `deliveryCustomizationUpdate`, and
+`metafieldsSet` on a `DeliveryCustomization` owner, need
+`write_delivery_customizations` (MCP-reported for both mutations,
+https://shopify.dev/docs/api/admin-graphql/2026-07/mutations/deliveryCustomizationCreate).
+`write_shipping` edits delivery profiles and carrier services; nothing here
+does, so it is not requested. The shipping discount is covered by the existing
+`write_discounts`; product and customer metafields by `write_products` and
+`write_customers`.
+
+```toml
+scopes = "write_app_proxy,write_customers,write_delivery_customizations,write_discounts,write_draft_orders,read_orders,write_orders,write_products,write_validations"
+```
+
+Adding it re-prompts every existing install (section 2, "Re-authorization").
+Checkout pricing does not need it and keeps working until the merchant
+approves; the extras report `needs_scopes` until then.
+
+### 7.3 Definitions
+
+```toml
+[product.metafields.app.visibility]
+type = "json"
+name = "TackQuote visibility"
+description = "Which TackQuote buyer groups may buy this product. Written by TackQuote. Read by the TackQuote order limits validation and theme blocks."
+access.admin = "merchant_read"
+access.storefront = "public_read"
+access.customer_account = "none"
+
+[customer.metafields.app.groups]
+type = "json"
+name = "TackQuote buyer groups"
+description = "This customer's TackQuote buyer-group codes, so the storefront can show wholesale-only products. Written by TackQuote."
+access.admin = "merchant_read"
+access.storefront = "public_read"
+access.customer_account = "none"
+
+[delivery_customization.metafields.app.shipping_rules]
+type = "json"
+name = "TackQuote shipping rules"
+description = "Wholesale shipping rules per buyer group, written by TackQuote. Read by the TackQuote wholesale shipping customization."
+access.admin = "merchant_read"
+
+[discount.metafields.app.shipping_rules]
+type = "json"
+name = "TackQuote shipping rates"
+description = "Wholesale shipping rates per buyer group, written by TackQuote. Read by the TackQuote wholesale shipping rate discount."
+access.admin = "merchant_read"
+```
+
+`visibility` and `groups` are `public_read` so the theme blocks can read them
+in Liquid (METAFIELD_CONTRACT.md §2.6, §2.8). They carry audience codes only.
+`$app:buyer`, which carries prices, stays `storefront = "none"`.
+
+### 7.4 Install
+
+Run after the checkout-pricing hook, on the merchant toggle and nightly:
+
+- `deliveryCustomizationCreate` with `functionHandle:
+  "tackquote-wholesale-shipping"`, `enabled: true`;
+- `discountAutomaticAppCreate` with `functionHandle:
+  "tackquote-wholesale-shipping-discount"`, `discountClasses: ["SHIPPING"]`,
+  `combinesWith: { productDiscounts: true, orderDiscounts: false,
+  shippingDiscounts: false }`;
+- then `metafieldsSet` of `$app:shipping_rules` on BOTH ids.
+
+Both objects are found by function id before anything is created, and the
+result is confirmed by re-reading (main repo `checkout-extras-install.ts`).
+
+**Stacking with the wholesale price.** A discount applies alongside another
+only when each allows the other's class. The shipping discount allows product
+discounts; the wholesale pricing discount (section 4.2) is created with
+`shippingDiscounts: false`, so until that is changed a buyer gets either the
+wholesale product price or the wholesale shipping rate, whichever Shopify
+finds better. Changing it is an owner decision (it also lets the wholesale
+price stack with the merchant's own shipping codes). UNVERIFIED on a live
+store.
+
+### 7.5 Measured resource use
+
+`function-runner` 9.2.2 on the release wasm built by `shopify app function
+build` (CLI 4.8.2). Inputs are in `shopify-listing/wave4/bench/` (not in
+this repository).
+
+| Case | Instructions | Input | Output |
+|---|---|---|---|
+| limits, 200 lines, every product restricted and failing, buyer + shop limits | **9,163,320** | 80.2 kB | 4.3 kB |
+| limits, 200 lines, guest, every product restricted | 5,913,541 | 80.1 kB | 4.9 kB |
+| limits, 200 lines, no visibility | 7,188,464 | 71.0 kB | 3.3 kB |
+| shipping customization, 35-rule document (8.7 kB), 5 groups x 25 options, 65-character handles | 3,900,583 | 29.4 kB | 14.1 kB (budgeted) |
+| shipping discount, same document and cart | 4,513,886 | 29.5 kB | 10.5 kB (budgeted) |
+
+| Module | Size |
+|---|---|
+| `tackquote-order-limits.wasm` | 107,352 B |
+| `tackquote-wholesale-shipping.wasm` | 86,684 B |
+| `tackquote-wholesale-shipping-discount.wasm` | 88,323 B |
+| `tackquote-wholesale-pricing.wasm` | 81,270 B |
+
+Validation headroom at 200 lines is now 17% (it was 36%): the product
+visibility read costs about 2M instructions at 200 lines. Both shipping
+Functions budget their output to 15,000 estimated bytes and log
+`output_budget` when they stop, in an order that never drops the move that
+keeps the cheapest option first.
