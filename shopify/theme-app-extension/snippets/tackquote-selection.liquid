@@ -1,4 +1,4 @@
-{% doc %}
+{%- comment -%}
   The variant lookup every block's JavaScript needs, as a JSON script tag.
 
   Only the fields the quote payload actually uses are emitted. Price is
@@ -29,7 +29,7 @@
   @param {product} product - The product whose variants should be emitted.
   @example
   {% render 'tackquote-selection', product: product %}
-{% enddoc %}
+{%- endcomment -%}
 <script type="application/json" class="tackquote-variants">
   [
     {%- for variant in product.variants -%}

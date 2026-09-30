@@ -1,4 +1,4 @@
-{% doc %}
+{%- comment -%}
   Merchant-only diagnostics for the read blocks, as data attributes on the
   block's root element. Emitted ONLY in the theme editor, so a shopper's page
   never carries them. `ns.explain` in tackquote-shared.js picks one by the
@@ -6,7 +6,7 @@
 
   @example
   <div {% render 'tackquote-diagnostics' %}></div>
-{% enddoc %}
+{%- endcomment -%}
 {%- if request.design_mode -%}
   data-msg-diag-password="{{ 'tackquote.diagnostics.password' | t | escape }}"
   data-msg-diag-not-json="{{ 'tackquote.diagnostics.not_json' | t | escape }}"

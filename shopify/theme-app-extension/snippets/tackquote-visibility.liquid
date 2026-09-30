@@ -1,4 +1,4 @@
-{% doc %}
+{%- comment -%}
   Catalog visibility (TackQuote metafield contract v2) for the product blocks.
 
   Outputs exactly one of:
@@ -28,7 +28,7 @@
 
   @example
   {%- capture tackquote_access -%}{% render 'tackquote-visibility', product: product %}{%- endcapture -%}
-{% enddoc %}
+{%- endcomment -%}
 {%- liquid
   assign vis = product.metafields['$app'].visibility.value
   assign restricted = false
