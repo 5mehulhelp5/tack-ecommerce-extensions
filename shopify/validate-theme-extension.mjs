@@ -295,16 +295,20 @@ describe('storefront translations', () => {
  * submission of every form containing a checkbox failed, and no test anywhere
  * could have seen it.
  *
- * The API-side contract these mirror (`wholesale-forms.service.ts`):
- *   ALLOWED_FIELD_TYPES = text | email | tel | textarea | number | select | checkbox
+ * The API-side contract these mirror (`wholesale-form-schema.ts`, Wave 3):
+ *   types     text | email | tel | textarea | number | select | checkbox |
+ *             file | address | tax_id
  *   checkbox  -> must be a JSON boolean
+ *   address   -> { line1, line2?, city, region?, postalCode, country }
+ *   file      -> { uploadId }, after a raw-bytes POST to {proxy}/wholesale-upload
+ *   showIf    -> hidden fields are not sent and not required
  *   all other -> must be a string (including `number`, validated by regex)
+ * The rendering half lives in tackquote-signup-fields.js; both files are read.
  */
 describe('the signup block matches the API wire contract', () => {
-  const signupSource = fs.readFileSync(
-    path.join(EXTENSION_DIR, 'assets', 'tackquote-signup.js'),
-    'utf8',
-  );
+  const signupSource = ['tackquote-signup.js', 'tackquote-signup-fields.js']
+    .map((f) => fs.readFileSync(path.join(EXTENSION_DIR, 'assets', f), 'utf8'))
+    .join('\n');
   // Comments stripped before matching. The first run of these assertions failed
   // on the file's OWN PROSE: the docblock explains why this route skips
   // Turnstile, and a bare /turnstile/i read that explanation as the defect —
@@ -313,7 +317,7 @@ describe('the signup block matches the API wire contract', () => {
 
   test('renders a real checkbox for a checkbox field', () => {
     assert.match(signup, /field\.type === 'checkbox'/);
-    assert.match(signup, /control\.type = 'checkbox'/);
+    assert.match(signup, /control = el\('input', \{ type: 'checkbox' \}\)/);
   });
 
   test('sends a checkbox as a boolean, never as control.value', () => {
@@ -326,8 +330,23 @@ describe('the signup block matches the API wire contract', () => {
     // main.ts runs ValidationPipe with forbidNonWhitelisted, so any extra
     // top-level key is a 400 — including a Turnstile token, which this route
     // deliberately does not accept.
-    assert.match(signup, /body: JSON\.stringify\(\{ values \}\)/);
+    assert.match(signup, /f\.post\(target, JSON\.stringify\(\{ values \}\), 'application\/json'\)/);
     assert.doesNotMatch(signup, /turnstile/i);
+  });
+
+  test('uploads a file as raw bytes to the upload route, then sends only its id', () => {
+    assert.match(signup, /\$\{proxy\}\/wholesale-upload\?\$\{q\}/);
+    assert.match(signup, /'application\/octet-stream'/);
+    assert.match(signup, /values\[field\.key\] = \{ uploadId: r\.uploadId \};/);
+  });
+
+  test('a field hidden by its condition is neither sent nor validated', () => {
+    assert.match(signup, /if \(wraps\[i\]\.hidden\) continue;/);
+    assert.match(signup, /c\.disabled = !visible;/);
+  });
+
+  test('an address travels as an object of named parts', () => {
+    assert.match(signup, /\['line1', 'line2', 'city', 'region', 'postalCode', 'country'\]/);
   });
 });
 

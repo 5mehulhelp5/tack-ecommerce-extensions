@@ -39,72 +39,15 @@
       return p;
     }
 
-    /**
-     * Builds one input for a form field.
-     *
-     * Field types come from the merchant's own form definition, so an unknown
-     * type falls back to a text input rather than being dropped — a field the
-     * seller asked for that silently never renders is worse than one rendered
-     * plainly.
-     */
-    function fieldControl(field) {
-      const id = `tq-${formSlug || 'default'}-${field.key}`;
-      let control;
-
-      if (field.type === 'textarea') {
-        control = document.createElement('textarea');
-        control.rows = 4;
-      } else if (field.type === 'select' && Array.isArray(field.options)) {
-        control = document.createElement('select');
-        for (const option of field.options) {
-          const opt = document.createElement('option');
-          opt.value = String(option);
-          opt.textContent = String(option);
-          control.appendChild(opt);
-        }
-      } else if (field.type === 'checkbox') {
-        // A REAL checkbox, not a text box. `checkbox` is one of the seven field
-        // types the seller can configure in TackQuote, and it used to fall
-        // through to the `else` below and render as free text — so a merchant
-        // whose form asks "I agree to the terms" got a box to type into, and
-        // the submission was then rejected outright (see `readValue`).
-        control = document.createElement('input');
-        control.type = 'checkbox';
-      } else {
-        control = document.createElement('input');
-        control.type =
-          field.type === 'email' || field.type === 'tel' || field.type === 'number'
-            ? field.type
-            : 'text';
-      }
-
-      control.id = id;
-      control.name = field.key;
-      if (field.required) control.required = true;
-      return control;
-    }
-
-    /**
-     * The value to send for one field.
-     *
-     * A checkbox MUST travel as a JSON boolean. The API validates it with a
-     * `typeof === 'boolean'` check and answers 400 "<label> must be a checkbox
-     * value" for anything else, so sending `control.value` — which is the string
-     * "on" for a ticked box, and "on" for an unticked one too — made every
-     * submission of every form containing a checkbox fail. Nothing caught it:
-     * the block and the API live in different repositories, so no type check
-     * spans the boundary, and the failure only appears once a merchant adds a
-     * checkbox to their form.
-     *
-     * Every other type travels as a string, including `number` — the API
-     * validates that one with a regex against a string, not a JS number.
-     */
-    function readValue(field, control) {
-      if (field.type === 'checkbox') return control.checked === true;
-      return control.value;
+    // Field rendering lives in tackquote-signup-fields.js (size budget). Schema
+    // JavaScript loads `async`, so wait for it rather than assume an order.
+    function withFields(fn) {
+      if (ns.signupFields) return fn();
+      ns.signupFieldsWaiting = (ns.signupFieldsWaiting || []).concat(fn);
     }
 
     function renderForm(definition) {
+      const f = ns.signupFields;
       const fields = Array.isArray(definition.fields) ? definition.fields : [];
       if (fields.length === 0) {
         show(line(msg('msgUnavailable'), 'tackquote-signup__error'));
@@ -113,23 +56,12 @@
 
       const form = document.createElement('form');
       form.className = 'tackquote-signup__form';
-      form.noValidate = false;
-
-      for (const field of fields) {
-        const wrap = document.createElement('div');
-        wrap.className = 'tackquote-signup__field';
-
-        const control = fieldControl(field);
-
-        const label = document.createElement('label');
-        label.htmlFor = control.id;
-        label.textContent = field.label || field.key;
-        if (field.required) label.textContent += ' *';
-
-        wrap.appendChild(label);
-        wrap.appendChild(control);
-        form.appendChild(wrap);
-      }
+      const wraps = fields.map((field) => f.build(field, `tq-${formSlug || 'default'}`, msg));
+      for (const wrap of wraps) form.appendChild(wrap);
+      const refresh = () => f.apply(fields, wraps);
+      form.addEventListener('input', refresh);
+      form.addEventListener('change', refresh);
+      refresh();
 
       const submit = document.createElement('button');
       submit.type = 'submit';
@@ -146,55 +78,65 @@
       form.addEventListener('submit', (event) => {
         event.preventDefault();
         if (submit.disabled) return;
-
-        // The browser's own validity check first, so a missing required field is
-        // reported without a round trip.
+        refresh();
         if (!form.checkValidity()) {
           status.textContent = msg('msgRequired');
           form.reportValidity();
           return;
         }
 
-        submit.disabled = true;
-        status.textContent = msg('msgSubmitting');
-
-        const values = {};
-        for (const field of fields) {
-          const control = form.elements.namedItem(field.key);
-          if (control) values[field.key] = readValue(field, control);
+        // Only SHOWN fields travel; a hidden field is never sent or required.
+        const answers = [];
+        for (let i = 0; i < fields.length; i += 1) {
+          if (wraps[i].hidden) continue;
+          const value = f.read(fields[i], wraps[i]);
+          if (value === undefined || value === '') continue;
+          if (fields[i].type === 'file') {
+            const problem = f.fileProblem(value, fields[i]);
+            if (problem) {
+              status.textContent = ns.format(msg(problem === 'type' ? 'msgFileType' : 'msgFileSize'), {
+                label: fields[i].label,
+                max: String(fields[i].maxSizeMb || 5),
+              });
+              return;
+            }
+          }
+          answers.push([fields[i], value]);
         }
 
-        // Post to the form that was RENDERED: the default form's slug comes back
-        // with its definition, so a default changed mid-typing cannot redirect it.
-        const target = definition.slug
-          ? `${proxy}/wholesale-signup/${encodeURIComponent(definition.slug)}`
-          : url;
-        ns.fetchJson(target, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify({ values }),
-          // Longer than a price lookup's deadline. This one writes, and a
-          // shopper who has filled in six fields would rather wait than be told
-          // to do it again.
-          timeoutMs: 10000,
-        })
-          .then((result) => {
-            // Prefer the merchant's own success message — they wrote it against
-            // this form in TackQuote, and it is where they say what happens next
-            // ("we review applications on Mondays"). The locale string is the
-            // fallback for a form that has none.
-            const message =
-              typeof result?.message === 'string' && result.message.trim()
-                ? result.message
-                : msg('msgSuccess');
+        submit.disabled = true;
+        status.textContent = msg('msgSubmitting');
+        const slug = definition.slug || formSlug;
+        const target = slug ? `${proxy}/wholesale-signup/${encodeURIComponent(slug)}` : url;
+        const values = {};
 
-            // Replace the form outright. Leaving it on screen invites a second
-            // submission, and the application has already been recorded.
+        // Files first, one at a time, then the application that names them.
+        answers
+          .reduce(
+            (chain, [field, value]) =>
+              chain.then(() => {
+                if (field.type !== 'file') {
+                  values[field.key] = value;
+                  return null;
+                }
+                status.textContent = ns.format(msg('msgUploading'), { label: field.label });
+                return f.upload(proxy, slug, field, value).then((r) => {
+                  values[field.key] = { uploadId: r.uploadId };
+                });
+              }),
+            Promise.resolve(),
+          )
+          .then(() => f.post(target, JSON.stringify({ values }), 'application/json'))
+          .then((result) => {
+            const message =
+              typeof result?.message === 'string' && result.message.trim() ? result.message : msg('msgSuccess');
             show(line(message, 'tackquote-signup__success'));
           })
-          .catch(() => {
+          .catch((err) => {
             submit.disabled = false;
-            status.textContent = msg('msgError');
+            // The server's sentence names the field; a transport failure does not.
+            const text = err && err.message && !/^HTTP \d+$/.test(err.message) ? err.message : msg('msgError');
+            status.textContent = text;
           });
       });
 
@@ -202,7 +144,7 @@
     }
 
     ns.fetchJson(url)
-      .then(renderForm)
+      .then((definition) => withFields(() => renderForm(definition)))
       .catch((err) => {
         // 404 = no form switched on. In the theme editor only (the attribute is
         // empty for shoppers), say where to fix it; everyone else sees the plain

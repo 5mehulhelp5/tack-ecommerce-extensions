@@ -61,7 +61,17 @@
       "required": "Please complete the required fields.",
       "sign_in_first": "Sign in to your account to apply. Your application is then linked to your account, so your wholesale prices appear as soon as it is approved.",
       "sign_in": "Sign in",
-      "create_account": "Create an account"
+      "create_account": "Create an account",
+      "choose": "Choose one",
+      "file_type": "{label}: please attach a PDF, JPEG or PNG file.",
+      "file_size": "{label}: the file must be {max} MB or smaller.",
+      "uploading": "Uploading {label}",
+      "addr_line1": "Street address",
+      "addr_line2": "Apartment, suite or unit",
+      "addr_city": "City",
+      "addr_region": "State or region",
+      "addr_postal_code": "Postal code",
+      "addr_country": "Country"
     },
     "quantity_breaks": {
       "loading": "Loading wholesale quantity pricing",
