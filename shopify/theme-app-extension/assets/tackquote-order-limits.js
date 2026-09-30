@@ -180,6 +180,10 @@
       if (data.accountSpecific) {
         wrap.appendChild(line(root.dataset.msgAccountNote, 'tackquote-limits__note'));
       }
+      // Only when TackQuote's checkout validation is confirmed active.
+      if (data.checkoutApplied === true) {
+        wrap.appendChild(line(root.dataset.msgEnforcedNote, 'tackquote-limits__note'));
+      }
       show(wrap);
     }
 

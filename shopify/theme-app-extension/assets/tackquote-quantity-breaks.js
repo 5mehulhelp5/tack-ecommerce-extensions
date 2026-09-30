@@ -107,19 +107,19 @@
       return el;
     }
 
-    function table(data) {
+    function table(data, applied) {
       const el = document.createElement('table');
       el.className = 'tackquote-breaks__table';
 
       const caption = document.createElement('caption');
       caption.className = 'tackquote-breaks__caption';
-      caption.textContent = root.dataset.msgCaption;
+      caption.textContent = applied ? root.dataset.msgCaptionApplied : root.dataset.msgCaption;
       el.appendChild(caption);
 
       const head = document.createElement('thead');
       const headRow = document.createElement('tr');
       headRow.appendChild(cell('th', root.dataset.msgQuantity, 'col'));
-      headRow.appendChild(cell('th', root.dataset.msgPrice, 'col'));
+      headRow.appendChild(cell('th', applied ? root.dataset.msgPriceApplied : root.dataset.msgPrice, 'col'));
       head.appendChild(headRow);
       el.appendChild(head);
 
@@ -138,6 +138,12 @@
     }
 
     function render(data) {
+      // True only when TackQuote's checkout discount is confirmed active.
+      const applied = data.checkoutApplied === true;
+      const h = root.querySelector('.tackquote-breaks__heading');
+      if (h && root.dataset.tackquoteAutoHeading === 'true') {
+        h.textContent = applied ? root.dataset.msgHeadingApplied : root.dataset.msgHeadingQuote;
+      }
       const view = ns.breaksView(data, designMode);
       if (view === 'hide') {
         root.hidden = true;
@@ -170,7 +176,8 @@
       }
 
       const wrap = document.createElement('div');
-      wrap.appendChild(table(data));
+      wrap.appendChild(table(data, applied));
+      if (applied) wrap.appendChild(line(root.dataset.msgAppliedNote, 'tackquote-breaks__note'));
       // The server says whether these are this buyer's negotiated rates or the
       // tenant's list prices. Labelling one as the other is the failure the
       // whole wholesale surface exists to avoid.
