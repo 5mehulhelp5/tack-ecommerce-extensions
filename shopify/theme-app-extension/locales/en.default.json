@@ -2,7 +2,7 @@
   "tackquote": {
     "setup": {
       "title": "TackQuote is not configured yet",
-      "proxy": "Set the app proxy path in this block's settings so this block can reach TackQuote. Until then it is hidden from shoppers."
+      "proxy": "Set the app proxy path in this block’s settings so this block can reach TackQuote. Until then it is hidden from shoppers."
     },
     "price": {
       "loading": "Checking your wholesale price",
@@ -16,16 +16,16 @@
       "error": "We could not load your price just now."
     },
     "diagnostics": {
-      "password": "This store is password protected, and the request was sent to the password page instead of TackQuote. Development stores are always password protected and it cannot be switched off. Preview the real storefront and enter the password (Online Store > Preferences). Prices resolve normally there.",
+      "password": "This store is password protected, and the request was sent to the password page instead of TackQuote. Development stores are always password protected and it cannot be switched off. Preview the real storefront and enter the password (Online Store → Preferences). Prices resolve normally there.",
       "not_json": "Something other than TackQuote answered {path}: an HTML page rather than data. Usually the storefront password gate, occasionally a theme or another app claiming that path.",
-      "not_found": "Shopify returned 404 for {path}. The app proxy subpath does not match this block's App proxy path setting. Check Settings > Apps and sales channels > TackQuote > App proxy.",
+      "not_found": "Shopify returned 404 for {path}. The app proxy subpath does not match this block’s App proxy path setting. Check Settings → Apps and sales channels → TackQuote → App proxy.",
       "auth": "Shopify forwarded the request but TackQuote rejected the signature. That usually means the app was reinstalled and the stored secret is stale. Reconnect the store.",
       "server": "TackQuote answered {status}. Nothing is wrong with this block; try again shortly.",
       "timeout": "TackQuote did not answer within 2.5 seconds, so the price was skipped rather than delaying the page.",
       "failed": "The request to {path} failed before it reached TackQuote.",
-      "not_connected": "This store is not connected to a TackQuote account. Connect it from TackQuote > Connections > Shopify, then reload the editor.",
-      "no_sku": "This variant has no SKU. TackQuote prices and applies rules by SKU, so add one in Shopify admin > Products > this product > Variants. Shoppers see nothing here until then.",
-      "no_limits": "No order limits apply to this product. Set them in TackQuote > Order Limits. Shoppers see nothing here until a rule applies."
+      "not_connected": "This store is not connected to a TackQuote account. Connect it from TackQuote → Connections → Shopify, then reload the editor.",
+      "no_sku": "This variant has no SKU. TackQuote prices and applies rules by SKU, so add one in Shopify admin → Products → this product → Variants. Shoppers see nothing here until then.",
+      "no_limits": "No order limits apply to this product. Set them in TackQuote → Order Limits. Shoppers see nothing here until a rule applies."
     },
     "quote": {
       "added": "Added to your quote request.",
@@ -49,7 +49,7 @@
     "signup": {
       "loading": "Loading the application form",
       "unavailable": "The wholesale application form is not available right now.",
-      "no_form": "No wholesale form is switched on yet. Create or enable a wholesale form in TackQuote > Settings > Wholesale > Forms, then reload the editor. Until then shoppers see a short note that applications are not open.",
+      "no_form": "No wholesale form is switched on yet. Create or enable a wholesale form in TackQuote → Settings → Wholesale → Forms, then reload the editor. Until then shoppers see a short note that applications are not open.",
       "submit": "Submit application",
       "submitting": "Sending your application",
       "success": "Thanks. Your wholesale application is with us and we will be in touch.",
