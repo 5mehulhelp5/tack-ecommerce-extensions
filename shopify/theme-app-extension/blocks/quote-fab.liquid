@@ -1,0 +1,152 @@
+{%- liquid
+  assign proxy_path = block.settings.proxy_path | strip | remove_last: '/'
+  assign show = false
+  case block.settings.pages
+    when 'all'
+      assign show = true
+    when 'shopping'
+      if template.name == 'product' or template.name == 'collection' or template.name == 'cart'
+        assign show = true
+      endif
+    when 'cart'
+      if template.name == 'cart'
+        assign show = true
+      endif
+  endcase
+  if proxy_path == blank
+    assign show = false
+  endif
+
+  assign label = block.settings.label | strip
+  if label == blank or label == 'Quote'
+    assign label = 'tackquote.quote.fab_label' | t
+  endif
+  assign quote_page = ''
+  if block.settings.quote_page != blank
+    assign quote_page = block.settings.quote_page.url
+  endif
+  assign hide_empty = true
+  if block.settings.show_when_empty or request.design_mode
+    assign hide_empty = false
+  endif
+  assign mpos = block.settings.mobile_position
+  if mpos == 'same'
+    assign mpos = ''
+  endif
+-%}
+
+{%- comment -%}
+  Floating quote cart, an app embed: every theme, beside cart drawers that take
+  no app block. Assets load only on the chosen page types. Placement logic:
+  tackquote-fab.js. Attributes are captured, never Liquid tags in a tag.
+{%- endcomment -%}
+{%- if show -%}
+  {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
+  {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
+  {%- capture fab_attrs -%}
+    data-pos="{{ block.settings.position | escape }}"
+    data-size="{{ block.settings.size | escape }}"
+    data-shape="{{ block.settings.shape | escape }}"
+    {% if mpos != blank %}data-mpos="{{ mpos | escape }}"{% endif %}
+    {% if block.settings.icon_only %}data-icon-only{% endif %}
+    {% if block.settings.collapse_on_scroll %}data-collapse{% endif %}
+    {% if block.settings.hide_on_mobile %}data-hide-mobile{% endif %}
+    {% if hide_empty %}data-tackquote-hide-empty hidden{% endif %}
+    {% if quote_page == blank %}aria-haspopup="dialog" aria-controls="tackquote-quote-drawer"{% endif %}
+  {%- endcapture -%}
+
+  {{ 'tackquote.css' | asset_url | stylesheet_tag }}
+  {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs, target_price: block.settings.target_price, id: 'tackquote-quote-drawer' %}
+
+  <div
+    class="tackquote-fab-wrap"
+    style="display:contents;--tq-x:{{ block.settings.offset_x }}px;--tq-y:{{ block.settings.offset_y }}px;--tq-z:{{ block.settings.z_index }}"
+  >
+    <button
+      type="button"
+      class="tackquote-fab"
+      data-tackquote-fab
+      data-tq-root
+      data-tackquote-open
+      data-tackquote-page="{{ quote_page | escape }}"
+      data-tackquote-label="{{ label | escape }}"
+      data-tackquote-count-label="{{ 'tackquote.quote.count_label' | t | escape }}"
+      {{ fab_attrs }}
+      {{ tq_attrs }}
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 3.5h6v3H9zM7.5 5H5v15.5h14V5h-2.5M8.5 11h7M8.5 14.5h7M8.5 18h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="tackquote-fab__label{% if block.settings.icon_only %} tackquote-vh{% endif %}">{{ label }}</span>
+      {%- if block.settings.show_count -%}
+        <span class="tackquote-count" data-tackquote-count aria-hidden="true" hidden>0</span>
+      {%- endif -%}
+    </button>
+    <span class="tackquote-vh" aria-live="polite" data-tackquote-live="{{ 'tackquote.quote.count' | t | escape }}"></span>
+  </div>
+
+  {%- if block.settings.header_icon -%}
+    <template data-tackquote-hicon>
+      <button
+        type="button"
+        class="tackquote-hicon"
+        data-tq-root
+        data-tackquote-open
+        data-tackquote-page="{{ quote_page | escape }}"
+        data-tackquote-label="{{ label | escape }}"
+        data-tackquote-count-label="{{ 'tackquote.quote.count_label' | t | escape }}"
+        aria-label="{{ label | escape }}"
+      >
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 3.5h6v3H9zM7.5 5H5v15.5h14V5h-2.5M8.5 11h7M8.5 14.5h7M8.5 18h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="tackquote-count" data-tackquote-count aria-hidden="true" hidden>0</span>
+      </button>
+    </template>
+  {%- endif -%}
+
+  <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
+  <script src="{{ 'tackquote-theme.js' | asset_url }}" async></script>
+  <script src="{{ 'tackquote-quote.js' | asset_url }}" defer></script>
+  <script src="{{ 'tackquote-quote-cart.js' | asset_url }}" defer></script>
+  <script src="{{ 'tackquote-fab.js' | asset_url }}" defer></script>
+{%- elsif request.design_mode and proxy_path == blank -%}
+  <div class="tackquote-setup" role="note">
+    <strong>{{ 'tackquote.setup.title' | t }}</strong>
+    <p>{{ 'tackquote.setup.proxy' | t }}</p>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Floating quote cart",
+  "target": "body",
+  "settings": [
+    { "type": "paragraph", "content": "A floating Quote button with a live item count that opens the buyer's quote. Scripts load only on the pages you choose." },
+    { "type": "select", "id": "pages", "label": "Show on", "options": [{ "value": "all", "label": "All pages" }, { "value": "shopping", "label": "Product, collection and cart pages" }, { "value": "cart", "label": "Cart page only" }], "default": "all" },
+    { "type": "checkbox", "id": "show_when_empty", "label": "Show when the quote is empty", "default": false },
+    { "type": "text", "id": "label", "label": "Button text", "default": "Quote" },
+    { "type": "checkbox", "id": "icon_only", "label": "Icon only", "default": false },
+    { "type": "checkbox", "id": "show_count", "label": "Show item count", "default": true },
+    { "type": "header", "content": "Position" },
+    { "type": "select", "id": "position", "label": "Position", "options": [{ "value": "bottom-end", "label": "Bottom right" }, { "value": "bottom-start", "label": "Bottom left" }, { "value": "bottom-center", "label": "Bottom center" }, { "value": "middle-end", "label": "Middle right" }], "default": "bottom-end" },
+    { "type": "range", "id": "offset_x", "label": "Side offset", "min": 0, "max": 96, "step": 4, "unit": "px", "default": 20 },
+    { "type": "range", "id": "offset_y", "label": "Bottom offset", "info": "For Middle right, how far below the middle.", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 20 },
+    { "type": "select", "id": "mobile_position", "label": "Position on mobile", "options": [{ "value": "same", "label": "Same as desktop" }, { "value": "bottom-end", "label": "Bottom right" }, { "value": "bottom-start", "label": "Bottom left" }, { "value": "bottom-center", "label": "Bottom center" }], "default": "same" },
+    { "type": "checkbox", "id": "hide_on_mobile", "label": "Hide on mobile", "default": false },
+    { "type": "checkbox", "id": "collapse_on_scroll", "label": "Shrink to the icon while scrolling", "default": true },
+    { "type": "select", "id": "size", "label": "Size", "options": [{ "value": "compact", "label": "Compact" }, { "value": "regular", "label": "Regular" }, { "value": "large", "label": "Large" }], "default": "regular" },
+    { "type": "select", "id": "shape", "label": "Shape", "options": [{ "value": "theme", "label": "Match theme buttons" }, { "value": "pill", "label": "Pill" }, { "value": "square", "label": "Square" }], "default": "theme" },
+    { "type": "range", "id": "z_index", "label": "Stacking level", "info": "Keep it below your theme's menus and drawers. Raise it only if page content covers the button.", "min": 1, "max": 50, "step": 1, "default": 30 },
+    { "type": "header", "content": "Quote" },
+    { "type": "checkbox", "id": "header_icon", "label": "Also show a quote icon in the header", "info": "Placed beside your theme's cart icon, when the theme has one in its header.", "default": false },
+    { "type": "page", "id": "quote_page", "label": "Quote page (optional)", "info": "Pick the page that holds the Quote page block to open it instead of the pop-up." },
+    { "type": "checkbox", "id": "target_price", "label": "Ask for a target price", "info": "Adds an optional Your target price field to each line of the quote form. Only what the buyer types is sent, never your storefront price.", "default": false },
+    { "type": "text", "id": "proxy_path", "label": "Advanced: app URL prefix", "default": "/apps/tackquote", "info": "Leave this as it is. Change it only if you renamed the TackQuote app proxy in Shopify (Settings, Apps and sales channels, TackQuote, App proxy)." },
+    {"type":"header","content":"Style","info":"Match theme (or empty) uses your theme's fonts, colors, corners and buttons."},
+    {"type":"select","id":"tq_size","label":"Text size","options":[{"value":"0.875","label":"Smaller"},{"value":"1","label":"Match theme"},{"value":"1.125","label":"Larger"},{"value":"1.25","label":"Largest"}],"default":"1"},
+    {"type":"select","id":"tq_font","label":"Font","options":[{"value":"theme","label":"Match theme"},{"value":"system","label":"System font"}],"default":"theme"},
+    {"type":"color","id":"tq_text","label":"Text color"},
+    {"type":"color","id":"tq_bg","label":"Background color"},
+    {"type":"color","id":"tq_accent","label":"Button color"},
+    {"type":"color","id":"tq_accent_text","label":"Button text color"},
+    {"type":"select","id":"tq_radius","label":"Corner radius","options":[{"value":"theme","label":"Match theme"},{"value":"0","label":"Square"},{"value":"4","label":"Slight"},{"value":"8","label":"Rounded"},{"value":"12","label":"More rounded"},{"value":"999","label":"Pill"}],"default":"theme"}
+  ]
+}
+{% endschema %}

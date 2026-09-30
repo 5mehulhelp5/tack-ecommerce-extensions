@@ -1,10 +1,10 @@
-/* Quick Order block. Inherits the theme's type and colour, like tackquote.css. */
-.tackquote-qo { margin: 1rem 0; }
-.tackquote-qo__label { display: block; margin-bottom: 0.35rem; }
-.tackquote-qo__input { width: 100%; font: inherit; color: inherit; background: transparent; border: 1px solid currentColor; padding: 0.5rem; }
-.tackquote-qo__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
-.tackquote-qo__table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; }
-.tackquote-qo__table th, .tackquote-qo__table td { text-align: left; padding: 0.35rem 0.5rem; border-bottom: 1px solid rgba(127, 127, 127, 0.35); vertical-align: top; }
-.tackquote-qo__table input { width: 5rem; min-height: 44px; font: inherit; color: inherit; background: transparent; }
-.tackquote-qo__limit { display: block; margin-top: 0.25rem; }
-.tackquote-qo__missing { opacity: 0.7; font-style: italic; }
+/* Quick Order block. Fields and buttons come from tackquote.css, in the theme's shape. */
+.tackquote-qo__label { display: block; margin-bottom: 0.35em; }
+.tackquote-qo__actions { display: flex; flex-wrap: wrap; gap: 0.5em; margin-top: 0.5em; }
+.tackquote-qo__actions .tackquote-button { width: auto; flex: 1 1 12em; }
+.tackquote-qo__out { overflow-x: auto; }
+.tackquote-qo__table { width: 100%; border-collapse: collapse; margin-top: 0.75em; }
+.tackquote-qo__table th, .tackquote-qo__table td { text-align: left; padding: 0.4em 0.5em; border-bottom: 1px solid var(--tq-line); vertical-align: top; }
+.tackquote-block .tackquote-qo__table input { width: 5.5em; }
+.tackquote-qo__limit { display: block; margin-top: 0.25em; opacity: 0.8; }
+.tackquote-qo__missing { opacity: 0.75; font-style: italic; }

@@ -13,12 +13,27 @@ const EXT = new URL('../theme-app-extension/', import.meta.url);
 const read = (p) => readFileSync(new URL(p, EXT), 'utf8');
 
 const PRODUCT_BLOCKS = ['wholesale-price', 'quantity-breaks', 'add-to-quote', 'request-a-quote', 'order-limits'];
-// Not about one product: nothing to restrict.
-const OTHER_BLOCKS = ['buyer-group-badge', 'wholesale-signup', 'credit-application'];
+// Not about one product: nothing to restrict. The quote-cart surfaces (cart
+// button, floating cart, Quote page) re-open lines a product block already
+// admitted; Quick Order and the price gate were missing here, so this list had
+// been failing since they shipped.
+const OTHER_BLOCKS = [
+  'buyer-group-badge',
+  'wholesale-signup',
+  'credit-application',
+  'quick-order',
+  'price-gate',
+  'quote-cart',
+  'quote-page',
+  'quote-fab',
+];
+// KNOWN GAP, disclosed in the embed's own settings: a grid card cannot read the
+// product's visibility metafield from an app embed, so this one cannot ask.
+const CARD_EMBEDS = ['quote-cards'];
 
 test('the block list is complete', () => {
   const all = readdirSync(new URL('blocks/', EXT)).map((f) => f.replace(/\.liquid$/, '')).sort();
-  assert.deepEqual(all, [...PRODUCT_BLOCKS, ...OTHER_BLOCKS].sort());
+  assert.deepEqual(all, [...PRODUCT_BLOCKS, ...OTHER_BLOCKS, ...CARD_EMBEDS].sort());
 });
 
 for (const b of PRODUCT_BLOCKS) {

@@ -35,6 +35,8 @@
     the theme editor sees every state; a shopper sees only the useful ones.
   {%- endcomment -%}
   {%- capture tackquote_diagnostics -%}{% render 'tackquote-diagnostics' %}{%- endcapture -%}
+  {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
+  {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
     class="tackquote-block tackquote-breaks"
     data-tackquote-mode="quantity-breaks"
@@ -62,6 +64,7 @@
     data-msg-currency-applied="{{ 'tackquote.currency.applied' | t | escape }}"
     data-msg-currency-quote="{{ 'tackquote.currency.quote' | t | escape }}"
     {{ tackquote_diagnostics | split: '-->' | last | split: '<!--' | first }}
+    {{ tq_attrs }}
     {{ block.shopify_attributes }}
   >
     {% render 'tackquote-selection', product: product %}
@@ -78,6 +81,7 @@
   </div>
 
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
+  <script src="{{ 'tackquote-theme.js' | asset_url }}" async></script>
 {%- endif -%}
 {%- endunless -%}
 
@@ -113,7 +117,15 @@
       "id": "heading",
       "label": "Heading",
       "info": "Leave blank for a heading that says whether the prices are applied at checkout or available on a quote."
-    }
+    },
+    {"type":"header","content":"Style","info":"Match theme (or empty) uses your theme's fonts, colors, corners and buttons."},
+    {"type":"select","id":"tq_size","label":"Text size","options":[{"value":"0.875","label":"Smaller"},{"value":"1","label":"Match theme"},{"value":"1.125","label":"Larger"},{"value":"1.25","label":"Largest"}],"default":"1"},
+    {"type":"select","id":"tq_font","label":"Font","options":[{"value":"theme","label":"Match theme"},{"value":"system","label":"System font"}],"default":"theme"},
+    {"type":"color","id":"tq_text","label":"Text color"},
+    {"type":"color","id":"tq_bg","label":"Background color"},
+    {"type":"color","id":"tq_accent","label":"Button color"},
+    {"type":"color","id":"tq_accent_text","label":"Button text color"},
+    {"type":"select","id":"tq_radius","label":"Corner radius","options":[{"value":"theme","label":"Match theme"},{"value":"0","label":"Square"},{"value":"4","label":"Slight"},{"value":"8","label":"Rounded"},{"value":"12","label":"More rounded"},{"value":"999","label":"Pill"}],"default":"theme"}
   ]
 }
 {% endschema %}

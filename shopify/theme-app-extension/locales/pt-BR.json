@@ -51,7 +51,21 @@
       "required": "Informe seu nome e e-mail.",
       "add_button": "Adicionar ao orçamento",
       "request_button": "Solicitar orçamento",
-      "helper": "Comprando em volume? Peça um preço para nós."
+      "helper": "Comprando em volume? Peça um preço para nós.",
+      "decrease": "Diminuir quantidade",
+      "increase": "Aumentar quantidade",
+      "full": "Sua solicitação de orçamento está cheia. Envie-a ou remova um item primeiro.",
+      "view": "Ver orçamento",
+      "count": "Itens no seu orçamento: {count}",
+      "count_label": "{label}, {count} no orçamento",
+      "cart_request": "Solicitar orçamento para o seu carrinho",
+      "cart_added": "Os itens do seu carrinho estão na sua solicitação.",
+      "cart_empty": "Seu carrinho está vazio.",
+      "cart_failed": "Não foi possível ler seu carrinho. Tente novamente.",
+      "fab_label": "Orçamento",
+      "target_price": "Seu preço-alvo (por unidade)",
+      "editor_view": "Ver orçamento aparece aqui quando o orçamento tiver itens.",
+      "card_failed": "Não foi possível adicionar esse item. Tente novamente."
     },
     "signup": {
       "loading": "Carregando o formulário de solicitação",
@@ -140,7 +154,8 @@
       "editor_title": "TackQuote Price Gate está ativado",
       "editor_guests": "Clientes que não entraram na conta não verão os preços. O editor de temas sempre os mostra.",
       "editor_tag": "Clientes sem esta tag de cliente não verão os preços:",
-      "editor_bad_selectors": "Os seletores de preço extras foram ignorados porque contêm chaves, ponto e vírgula ou @."
+      "editor_bad_selectors": "Os seletores de preço extras foram ignorados porque contêm chaves, ponto e vírgula ou @.",
+      "editor_quote_only": "Este produto tem a tag somente orçamento, então os clientes não veem Adicionar ao carrinho nem Comprar agora."
     },
     "quick_order": {
       "help": "Um item por linha: SKU e depois a quantidade. Por exemplo ABC-100, 12",

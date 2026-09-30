@@ -51,7 +51,21 @@
       "required": "Inserisci il tuo nome e la tua email.",
       "add_button": "Aggiungi al preventivo",
       "request_button": "Richiedi un preventivo",
-      "helper": "Acquisti grandi quantità? Chiedici un prezzo."
+      "helper": "Acquisti grandi quantità? Chiedici un prezzo.",
+      "decrease": "Diminuisci quantità",
+      "increase": "Aumenta quantità",
+      "full": "La tua richiesta di preventivo è piena. Inviala o rimuovi prima un articolo.",
+      "view": "Vedi preventivo",
+      "count": "Articoli nel tuo preventivo: {count}",
+      "count_label": "{label}, {count} nel preventivo",
+      "cart_request": "Chiedi un preventivo per il tuo carrello",
+      "cart_added": "Gli articoli del carrello sono nella tua richiesta.",
+      "cart_empty": "Il tuo carrello è vuoto.",
+      "cart_failed": "Non siamo riusciti a leggere il tuo carrello. Riprova.",
+      "fab_label": "Preventivo",
+      "target_price": "Il tuo prezzo target (cad.)",
+      "editor_view": "Vedi preventivo compare qui quando il preventivo contiene articoli.",
+      "card_failed": "Non siamo riusciti ad aggiungere l’articolo. Riprova."
     },
     "signup": {
       "loading": "Caricamento del modulo di richiesta",
@@ -140,7 +154,8 @@
       "editor_title": "TackQuote Price Gate è attivo",
       "editor_guests": "I clienti che non hanno effettuato l’accesso non vedranno i prezzi. L’editor del tema li mostra sempre.",
       "editor_tag": "I clienti senza questo tag cliente non vedranno i prezzi:",
-      "editor_bad_selectors": "I selettori di prezzo aggiuntivi sono stati ignorati perché contengono parentesi graffe, punti e virgola o @."
+      "editor_bad_selectors": "I selettori di prezzo aggiuntivi sono stati ignorati perché contengono parentesi graffe, punti e virgola o @.",
+      "editor_quote_only": "Questo prodotto ha il tag solo preventivo: i clienti non vedono Aggiungi al carrello né Acquista ora."
     },
     "quick_order": {
       "help": "Un articolo per riga: SKU, poi quantità. Ad esempio ABC-100, 12",

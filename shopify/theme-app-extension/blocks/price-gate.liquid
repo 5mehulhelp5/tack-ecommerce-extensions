@@ -23,6 +23,23 @@
     assign extra_ok = false
   endif
 
+  comment
+    Quote-only products: a product carrying the merchant's tag loses Add to
+    cart and Buy it now for EVERY shopper (quote is the only way to buy it),
+    whoever is signed in. Product pages only: an embed sees `product` there.
+  endcomment
+  assign quote_only = false
+  assign quote_tag = block.settings.quote_only_tag | strip | downcase
+  if quote_tag != blank and product != blank
+    for product_tag in product.tags
+      assign have_tag = product_tag | strip | downcase
+      if have_tag == quote_tag
+        assign quote_only = true
+        break
+      endif
+    endfor
+  endif
+
   assign login_url = routes.storefront_login_url | default: routes.account_login_url
   assign message = block.settings.message | strip
   if message == blank
@@ -43,6 +60,9 @@
     {%- unless extra_ok -%}
       <span>{{ 'tackquote.gate.editor_bad_selectors' | t }}</span>
     {%- endunless -%}
+    {%- if quote_only -%}
+      <span>{{ 'tackquote.gate.editor_quote_only' | t }}</span>
+    {%- endif -%}
   </div>
   <style>
     .tackquote-gate-editor { position: fixed; bottom: 12px; left: 12px; z-index: 2147483000; max-width: 22rem; padding: 10px 12px; background: #fff; color: #111; border: 1px solid #111; font: 13px/1.4 system-ui, sans-serif; display: flex; flex-direction: column; gap: 4px; }
@@ -62,6 +82,13 @@
     data-msg="{{ message | escape }}"
     data-extra="{% if extra_ok %}{{ extra | escape }}{% endif %}"
   ></div>
+{%- endif -%}
+{%- if quote_only -%}
+  {%- unless request.design_mode -%}
+    <style>
+      form[action*="/cart/add"] [type="submit"]:not([class*="tackquote"]), form[action*="/cart/add"] button[name="add"], .product-form__submit, .shopify-payment-button { display: none !important; }
+    </style>
+  {%- endunless -%}
 {%- endif -%}
 
 {% schema %}
@@ -96,6 +123,12 @@
       "id": "hide_cart",
       "label": "Also hide add to cart and buy buttons",
       "default": true
+    },
+    {
+      "type": "text",
+      "id": "quote_only_tag",
+      "label": "Quote-only product tag",
+      "info": "Products with this tag hide add to cart and Buy it now from every shopper, so a quote is the only way to buy them. Leave blank to switch off. Pair it with the Request a Quote block."
     },
     {
       "type": "text",

@@ -1,0 +1,367 @@
+/*
+ * The quote drawer, the Quote page, the cart-page quote button, the floating
+ * quote cart, the header quote icon and the product-card button. Loaded by
+ * snippets/tackquote-drawer.liquid wherever a drawer is rendered. Same chain as
+ * tackquote.css: merchant --tqm-* > detected --tqd-* > theme tokens > inherit.
+ */
+.tackquote-drawer {
+  box-sizing: border-box;
+  inline-size: min(34em, calc(100vw - 2em));
+  max-block-size: min(88vh, 56em);
+  margin: auto;
+  padding: 1.25em 1.5em 1.5em;
+  overflow-y: auto;
+  border: 0;
+  border-radius: var(--tqm-radius, var(--popup-corner-radius, 0.75em));
+  box-shadow: 0 0.75em 2.5em rgb(0 0 0 / 22%);
+  /* No theme token here: Dawn and Horizon both name it --color-background, in two
+     formats, so only the detected value (or Canvas) is safe. */
+  background: var(--tqm-bg, var(--tqd-bg, Canvas));
+  color: var(--tqm-text, var(--tqd-fg, CanvasText));
+  font-family: var(--tqm-font, inherit);
+  font-size: calc(var(--tqm-size, 1) * max(1em, var(--tqd-body, 1em)));
+}
+.tackquote-drawer::backdrop {
+  background: rgb(0 0 0 / 45%);
+}
+.tackquote-drawer--inline {
+  inline-size: auto;
+  max-block-size: none;
+  margin-block: 1em;
+  padding: 0;
+  overflow: visible;
+  box-shadow: none;
+  background: var(--tqm-bg, transparent);
+  color: var(--tqm-text, inherit);
+}
+.tackquote-drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  margin: 0 0 1em;
+}
+.tackquote-drawer__head > form {
+  margin: 0;
+}
+.tackquote-drawer__title {
+  margin: 0;
+  font-family: var(--tqm-font, var(--tqd-hfont, var(--font-heading--family, var(--font-heading-family))));
+  font-weight: var(--tqd-hweight, var(--font-heading--weight, var(--font-heading-weight, 600)));
+  letter-spacing: var(--tqd-hls);
+  text-transform: var(--tqd-htt);
+  font-size: calc(var(--font-heading-scale, 1) * 1.3em);
+  line-height: 1.25;
+  color: inherit;
+}
+.tackquote-icon-button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+.tackquote-icon-button > svg {
+  inline-size: 1.1em;
+  block-size: 1.1em;
+}
+.tackquote-icon-button:focus-visible,
+.tackquote-link-button:focus-visible,
+.tackquote-qty__input:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+.tackquote-drawer__items {
+  margin: 0 0 1em;
+  padding: 0;
+  list-style: none;
+}
+.tackquote-line {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.4em 0.75em;
+  align-items: center;
+  padding-block: 0.6em;
+  border-bottom: 1px solid var(--tq-line);
+}
+.tackquote-line__name {
+  grid-column: 1 / -1;
+  overflow-wrap: anywhere;
+}
+.tackquote-line__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  align-items: center;
+}
+.tackquote-link-button {
+  min-block-size: 44px;
+  padding: 0 0.25em;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+  appearance: none;
+}
+.tackquote-qty {
+  display: inline-flex;
+  align-items: center;
+  border: var(--tqd-in-border, 1px solid var(--tq-field));
+  border-radius: var(--tq-ir);
+}
+.tackquote-qty__input {
+  inline-size: 3.5em;
+  min-block-size: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  appearance: textfield;
+}
+.tackquote-qty__input::-webkit-inner-spin-button,
+.tackquote-qty__input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+.tackquote-line__target {
+  display: flex;
+  gap: 0.4em;
+  align-items: center;
+}
+.tackquote-drawer__empty {
+  margin: 0 0 1em;
+  opacity: 0.85;
+}
+.tackquote-drawer__label {
+  display: block;
+  margin: 0 0 0.9em;
+}
+.tackquote-drawer__label > span {
+  display: block;
+  margin: 0 0 0.3em;
+}
+.tackquote-drawer__status {
+  margin: 0.75em 0 0;
+}
+.tackquote-drawer__status:empty,
+.tackquote-hidden-empty[hidden],
+.tackquote-count[hidden] {
+  display: none;
+}
+@media (max-width: 749px) {
+  .tackquote-drawer {
+    inline-size: 100vw;
+    max-inline-size: 100vw;
+    max-block-size: 92vh;
+    margin-block-end: 0;
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+  .tackquote-drawer--inline {
+    inline-size: auto;
+  }
+}
+
+/* Count badge: the detected button pair, which passed the contrast check. */
+.tackquote-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-inline-size: 1.6em;
+  block-size: 1.6em;
+  padding: 0 0.4em;
+  border-radius: 999px;
+  background: var(--tq-count-bg, var(--tq-accent));
+  color: var(--tq-count-fg, var(--tq-accent-text));
+  font-size: 0.8em;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cart page: our own wrapper only; placement is its margin, not the theme's layout. */
+.tackquote-qcart {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75em;
+  margin-block: 1em;
+}
+.tackquote-qcart[data-placement="before"] {
+  margin-block: 0 1em;
+}
+.tackquote-qcart > .tackquote-button {
+  flex: 1 1 14em;
+  inline-size: auto;
+}
+.tackquote-qcart > .tackquote-status {
+  flex-basis: 100%;
+  margin: 0;
+}
+.tackquote-qcart__placeholder {
+  flex-basis: 100%;
+  padding: 0.75em 1em;
+  border: 1px dashed currentColor;
+  border-radius: var(--tq-r);
+  opacity: 0.75;
+}
+
+/* Floating quote cart: logical insets, safe areas, a merchant-set z-index. */
+.tackquote-fab {
+  --tq-fab: 52px;
+  position: fixed;
+  z-index: var(--tq-z, 30);
+  inset-block-end: calc(var(--tq-y, 20px) + var(--tq-lift, 0px) + env(safe-area-inset-bottom, 0px));
+  inset-inline-end: var(--tq-x, 20px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  box-sizing: border-box;
+  min-inline-size: var(--tq-fab);
+  min-block-size: var(--tq-fab);
+  padding: 0 1.1em;
+  border: var(--tqd-accent-border, 0 none);
+  border-radius: var(--tqm-radius, var(--tq-shape, var(--tq-r)));
+  box-shadow: 0 0.35em 1.2em rgb(0 0 0 / 18%);
+  background: var(--tqm-accent, var(--tqd-fab-bg, var(--tq-accent)));
+  color: var(--tqm-accent-text, var(--tqd-fab-fg, var(--tq-accent-text)));
+  font-family: var(--tqm-font, var(--tqd-btn-font, inherit));
+  font-size: calc(var(--tqm-size, 1) * max(1em, var(--tqd-body, 1em)));
+  font-weight: var(--tqd-btn-weight, 600);
+  letter-spacing: min(var(--tqd-btn-ls, 0em), 0.08em);
+  text-transform: var(--tqd-btn-tt);
+  cursor: pointer;
+  appearance: none;
+  transition: inset-block-end 0.2s ease;
+}
+.tackquote-fab[hidden] {
+  display: none;
+}
+.tackquote-fab[data-pos="bottom-start"] {
+  inset-inline: var(--tq-x, 20px) auto;
+}
+.tackquote-fab[data-pos="bottom-center"] {
+  inset-inline: 0;
+  margin-inline: auto;
+  inline-size: max-content;
+}
+.tackquote-fab[data-pos="middle-end"] {
+  inset-block: calc(50% + var(--tq-y, 0px)) auto;
+  translate: 0 -50%;
+}
+.tackquote-fab[data-size="compact"] {
+  --tq-fab: 44px;
+  padding-inline: 0.8em;
+}
+.tackquote-fab[data-size="large"] {
+  --tq-fab: 60px;
+  font-size: 1.125em;
+}
+.tackquote-fab[data-shape="pill"] {
+  --tq-shape: 999px;
+}
+.tackquote-fab[data-shape="square"] {
+  --tq-shape: 0.35em;
+}
+.tackquote-fab[data-icon-only],
+.tackquote-fab[data-collapsed] {
+  padding: 0;
+  inline-size: var(--tq-fab);
+}
+.tackquote-fab[data-collapsed] > .tackquote-fab__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+.tackquote-fab > svg,
+.tackquote-hicon > svg,
+.tackquote-card-add > svg {
+  flex: none;
+  inline-size: 1.35em;
+  block-size: 1.35em;
+}
+.tackquote-fab > .tackquote-count {
+  --tq-count-bg: currentColor;
+  --tq-count-fg: var(--tqm-accent, var(--tqd-fab-bg, var(--tq-accent)));
+}
+.tackquote-fab[data-icon-only] > .tackquote-count,
+.tackquote-fab[data-collapsed] > .tackquote-count,
+.tackquote-hicon > .tackquote-count {
+  position: absolute;
+  inset-block-start: -0.3em;
+  inset-inline-end: -0.3em;
+}
+.tackquote-fab:focus-visible,
+.tackquote-hicon:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+@media (max-width: 749px) {
+  .tackquote-fab {
+    --tq-fab: 44px;
+    padding-inline: 0.8em;
+  }
+  .tackquote-fab[data-hide-mobile] {
+    display: none;
+  }
+  .tackquote-fab[data-mpos="bottom-end"],
+  .tackquote-fab[data-mpos="bottom-start"],
+  .tackquote-fab[data-mpos="bottom-center"] {
+    inset-block: auto calc(var(--tq-y, 16px) + var(--tq-lift, 0px) + env(safe-area-inset-bottom, 0px));
+    translate: none;
+  }
+  .tackquote-fab[data-mpos="bottom-end"] {
+    inset-inline: auto var(--tq-x, 16px);
+  }
+  .tackquote-fab[data-mpos="bottom-start"] {
+    inset-inline: var(--tq-x, 16px) auto;
+  }
+  .tackquote-fab[data-mpos="bottom-center"] {
+    inset-inline: 0;
+    margin-inline: auto;
+  }
+}
+
+/* Header quote icon, beside the theme's cart icon and wearing its classes. */
+.tackquote-hicon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* Product-card "Add to quote", injected by the Quote on product cards embed. */
+.tackquote-card-add {
+  position: relative;
+  z-index: 2;
+  margin-block-start: 0.5em;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tackquote-fab {
+    transition: none;
+  }
+}

@@ -51,7 +51,21 @@
       "required": "Bitte geben Sie Ihren Namen und Ihre E-Mail-Adresse an.",
       "add_button": "Zum Angebot hinzufügen",
       "request_button": "Angebot anfordern",
-      "helper": "Sie kaufen größere Mengen? Fragen Sie uns nach einem Preis."
+      "helper": "Sie kaufen größere Mengen? Fragen Sie uns nach einem Preis.",
+      "decrease": "Menge verringern",
+      "increase": "Menge erhöhen",
+      "full": "Ihre Angebotsanfrage ist voll. Bitte senden Sie sie ab oder entfernen Sie zuerst einen Artikel.",
+      "view": "Angebot ansehen",
+      "count": "Artikel in Ihrer Anfrage: {count}",
+      "count_label": "{label}, {count} in der Anfrage",
+      "cart_request": "Angebot für Ihren Warenkorb anfragen",
+      "cart_added": "Ihre Warenkorbartikel sind jetzt in Ihrer Angebotsanfrage.",
+      "cart_empty": "Ihr Warenkorb ist leer.",
+      "cart_failed": "Ihr Warenkorb konnte nicht gelesen werden. Bitte versuchen Sie es erneut.",
+      "fab_label": "Angebot",
+      "target_price": "Ihr Wunschpreis (pro Stück)",
+      "editor_view": "Angebot ansehen erscheint hier, sobald die Anfrage Artikel enthält.",
+      "card_failed": "Der Artikel konnte nicht hinzugefügt werden. Bitte versuchen Sie es erneut."
     },
     "signup": {
       "loading": "Antragsformular wird geladen",
@@ -140,7 +154,8 @@
       "editor_title": "TackQuote Price Gate ist aktiv",
       "editor_guests": "Nicht angemeldete Kunden sehen keine Preise. Im Theme-Editor werden sie immer angezeigt.",
       "editor_tag": "Kunden ohne diesen Kunden-Tag sehen keine Preise:",
-      "editor_bad_selectors": "Die zusätzlichen Preisselektoren wurden ignoriert, weil sie geschweifte Klammern, Semikolons oder @ enthalten."
+      "editor_bad_selectors": "Die zusätzlichen Preisselektoren wurden ignoriert, weil sie geschweifte Klammern, Semikolons oder @ enthalten.",
+      "editor_quote_only": "Dieses Produkt hat das Nur-Angebot-Tag. Kunden sehen daher weder In den Warenkorb noch Jetzt kaufen."
     },
     "quick_order": {
       "help": "Ein Artikel pro Zeile: SKU, dann Menge. Zum Beispiel ABC-100, 12",

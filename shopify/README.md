@@ -1,7 +1,7 @@
 # TackQuote for Shopify — Theme App Extension
 
-Nine app blocks a merchant drags onto a page from the theme editor, one app embed switched on
-under *Theme settings, App embeds*, and one customer-account extension:
+Eleven app blocks a merchant drags onto a page from the theme editor, three app embeds switched
+on under *Theme settings, App embeds*, and one customer-account extension:
 
 | Block | Where | What it does |
 | --- | --- | --- |
@@ -14,7 +14,11 @@ under *Theme settings, App embeds*, and one customer-account extension:
 | **Quick Order** | product, page | A signed-in buyer pastes SKUs and quantities, then adds them all to the cart or to a quote. |
 | **Wholesale Application** | page, home | The merchant's application form: text, email, phone, number, choice, checkbox, long text, file upload, address and tax ID fields, with show-if conditions. |
 | **Net Terms Application** | page | A form for buyers to apply for net payment terms. |
-| **Price Gate** (app embed) | every page | Hides prices and add to cart from guests, or from customers without the wholesale tag, with a Log in to see prices link. |
+| **Quote cart button** | cart | "Request a quote for your cart" (reads the live cart) and "View quote (N)", after the cart. |
+| **Quote page** | page | The saved quote, with quantity editing and the request form, inline on its own page. |
+| **Price Gate** (app embed) | every page | Hides prices and add to cart from guests, or from customers without the wholesale tag, with a Log in to see prices link. Also hides add to cart and Buy it now on products carrying a quote-only tag. |
+| **Floating quote cart** (app embed) | chosen page types | A floating Quote button with a live count that opens the quote; optional header quote icon. |
+| **Quote on product cards** (app embed) | collection, search, home | Add to Quote under each product card; products with options open their page. |
 | **Net terms** (customer account) | Profile page | A signed-in customer on new customer accounts applies for net terms and sees the status. Lives in `customer-account-net-terms/`. |
 
 The first five are product-page furniture; the application form is not about a product at
@@ -24,6 +28,40 @@ statement about the *account* rather than the item, so it is equally at home in 
 This is the Shopify counterpart to the WooCommerce catalog-mode work — same intent,
 Shopify's extension model instead of PHP hooks. Licensed MIT, like every extension in
 this directory.
+
+Theme-editor deep links (not yet listed in the web app's `shopify-theme-blocks.ts`, which still names nine blocks and one embed):
+`…/admin/themes/current/editor?template=cart&addAppBlockId=<api_key>/quote-cart&target=newAppsSection`,
+`…?template=page&addAppBlockId=<api_key>/quote-page&target=newAppsSection`, and
+`…?context=apps&activateAppId=<api_key>/quote-fab` (or `/quote-cards`) for the embeds.
+
+---
+
+## Matching the merchant's theme
+
+Every block, the drawer and the embeds wear the theme's own type, colours, corners and
+buttons, in any Online Store 2.0 theme, with one CSS chain per property:
+
+1. the merchant's explicit style setting (`--tqm-*`, written by `snippets/tackquote-style.liquid`;
+   every setting defaults to *Match theme*, which writes nothing);
+2. what `assets/tackquote-theme.js` detected from the theme's own rendered elements
+   (`--tqd-*`, written on each TackQuote root, never `:root`): the section's background and
+   text colour, a heading, the theme's primary button (add to cart first, preferring an opaque
+   candidate, since Dawn's add to cart is an outline beside dynamic checkout) and an input;
+3. the theme's tokens: Horizon's full colours (`--color-primary-button-background`, …) before
+   Dawn's r,g,b triplets (`rgb(var(--color-button))`);
+4. `inherit` / `currentColor`.
+
+We never WRITE a theme token: Horizon holds full colours where Dawn holds triplets, and Dawn
+derives `--buttons-radius-outset` from `--buttons-radius`. Sizes are `em`, never `rem`
+(Dawn's `html{font-size:62.5%}` makes a rem 10px), and nothing defaults below the body size.
+Detected button colours must pass WCAG AA (4.5:1, 3:1 for large text); otherwise the theme's
+tokens are used, and if those fail too, the section's inverted foreground/background pair.
+No font is ever loaded. `tests/theme-detect.test.mjs` pins the decisions against Dawn, Horizon,
+a classic `.btn` theme and a dark section; `validate-theme-extension.mjs` pins the chain order.
+
+The drawer is a native `<dialog>` opened with `showModal()`: top layer, focus contained,
+Escape closes, focus returns to the trigger. It is moved under `<body>` on first open so it
+inherits the body type, and is painted from the OPENING block's section.
 
 ---
 

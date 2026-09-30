@@ -1,0 +1,93 @@
+{%- liquid
+  assign proxy_path = block.settings.proxy_path | strip | remove_last: '/'
+  assign show = false
+  case block.settings.pages
+    when 'grids'
+      if template.name == 'collection' or template.name == 'search' or template.name == 'index' or template.name == 'list-collections'
+        assign show = true
+      endif
+    when 'collection'
+      if template.name == 'collection'
+        assign show = true
+      endif
+    when 'all'
+      assign show = true
+  endcase
+  if proxy_path == blank
+    assign show = false
+  endif
+
+  assign label = block.settings.label | strip
+  if label == blank or label == 'Add to Quote'
+    assign label = 'tackquote.quote.add_button' | t
+  endif
+
+  assign selector = block.settings.card_selector | strip
+  if selector contains '{' or selector contains '}' or selector contains '<' or selector contains ';' or selector contains '@'
+    assign selector = ''
+  endif
+-%}
+
+{%- comment -%}
+  "Add to Quote" on product cards, an app EMBED: a collection grid has no app
+  block slot, so tackquote-cards.js finds the cards and adds the button after
+  each one. It loads only on the page types chosen here.
+
+  KNOWN LIMIT, stated to the merchant in the settings: an embed cannot read a
+  card's TackQuote catalog-visibility metafield, so a product restricted to
+  buyer groups still shows this button on a grid (its product page does not).
+  Checkout still refuses it for a buyer who may not purchase it.
+{%- endcomment -%}
+{%- if show -%}
+  {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
+  {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
+  {{ 'tackquote.css' | asset_url | stylesheet_tag }}
+  {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs, target_price: block.settings.target_price %}
+  <div
+    hidden
+    data-tackquote-cards
+    data-selector="{{ selector | escape }}"
+    data-msg-added="{{ 'tackquote.quote.added' | t | escape }}"
+    data-msg-full="{{ 'tackquote.quote.full' | t | escape }}"
+    data-msg-unavailable="{{ 'tackquote.quote.unavailable' | t | escape }}"
+    data-msg-failure="{{ 'tackquote.quote.card_failed' | t | escape }}"
+  >
+    <template>
+      <div class="tackquote-card-add" data-tq-root {{ tq_attrs }}>
+        <button type="button" class="tackquote-button tackquote-button--theme button button--secondary btn btn--secondary" data-label="{{ label | escape }}">
+          {{- label -}}
+        </button>
+        <span class="tackquote-vh" role="status" data-tackquote-card-status></span>
+      </div>
+    </template>
+  </div>
+  <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
+  <script src="{{ 'tackquote-theme.js' | asset_url }}" async></script>
+  <script src="{{ 'tackquote-quote.js' | asset_url }}" defer></script>
+  <script src="{{ 'tackquote-quote-cart.js' | asset_url }}" defer></script>
+  <script src="{{ 'tackquote-cards.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Quote on product cards",
+  "target": "body",
+  "settings": [
+    { "type": "paragraph", "content": "Adds an Add to Quote button under each product card in your collection and search grids. Products with options open their product page so the buyer can choose." },
+    { "type": "paragraph", "content": "Cards cannot tell which products you restricted to buyer groups, so those still show the button on grids. Checkout still refuses them for buyers who may not purchase them." },
+    { "type": "select", "id": "pages", "label": "Show on", "options": [{ "value": "grids", "label": "Collection, search and home pages" }, { "value": "collection", "label": "Collection pages only" }, { "value": "all", "label": "All pages" }], "default": "grids" },
+    { "type": "text", "id": "label", "label": "Button text", "default": "Add to Quote" },
+    { "type": "checkbox", "id": "target_price", "label": "Ask for a target price", "info": "Adds an optional Your target price field to each line of the quote form. Only what the buyer types is sent, never your storefront price.", "default": false },
+    { "type": "text", "id": "card_selector", "label": "Advanced: product card selector", "info": "Only if your theme's cards are not found. A CSS selector such as .product-card. Braces, semicolons and @ are refused." },
+    { "type": "text", "id": "proxy_path", "label": "Advanced: app URL prefix", "default": "/apps/tackquote", "info": "Leave this as it is. Change it only if you renamed the TackQuote app proxy in Shopify (Settings, Apps and sales channels, TackQuote, App proxy)." },
+    {"type":"header","content":"Style","info":"Match theme (or empty) uses your theme's fonts, colors, corners and buttons."},
+    {"type":"select","id":"tq_size","label":"Text size","options":[{"value":"0.875","label":"Smaller"},{"value":"1","label":"Match theme"},{"value":"1.125","label":"Larger"},{"value":"1.25","label":"Largest"}],"default":"1"},
+    {"type":"select","id":"tq_font","label":"Font","options":[{"value":"theme","label":"Match theme"},{"value":"system","label":"System font"}],"default":"theme"},
+    {"type":"color","id":"tq_text","label":"Text color"},
+    {"type":"color","id":"tq_bg","label":"Background color"},
+    {"type":"color","id":"tq_accent","label":"Button color"},
+    {"type":"color","id":"tq_accent_text","label":"Button text color"},
+    {"type":"select","id":"tq_radius","label":"Corner radius","options":[{"value":"theme","label":"Match theme"},{"value":"0","label":"Square"},{"value":"4","label":"Slight"},{"value":"8","label":"Rounded"},{"value":"12","label":"More rounded"},{"value":"999","label":"Pill"}],"default":"theme"}
+  ]
+}
+{% endschema %}

@@ -59,7 +59,7 @@
       const set = el('fieldset', { className: 'tackquote-signup__address' });
       set.appendChild(el('legend', { textContent: labelText }));
       for (const part of ADDRESS) {
-        const input = el('input', { type: 'text', id: `${id}-${part}`, name: `${field.key}.${part}` });
+        const input = el('input', { type: 'text', id: `${id}-${part}`, name: `${field.key}.${part}`, className: 'tackquote-field' });
         input.autocomplete = AUTOCOMPLETE[part];
         if (field.required && ADDRESS_REQUIRED.indexOf(part) !== -1) input.required = true;
         const label = el('label', { htmlFor: input.id, textContent: msg(`msgAddr_${part}`) || part });
@@ -90,6 +90,8 @@
       }
       control.id = id;
       control.name = field.key;
+      // Text-like controls wear the theme's input shape (tackquote.css).
+      if (field.type !== 'checkbox' && field.type !== 'file') control.className = 'tackquote-field';
       if (field.required) control.required = true;
       wrap.append(el('label', { htmlFor: id, textContent: labelText }), control);
     }
