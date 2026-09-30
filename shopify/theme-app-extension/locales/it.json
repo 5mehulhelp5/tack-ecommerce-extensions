@@ -2,7 +2,7 @@
   "tackquote": {
     "setup": {
       "title": "TackQuote non è ancora configurato",
-      "proxy": "Imposta il percorso del proxy dell’app nelle impostazioni di questo blocco, così che possa raggiungere TackQuote. Fino ad allora resta nascosto ai clienti."
+      "proxy": "Imposta il prefisso URL dell’app nelle impostazioni di questo blocco, così che possa raggiungere TackQuote. Fino ad allora resta nascosto ai clienti."
     },
     "price": {
       "loading": "Verifica del tuo prezzo all’ingrosso in corso",
@@ -14,7 +14,10 @@
       "quote_note": "Il tuo prezzo all’ingrosso, disponibile su preventivo. Aggiungi questo articolo a un preventivo per richiederlo.",
       "list_note": "Prezzo di listino, non una tariffa negoziata.",
       "error": "Al momento non è stato possibile caricare il tuo prezzo.",
-      "heading": "Il tuo prezzo all’ingrosso su preventivo"
+      "heading_quote": "Il tuo prezzo all’ingrosso su preventivo",
+      "heading_applied": "Il tuo prezzo all’ingrosso",
+      "anonymous_applied": "Accedi per vedere il tuo prezzo all’ingrosso.",
+      "applied_note": "Il tuo prezzo all’ingrosso, applicato al checkout."
     },
     "diagnostics": {
       "password": "Questo negozio è protetto da password e la richiesta è arrivata alla pagina della password anziché a TackQuote. I negozi di sviluppo sono sempre protetti da password e non è possibile disattivarla. Apri l’anteprima del negozio reale e inserisci la password (Negozio online → Preferenze). Lì i prezzi vengono mostrati normalmente.",
@@ -59,7 +62,10 @@
       "success": "Grazie. Abbiamo ricevuto la tua richiesta di account all’ingrosso e ti contatteremo.",
       "error": "Invio non riuscito. Riprova.",
       "required": "Compila i campi obbligatori.",
-      "heading": "Richiedi un account all’ingrosso"
+      "heading": "Richiedi un account all’ingrosso",
+      "sign_in_first": "Accedi al tuo account per inviare la richiesta. Verrà collegata al tuo account e i tuoi prezzi all’ingrosso compariranno non appena sarà approvata.",
+      "sign_in": "Accedi",
+      "create_account": "Crea un account"
     },
     "quantity_breaks": {
       "loading": "Caricamento dei prezzi all’ingrosso per quantità",
@@ -72,7 +78,11 @@
       "login": "Accedi",
       "unlinked": "Il tuo account non è ancora collegato ai prezzi all’ingrosso. Richiedi un preventivo e ce ne occuperemo noi.",
       "error": "Al momento non è stato possibile caricare i prezzi per quantità.",
-      "heading": "Prezzi all’ingrosso per quantità"
+      "heading_quote": "Prezzi all’ingrosso per quantità, disponibili su preventivo",
+      "heading_applied": "Prezzi all’ingrosso per quantità, applicati al checkout",
+      "caption_applied": "Prezzo all’ingrosso per unità in base alla quantità, applicato al checkout",
+      "price_applied": "Il tuo prezzo unitario",
+      "applied_note": "Applicato al checkout."
     },
     "badge": {
       "label": "La tua fascia di prezzo",
@@ -91,7 +101,8 @@
       "account_note": "In base al tuo account.",
       "loading": "Verifica dei limiti d’ordine per questo prodotto",
       "empty": "A questo prodotto non si applica alcun ordine minimo.",
-      "error": "Gli ordini minimi non sono disponibili al momento."
+      "error": "Gli ordini minimi non sono disponibili al momento.",
+      "enforced_note": "Applicato al checkout."
     },
     "credit": {
       "sign_in": "Accedi al tuo account per richiedere il pagamento dilazionato.",

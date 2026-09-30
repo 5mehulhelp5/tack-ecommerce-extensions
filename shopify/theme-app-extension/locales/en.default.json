@@ -2,7 +2,7 @@
   "tackquote": {
     "setup": {
       "title": "TackQuote is not configured yet",
-      "proxy": "Set the app proxy path in this block’s settings so this block can reach TackQuote. Until then it is hidden from shoppers."
+      "proxy": "Set the app URL prefix in this block’s settings so this block can reach TackQuote. Until then it is hidden from shoppers."
     },
     "price": {
       "loading": "Checking your wholesale price",
@@ -14,7 +14,10 @@
       "quote_note": "Your wholesale price, available on a quote. Add this item to a quote to request it.",
       "list_note": "List price, not a negotiated rate.",
       "error": "We could not load your price just now.",
-      "heading": "Your quoted wholesale price"
+      "heading_quote": "Your quoted wholesale price",
+      "heading_applied": "Your wholesale price",
+      "anonymous_applied": "Log in to see your wholesale price.",
+      "applied_note": "Your wholesale price, applied at checkout."
     },
     "diagnostics": {
       "password": "This store is password protected, and the request was sent to the password page instead of TackQuote. Development stores are always password protected and it cannot be switched off. Preview the real storefront and enter the password (Online Store → Preferences). Prices resolve normally there.",
@@ -59,7 +62,10 @@
       "success": "Thanks. Your wholesale application is with us and we will be in touch.",
       "error": "We could not send that. Please try again.",
       "required": "Please complete the required fields.",
-      "heading": "Apply for a wholesale account"
+      "heading": "Apply for a wholesale account",
+      "sign_in_first": "Sign in to your account to apply. Your application is then linked to your account, so your wholesale prices appear as soon as it is approved.",
+      "sign_in": "Sign in",
+      "create_account": "Create an account"
     },
     "quantity_breaks": {
       "loading": "Loading wholesale quantity pricing",
@@ -72,7 +78,11 @@
       "login": "Sign in",
       "unlinked": "Your account is not linked to wholesale pricing yet. Request a quote and we will set it up.",
       "error": "We could not load wholesale quantity pricing just now.",
-      "heading": "Wholesale quantity pricing"
+      "heading_quote": "Wholesale quantity pricing, available on a quote",
+      "heading_applied": "Wholesale quantity pricing, applied at checkout",
+      "caption_applied": "Wholesale price per unit by quantity, applied at checkout",
+      "price_applied": "Your price each",
+      "applied_note": "Applied at checkout."
     },
     "badge": {
       "label": "Your pricing tier",
@@ -91,7 +101,8 @@
       "account_note": "Based on your account.",
       "loading": "Checking order limits for this product",
       "empty": "No order minimums apply to this product.",
-      "error": "Order minimums are unavailable right now."
+      "error": "Order minimums are unavailable right now.",
+      "enforced_note": "Enforced at checkout."
     },
     "credit": {
       "sign_in": "Sign in to your account to apply for net terms.",

@@ -99,9 +99,16 @@
     }
 
     function render(data) {
+      // True only when TackQuote's checkout discount is confirmed active.
+      const applied = data.checkoutApplied === true;
+      const d = root.dataset;
+      const h = root.querySelector('.tackquote-price__heading');
+      if (h && d.tackquoteAutoHeading === 'true') {
+        h.textContent = applied ? d.msgHeadingApplied : d.msgHeadingQuote;
+      }
       if (data.status === 'anonymous') {
         const wrap = document.createElement('div');
-        wrap.appendChild(line(root.dataset.msgAnonymous));
+        wrap.appendChild(line(applied ? d.msgAnonymousApplied : d.msgAnonymous));
         const link = document.createElement('a');
         link.className = 'tackquote-price__login';
         link.href = root.dataset.tackquoteLoginUrl || '/account/login';
@@ -151,7 +158,7 @@
         if (!data.accountSpecific) {
           box.appendChild(line(root.dataset.msgListNote, 'tackquote-price__note'));
         }
-        box.appendChild(line(root.dataset.msgQuoteNote, 'tackquote-price__note'));
+        box.appendChild(line(applied ? d.msgAppliedNote : d.msgQuoteNote, 'tackquote-price__note'));
         show(box);
         return;
       }

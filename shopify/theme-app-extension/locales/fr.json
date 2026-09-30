@@ -2,7 +2,7 @@
   "tackquote": {
     "setup": {
       "title": "TackQuote n’est pas encore configuré",
-      "proxy": "Indiquez le chemin du proxy d’application dans les paramètres de ce bloc pour qu’il puisse joindre TackQuote. D’ici là, il reste masqué pour les clients."
+      "proxy": "Indiquez le préfixe d’URL de l’application dans les paramètres de ce bloc pour qu’il puisse joindre TackQuote. D’ici là, il reste masqué pour les clients."
     },
     "price": {
       "loading": "Vérification de votre prix professionnel",
@@ -14,7 +14,10 @@
       "quote_note": "Votre prix professionnel, disponible sur devis. Ajoutez cet article à un devis pour le demander.",
       "list_note": "Prix catalogue, pas un tarif négocié.",
       "error": "Impossible de charger votre prix pour le moment.",
-      "heading": "Votre prix professionnel sur devis"
+      "heading_quote": "Votre prix professionnel sur devis",
+      "heading_applied": "Votre prix professionnel",
+      "anonymous_applied": "Connectez-vous pour voir votre prix professionnel.",
+      "applied_note": "Votre prix professionnel, appliqué au paiement."
     },
     "diagnostics": {
       "password": "Cette boutique est protégée par un mot de passe et la requête a abouti à la page du mot de passe au lieu de TackQuote. Les boutiques de développement sont toujours protégées par un mot de passe, sans possibilité de le désactiver. Prévisualisez la vraie boutique et saisissez le mot de passe (Boutique en ligne → Préférences). Les prix s’y affichent normalement.",
@@ -59,7 +62,10 @@
       "success": "Merci. Nous avons bien reçu votre demande de compte professionnel et reviendrons vers vous.",
       "error": "L’envoi a échoué. Veuillez réessayer.",
       "required": "Veuillez remplir les champs obligatoires.",
-      "heading": "Demander un compte professionnel"
+      "heading": "Demander un compte professionnel",
+      "sign_in_first": "Connectez-vous à votre compte pour faire votre demande. Elle est alors associée à votre compte, et vos prix professionnels s’affichent dès son approbation.",
+      "sign_in": "Se connecter",
+      "create_account": "Créer un compte"
     },
     "quantity_breaks": {
       "loading": "Chargement des prix professionnels par quantité",
@@ -72,7 +78,11 @@
       "login": "Se connecter",
       "unlinked": "Votre compte n’est pas encore associé aux tarifs professionnels. Demandez un devis et nous nous en occupons.",
       "error": "Impossible de charger les prix par quantité pour le moment.",
-      "heading": "Prix professionnels par quantité"
+      "heading_quote": "Prix professionnels par quantité, disponibles sur devis",
+      "heading_applied": "Prix professionnels par quantité, appliqués au paiement",
+      "caption_applied": "Prix professionnel unitaire selon la quantité, appliqué au paiement",
+      "price_applied": "Votre prix unitaire",
+      "applied_note": "Appliqué au paiement."
     },
     "badge": {
       "label": "Votre niveau tarifaire",
@@ -91,7 +101,8 @@
       "account_note": "Selon votre compte.",
       "loading": "Vérification des limites de commande de ce produit",
       "empty": "Aucun minimum de commande ne s’applique à ce produit.",
-      "error": "Les minimums de commande sont indisponibles pour le moment."
+      "error": "Les minimums de commande sont indisponibles pour le moment.",
+      "enforced_note": "Appliqué au paiement."
     },
     "credit": {
       "sign_in": "Connectez-vous à votre compte pour demander un paiement à terme.",

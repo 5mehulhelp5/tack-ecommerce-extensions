@@ -2,7 +2,7 @@
   "tackquote": {
     "setup": {
       "title": "O TackQuote ainda não está configurado",
-      "proxy": "Defina o caminho do proxy do app nas configurações deste bloco para que ele consiga acessar o TackQuote. Até lá, ele fica oculto para os clientes."
+      "proxy": "Defina o prefixo de URL do app nas configurações deste bloco para que ele consiga acessar o TackQuote. Até lá, ele fica oculto para os clientes."
     },
     "price": {
       "loading": "Verificando seu preço de atacado",
@@ -14,7 +14,10 @@
       "quote_note": "Seu preço de atacado, disponível em um orçamento. Adicione este item a um orçamento para solicitá-lo.",
       "list_note": "Preço de tabela, não uma tarifa negociada.",
       "error": "Não foi possível carregar seu preço agora.",
-      "heading": "Seu preço de atacado em orçamento"
+      "heading_quote": "Seu preço de atacado em orçamento",
+      "heading_applied": "Seu preço de atacado",
+      "anonymous_applied": "Entre na sua conta para ver seu preço de atacado.",
+      "applied_note": "Seu preço de atacado, aplicado no checkout."
     },
     "diagnostics": {
       "password": "Esta loja é protegida por senha, e a solicitação foi enviada para a página de senha em vez do TackQuote. Lojas de desenvolvimento são sempre protegidas por senha, e isso não pode ser desativado. Visualize a loja real e digite a senha (Loja virtual → Preferências). Lá, os preços aparecem normalmente.",
@@ -59,7 +62,10 @@
       "success": "Obrigado. Recebemos sua solicitação de conta de atacado e entraremos em contato.",
       "error": "Não foi possível enviar. Tente novamente.",
       "required": "Preencha os campos obrigatórios.",
-      "heading": "Solicite uma conta de atacado"
+      "heading": "Solicite uma conta de atacado",
+      "sign_in_first": "Entre na sua conta para fazer a solicitação. Ela fica vinculada à sua conta, e seus preços de atacado aparecem assim que ela for aprovada.",
+      "sign_in": "Entrar",
+      "create_account": "Criar uma conta"
     },
     "quantity_breaks": {
       "loading": "Carregando os preços de atacado por quantidade",
@@ -72,7 +78,11 @@
       "login": "Entrar",
       "unlinked": "Sua conta ainda não está vinculada aos preços de atacado. Solicite um orçamento e nós configuramos isso para você.",
       "error": "Não foi possível carregar os preços por quantidade agora.",
-      "heading": "Preços de atacado por quantidade"
+      "heading_quote": "Preços de atacado por quantidade, disponíveis em um orçamento",
+      "heading_applied": "Preços de atacado por quantidade, aplicados no checkout",
+      "caption_applied": "Preço de atacado por unidade conforme a quantidade, aplicado no checkout",
+      "price_applied": "Seu preço por unidade",
+      "applied_note": "Aplicado no checkout."
     },
     "badge": {
       "label": "Sua faixa de preço",
@@ -91,7 +101,8 @@
       "account_note": "Com base na sua conta.",
       "loading": "Verificando os limites de pedido deste produto",
       "empty": "Nenhum pedido mínimo se aplica a este produto.",
-      "error": "Os pedidos mínimos não estão disponíveis no momento."
+      "error": "Os pedidos mínimos não estão disponíveis no momento.",
+      "enforced_note": "Aplicado no checkout."
     },
     "credit": {
       "sign_in": "Entre na sua conta para solicitar pagamento a prazo.",

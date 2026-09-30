@@ -2,7 +2,7 @@
   "tackquote": {
     "setup": {
       "title": "TackQuote ist noch nicht eingerichtet",
-      "proxy": "Tragen Sie in den Einstellungen dieses Blocks den App-Proxy-Pfad ein, damit der Block TackQuote erreicht. Bis dahin ist er für Kunden ausgeblendet."
+      "proxy": "Tragen Sie in den Einstellungen dieses Blocks das App-URL-Präfix ein, damit der Block TackQuote erreicht. Bis dahin ist er für Kunden ausgeblendet."
     },
     "price": {
       "loading": "Ihr Großhandelspreis wird geprüft",
@@ -14,7 +14,10 @@
       "quote_note": "Ihr Großhandelspreis, erhältlich per Angebot. Legen Sie diesen Artikel in eine Angebotsanfrage, um ihn anzufordern.",
       "list_note": "Listenpreis, kein verhandelter Preis.",
       "error": "Ihr Preis konnte gerade nicht geladen werden.",
-      "heading": "Ihr Großhandelspreis im Angebot"
+      "heading_quote": "Ihr Großhandelspreis im Angebot",
+      "heading_applied": "Ihr Großhandelspreis",
+      "anonymous_applied": "Melden Sie sich an, um Ihren Großhandelspreis zu sehen.",
+      "applied_note": "Ihr Großhandelspreis, angewendet an der Kasse."
     },
     "diagnostics": {
       "password": "Dieser Shop ist passwortgeschützt, und die Anfrage ging an die Passwortseite statt an TackQuote. Entwicklungsshops sind immer passwortgeschützt, das lässt sich nicht abschalten. Öffnen Sie die Vorschau des echten Shops und geben Sie das Passwort ein (Onlineshop → Präferenzen). Dort werden die Preise normal angezeigt.",
@@ -59,7 +62,10 @@
       "success": "Vielen Dank. Ihr Antrag auf ein Großhandelskonto ist bei uns eingegangen, wir melden uns bei Ihnen.",
       "error": "Das Senden ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
       "required": "Bitte füllen Sie die Pflichtfelder aus.",
-      "heading": "Großhandelskonto beantragen"
+      "heading": "Großhandelskonto beantragen",
+      "sign_in_first": "Melden Sie sich in Ihrem Konto an, um den Antrag zu stellen. Er wird dann mit Ihrem Konto verknüpft, und Ihre Großhandelspreise erscheinen, sobald er genehmigt ist.",
+      "sign_in": "Anmelden",
+      "create_account": "Konto erstellen"
     },
     "quantity_breaks": {
       "loading": "Großhandelsstaffelpreise werden geladen",
@@ -72,7 +78,11 @@
       "login": "Anmelden",
       "unlinked": "Ihr Konto ist noch nicht mit Großhandelspreisen verknüpft. Fordern Sie ein Angebot an, dann richten wir das ein.",
       "error": "Die Großhandelsstaffelpreise konnten gerade nicht geladen werden.",
-      "heading": "Großhandelsstaffelpreise"
+      "heading_quote": "Großhandelsstaffelpreise, erhältlich per Angebot",
+      "heading_applied": "Großhandelsstaffelpreise, angewendet an der Kasse",
+      "caption_applied": "Großhandelspreis pro Stück nach Menge, angewendet an der Kasse",
+      "price_applied": "Ihr Preis pro Stück",
+      "applied_note": "Angewendet an der Kasse."
     },
     "badge": {
       "label": "Ihre Preisstufe",
@@ -91,7 +101,8 @@
       "account_note": "Gemäß Ihrem Konto.",
       "loading": "Bestellgrenzen für dieses Produkt werden geprüft",
       "empty": "Für dieses Produkt gelten keine Mindestbestellmengen.",
-      "error": "Die Mindestbestellmengen sind gerade nicht verfügbar."
+      "error": "Die Mindestbestellmengen sind gerade nicht verfügbar.",
+      "enforced_note": "Wird an der Kasse durchgesetzt."
     },
     "credit": {
       "sign_in": "Melden Sie sich in Ihrem Konto an, um Zahlung auf Ziel zu beantragen.",

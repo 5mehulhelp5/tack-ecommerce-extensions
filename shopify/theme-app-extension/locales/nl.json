@@ -2,7 +2,7 @@
   "tackquote": {
     "setup": {
       "title": "TackQuote is nog niet ingesteld",
-      "proxy": "Stel in de instellingen van dit blok het app-proxypad in, zodat het blok TackQuote kan bereiken. Tot die tijd is het verborgen voor klanten."
+      "proxy": "Stel in de instellingen van dit blok het app-URL-voorvoegsel in, zodat het blok TackQuote kan bereiken. Tot die tijd is het verborgen voor klanten."
     },
     "price": {
       "loading": "Je groothandelsprijs wordt gecontroleerd",
@@ -14,7 +14,10 @@
       "quote_note": "Je groothandelsprijs, beschikbaar via een offerte. Voeg dit artikel toe aan een offerte om hem aan te vragen.",
       "list_note": "Catalogusprijs, geen onderhandeld tarief.",
       "error": "Je prijs kon op dit moment niet worden geladen.",
-      "heading": "Je groothandelsprijs op offerte"
+      "heading_quote": "Je groothandelsprijs op offerte",
+      "heading_applied": "Je groothandelsprijs",
+      "anonymous_applied": "Log in om je groothandelsprijs te zien.",
+      "applied_note": "Je groothandelsprijs, toegepast bij het afrekenen."
     },
     "diagnostics": {
       "password": "Deze winkel is met een wachtwoord beveiligd en het verzoek kwam op de wachtwoordpagina terecht in plaats van bij TackQuote. Ontwikkelwinkels zijn altijd met een wachtwoord beveiligd en dat kan niet worden uitgeschakeld. Bekijk een voorbeeld van de echte winkel en voer het wachtwoord in (Onlinewinkel → Voorkeuren). Daar worden de prijzen normaal weergegeven.",
@@ -59,7 +62,10 @@
       "success": "Bedankt. We hebben je aanvraag voor een groothandelsaccount ontvangen en nemen contact met je op.",
       "error": "Versturen is mislukt. Probeer het opnieuw.",
       "required": "Vul de verplichte velden in.",
-      "heading": "Een groothandelsaccount aanvragen"
+      "heading": "Een groothandelsaccount aanvragen",
+      "sign_in_first": "Log in op je account om een aanvraag te doen. Die wordt dan aan je account gekoppeld, zodat je groothandelsprijzen verschijnen zodra hij is goedgekeurd.",
+      "sign_in": "Inloggen",
+      "create_account": "Account aanmaken"
     },
     "quantity_breaks": {
       "loading": "Staffelprijzen voor de groothandel worden geladen",
@@ -72,7 +78,11 @@
       "login": "Inloggen",
       "unlinked": "Je account is nog niet gekoppeld aan groothandelsprijzen. Vraag een offerte aan en wij regelen het.",
       "error": "De staffelprijzen konden op dit moment niet worden geladen.",
-      "heading": "Staffelprijzen voor de groothandel"
+      "heading_quote": "Staffelprijzen voor de groothandel, beschikbaar via een offerte",
+      "heading_applied": "Staffelprijzen voor de groothandel, toegepast bij het afrekenen",
+      "caption_applied": "Groothandelsprijs per stuk naar aantal, toegepast bij het afrekenen",
+      "price_applied": "Je prijs per stuk",
+      "applied_note": "Toegepast bij het afrekenen."
     },
     "badge": {
       "label": "Je prijsniveau",
@@ -91,7 +101,8 @@
       "account_note": "Op basis van je account.",
       "loading": "Bestellimieten voor dit product worden gecontroleerd",
       "empty": "Voor dit product geldt geen minimale bestelling.",
-      "error": "Minimale bestellingen zijn op dit moment niet beschikbaar."
+      "error": "Minimale bestellingen zijn op dit moment niet beschikbaar.",
+      "enforced_note": "Gehandhaafd bij het afrekenen."
     },
     "credit": {
       "sign_in": "Log in op je account om betalen op rekening aan te vragen.",

@@ -16,6 +16,12 @@
   https://shopify.dev/docs/apps/build/online-store/app-proxies/authenticate-app-proxies
 {%- endcomment -%}
 
+{%- comment -%}
+  Login-first: a signed-out shopper is asked to sign in (or create an account)
+  before applying, so the application carries Shopify's signed customer id and
+  approval can link the account without reading any customer data. The theme
+  editor still shows the form, so the merchant can see it.
+{%- endcomment -%}
 {%- if proxy_path == blank -%}
   {%- if request.design_mode -%}
     <div class="tackquote-setup" {{ block.shopify_attributes }}>
@@ -59,9 +65,21 @@
       <div class="tackquote-signup__intro">{{ block.settings.intro }}</div>
     {%- endif -%}
 
-    <div class="tackquote-signup__body" data-tackquote-signup-body role="status" aria-live="polite">
-      <p class="tackquote-signup__loading">{{ 'tackquote.signup.loading' | t }}</p>
-    </div>
+    {%- if customer or request.design_mode -%}
+      <div class="tackquote-signup__body" data-tackquote-signup-body role="status" aria-live="polite">
+        <p class="tackquote-signup__loading">{{ 'tackquote.signup.loading' | t }}</p>
+      </div>
+    {%- else -%}
+      <div class="tackquote-signup__signin">
+        <p>{{ 'tackquote.signup.sign_in_first' | t }}</p>
+        <p>
+          <a class="button" href="{{ routes.storefront_login_url | default: routes.account_login_url }}">{{ 'tackquote.signup.sign_in' | t }}</a>
+          {%- if routes.account_register_url != blank %}
+            <a class="button button--secondary" href="{{ routes.account_register_url }}">{{ 'tackquote.signup.create_account' | t }}</a>
+          {%- endif %}
+        </p>
+      </div>
+    {%- endif -%}
   </div>
 
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
@@ -78,9 +96,9 @@
     {
       "type": "text",
       "id": "proxy_path",
-      "label": "App proxy path",
+      "label": "Advanced: app URL prefix",
       "default": "/apps/tackquote",
-      "info": "Must match the subpath configured for the TackQuote app proxy."
+      "info": "Leave this as it is. Change it only if you renamed the TackQuote app proxy in Shopify (Settings, Apps and sales channels, TackQuote, App proxy)."
     },
     {
       "type": "text",

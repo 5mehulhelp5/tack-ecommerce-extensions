@@ -2,7 +2,7 @@
   "tackquote": {
     "setup": {
       "title": "TackQuote aún no está configurado",
-      "proxy": "Indica la ruta del proxy de la aplicación en la configuración de este bloque para que pueda conectarse con TackQuote. Mientras tanto, permanece oculto para los clientes."
+      "proxy": "Indica el prefijo de URL de la aplicación en la configuración de este bloque para que pueda conectarse con TackQuote. Mientras tanto, permanece oculto para los clientes."
     },
     "price": {
       "loading": "Comprobando tu precio mayorista",
@@ -14,7 +14,10 @@
       "quote_note": "Tu precio mayorista, disponible en un presupuesto. Añade este artículo a un presupuesto para solicitarlo.",
       "list_note": "Precio de catálogo, no una tarifa negociada.",
       "error": "No hemos podido cargar tu precio en este momento.",
-      "heading": "Tu precio mayorista en presupuesto"
+      "heading_quote": "Tu precio mayorista en presupuesto",
+      "heading_applied": "Tu precio mayorista",
+      "anonymous_applied": "Inicia sesión para ver tu precio mayorista.",
+      "applied_note": "Tu precio mayorista, aplicado en el pago."
     },
     "diagnostics": {
       "password": "Esta tienda está protegida con contraseña y la solicitud llegó a la página de contraseña en lugar de a TackQuote. Las tiendas de desarrollo siempre están protegidas con contraseña y no se puede desactivar. Abre la vista previa de la tienda real e introduce la contraseña (Tienda online → Preferencias). Allí los precios se muestran con normalidad.",
@@ -59,7 +62,10 @@
       "success": "Gracias. Hemos recibido tu solicitud de cuenta mayorista y nos pondremos en contacto contigo.",
       "error": "No se ha podido enviar. Inténtalo de nuevo.",
       "required": "Completa los campos obligatorios.",
-      "heading": "Solicita una cuenta mayorista"
+      "heading": "Solicita una cuenta mayorista",
+      "sign_in_first": "Inicia sesión en tu cuenta para enviar la solicitud. Así queda vinculada a tu cuenta y tus precios mayoristas aparecen en cuanto se apruebe.",
+      "sign_in": "Iniciar sesión",
+      "create_account": "Crear una cuenta"
     },
     "quantity_breaks": {
       "loading": "Cargando los precios mayoristas por cantidad",
@@ -72,7 +78,11 @@
       "login": "Iniciar sesión",
       "unlinked": "Tu cuenta aún no está vinculada a los precios mayoristas. Solicita un presupuesto y lo configuraremos.",
       "error": "No hemos podido cargar los precios por cantidad en este momento.",
-      "heading": "Precios mayoristas por cantidad"
+      "heading_quote": "Precios mayoristas por cantidad, disponibles en un presupuesto",
+      "heading_applied": "Precios mayoristas por cantidad, aplicados en el pago",
+      "caption_applied": "Precio mayorista por unidad según la cantidad, aplicado en el pago",
+      "price_applied": "Tu precio por unidad",
+      "applied_note": "Aplicado en el pago."
     },
     "badge": {
       "label": "Tu nivel de precios",
@@ -91,7 +101,8 @@
       "account_note": "Según tu cuenta.",
       "loading": "Comprobando los límites de pedido de este producto",
       "empty": "Este producto no tiene pedido mínimo.",
-      "error": "Los pedidos mínimos no están disponibles en este momento."
+      "error": "Los pedidos mínimos no están disponibles en este momento.",
+      "enforced_note": "Se aplica en el pago."
     },
     "credit": {
       "sign_in": "Inicia sesión en tu cuenta para solicitar pago aplazado.",
