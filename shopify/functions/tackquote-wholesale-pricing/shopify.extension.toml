@@ -14,6 +14,7 @@ api_version = "2026-07"
 [[extensions]]
 name = "t:name"
 handle = "tackquote-wholesale-pricing"
+uid = "c76689af-f65e-a660-155b-dbdb2ff5d16c9bdc7a78"
 type = "function"
 description = "t:description"
 
