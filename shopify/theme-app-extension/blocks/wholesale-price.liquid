@@ -7,70 +7,52 @@
   endif
 -%}
 
-{%- comment -%}
-  Catalog visibility: a product restricted to TackQuote buyer groups offers
-  no price, break, limit or quote control to a shopper who may not buy it.
-  The rule, and why, is in snippets/tackquote-visibility.liquid.
-{%- endcomment -%}
+{%- # README.md, Liquid design notes: wholesale-price.liquid (1) -%}
 {%- capture tackquote_access -%}{% render 'tackquote-visibility', product: product %}{%- endcapture -%}
 {%- assign tackquote_access = tackquote_access | strip -%}
 {%- unless tackquote_access == 'hidden' -%}
 {{ tackquote_access }}
 {%- if proxy_path == blank -%}
-  {%- if request.design_mode -%}
-    <div class="tackquote-setup" {{ block.shopify_attributes }}>
-      <strong>{{ 'tackquote.setup.title' | t }}</strong>
-      <p>{{ 'tackquote.setup.proxy' | t }}</p>
-    </div>
-  {%- endif -%}
+  {% render 'tackquote-setup', attrs: block.shopify_attributes %}
 {%- else -%}
-  {%- comment -%}
-    Kept OUTSIDE the tag's attribute list: a Liquid tag between attributes
-    failed `shopify app deploy`'s theme check on another block (b5a4158).
-
-    Two attributes below are NOT identity and must never be read as such.
-    `data-tackquote-customer` only partitions the per-tab price cache, so that
-    logging out in the same tab cannot surface the price the previous session
-    was entitled to see. The identity that decides the price is
-    `logged_in_customer_id`, which Shopify injects into the proxy request and
-    signs; anything emitted here is just markup a shopper can edit.
-    `data-tackquote-design` suspends the fail-quiet behaviour: a merchant placing
-    the block in the theme editor needs to see every state, a shopper does not.
-  {%- endcomment -%}
+  {%- # README.md, Liquid design notes: wholesale-price.liquid (2) -%}
   {%- capture tackquote_diagnostics -%}{% render 'tackquote-diagnostics' %}{%- endcapture -%}
+  {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
+  {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
     class="tackquote-block tackquote-price"
-    data-tackquote-mode="price"
-    data-tackquote-proxy="{{ proxy_path | escape }}"
-    data-tackquote-variant="{{ variant.id }}"
-    data-tackquote-login-url="{{ routes.account_login_url }}"
-    data-tackquote-customer="{{ customer.id }}"
-    data-tackquote-design="{% if request.design_mode %}true{% else %}false{% endif %}"
-    data-msg-anonymous="{{ 'tackquote.price.anonymous' | t | escape }}"
-    data-msg-login="{{ 'tackquote.price.login' | t | escape }}"
-    data-msg-unlinked="{{ 'tackquote.price.unlinked' | t | escape }}"
-    data-msg-unpriced="{{ 'tackquote.price.unpriced' | t | escape }}"
-    data-msg-each="{{ 'tackquote.price.each' | t | escape }}"
-    data-msg-list-note="{{ 'tackquote.price.list_note' | t | escape }}"
-    data-msg-quote-note="{{ 'tackquote.price.quote_note' | t | escape }}"
-    data-msg-applied-note="{{ 'tackquote.price.applied_note' | t | escape }}"
-    data-msg-anonymous-applied="{{ 'tackquote.price.anonymous_applied' | t | escape }}"
-    data-msg-heading-quote="{{ 'tackquote.price.heading_quote' | t | escape }}"
-    data-msg-heading-applied="{{ 'tackquote.price.heading_applied' | t | escape }}"
-    data-tackquote-auto-heading="{{ auto_heading }}"
-    data-msg-error="{{ 'tackquote.price.error' | t | escape }}"
-    data-tackquote-currency="{{ cart.currency.iso_code }}"
-    data-msg-currency-applied="{{ 'tackquote.currency.applied' | t | escape }}"
-    data-msg-currency-quote="{{ 'tackquote.currency.quote' | t | escape }}"
-    {{ tackquote_diagnostics | split: '-->' | last | split: '<!--' | first }}
-    {{ block.shopify_attributes }}
+  data-tackquote-mode="price"
+  data-tackquote-proxy="{{ proxy_path | escape }}"
+  data-tackquote-variant="{{ variant.id }}"
+  data-tackquote-login-url="{{ routes.account_login_url }}"
+  data-tackquote-customer="{{ customer.id }}"
+  data-tackquote-design="{% if request.design_mode %}true{% else %}false{% endif %}"
+  data-msg-anonymous="{{ 'tackquote.price.anonymous' | t | escape }}"
+  data-msg-login="{{ 'tackquote.price.login' | t | escape }}"
+  data-msg-unlinked="{{ 'tackquote.price.unlinked' | t | escape }}"
+  data-msg-unpriced="{{ 'tackquote.price.unpriced' | t | escape }}"
+  data-msg-each="{{ 'tackquote.price.each' | t | escape }}"
+  data-msg-list-note="{{ 'tackquote.price.list_note' | t | escape }}"
+  data-msg-quote-note="{{ 'tackquote.price.quote_note' | t | escape }}"
+  data-msg-applied-note="{{ 'tackquote.price.applied_note' | t | escape }}"
+  data-msg-anonymous-applied="{{ 'tackquote.price.anonymous_applied' | t | escape }}"
+  data-msg-heading-quote="{{ 'tackquote.price.heading_quote' | t | escape }}"
+  data-msg-heading-applied="{{ 'tackquote.price.heading_applied' | t | escape }}"
+  data-tackquote-auto-heading="{{ auto_heading }}"
+  data-msg-error="{{ 'tackquote.price.error' | t | escape }}"
+  data-tackquote-currency="{{ cart.currency.iso_code }}"
+  data-msg-currency-applied="{{ 'tackquote.currency.applied' | t | escape }}"
+  data-msg-currency-quote="{{ 'tackquote.currency.quote' | t | escape }}"
+  {{ tackquote_diagnostics | split: '-->' | last | split: '<!--' | first }}
+  {{ tq_attrs }}
+  {{ block.shopify_attributes }}
   >
     {% render 'tackquote-selection', product: product %}
     <h3 class="tackquote-price__heading">
       {%- if auto_heading -%}
-        {{ 'tackquote.price.heading_quote' | t }}
+  {{ 'tackquote.price.heading_quote' | t }}
       {%- else -%}
-        {{ block.settings.heading }}
+  {{ block.settings.heading }}
       {%- endif -%}
     </h3>
     <div class="tackquote-price__body" data-tackquote-price-body role="status" aria-live="polite">
@@ -79,38 +61,22 @@
   </div>
 
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
+  <script src="{{ 'tackquote-theme.js' | asset_url }}" async></script>
 {%- endif -%}
 {%- endunless -%}
 
 {% schema %}
-{
-  "name": "Wholesale Price",
-  "target": "section",
-  "enabled_on": {
-    "templates": [
-      "product"
-    ]
-  },
-  "stylesheet": "tackquote.css",
-  "javascript": "tackquote-price.js",
-  "settings": [
-    {
-      "type": "paragraph",
-      "content": "Shows the signed-in customer's wholesale price. When checkout pricing is on in TackQuote the block says the price is applied at checkout; otherwise it offers the price on a quote. TackQuote resolves the price from the shopper's Shopify session, so it is never read from this page and a shopper cannot alter it."
-    },
-    {
-      "type": "text",
-      "id": "proxy_path",
-      "label": "Advanced: app URL prefix",
-      "default": "/apps/tackquote",
-      "info": "Leave this as it is. Change it only if you renamed the TackQuote app proxy in Shopify (Settings, Apps and sales channels, TackQuote, App proxy)."
-    },
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Heading",
-      "info": "Leave blank for a heading that follows your checkout setting."
-    }
-  ]
-}
+{"name": "Wholesale Price", "target": "section", "enabled_on": {"templates": ["product"]}, "stylesheet": "tackquote.css", "javascript": "tackquote-price.js","settings":[
+    {"type":"paragraph","content":"t:tq.p.wholesale_price_1"},
+    {"type":"text","id":"heading","label":"Heading","info":"Leave blank for a heading that follows your checkout setting."},
+    {"type":"text","id":"proxy_path","label":"t:tq.c.proxy","default":"/apps/tackquote","info":"t:tq.c.proxy_info"},
+    {"type":"header","content":"t:tq.s.header","info":"t:tq.s.info"},
+    {"type":"select","id":"tq_size","label":"t:tq.s.size","options":[{"value":"0.875","label":"t:tq.s.smaller"},{"value":"1","label":"t:tq.s.match"},{"value":"1.125","label":"t:tq.s.larger"},{"value":"1.25","label":"t:tq.s.largest"}],"default":"1"},
+    {"type":"select","id":"tq_font","label":"t:tq.s.font","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"system","label":"t:tq.s.system"}],"default":"theme"},
+    {"type":"color","id":"tq_text","label":"t:tq.s.text"},
+    {"type":"color","id":"tq_bg","label":"t:tq.s.bg"},
+    {"type":"color","id":"tq_accent","label":"t:tq.s.accent"},
+    {"type":"color","id":"tq_accent_text","label":"t:tq.s.accent_text"},
+    {"type":"select","id":"tq_radius","label":"t:tq.s.radius","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"0","label":"t:tq.s.square"},{"value":"4","label":"t:tq.s.slight"},{"value":"8","label":"t:tq.s.rounded"},{"value":"12","label":"t:tq.s.more_rounded"},{"value":"999","label":"t:tq.s.pill"}],"default":"theme"}
+  ]}
 {% endschema %}

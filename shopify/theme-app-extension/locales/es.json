@@ -51,7 +51,24 @@
       "required": "Indica tu nombre y tu correo electrónico.",
       "add_button": "Añadir al presupuesto",
       "request_button": "Solicitar presupuesto",
-      "helper": "¿Compras por volumen? Pídenos un precio."
+      "helper": "¿Compras por volumen? Pídenos un precio.",
+      "decrease": "Reducir cantidad",
+      "increase": "Aumentar cantidad",
+      "full": "Tu solicitud de presupuesto está llena. Envíala o quita un artículo primero.",
+      "view": "Ver presupuesto",
+      "count": "Artículos en tu presupuesto: {count}",
+      "count_label": "{label}, {count} en el presupuesto",
+      "cart_request": "Pide un presupuesto para tu carrito",
+      "cart_added": "Los artículos de tu carrito ya están en tu solicitud.",
+      "cart_empty": "Tu carrito está vacío.",
+      "cart_failed": "No hemos podido leer tu carrito. Inténtalo de nuevo.",
+      "fab_label": "Presupuesto",
+      "target_price": "Tu precio objetivo (por unidad)",
+      "editor_view": "Ver presupuesto aparece aquí cuando el presupuesto tiene artículos.",
+      "card_failed": "No hemos podido añadir ese artículo. Inténtalo de nuevo.",
+      "files": "Adjuntar archivos (opcional)",
+      "files_help": "Hasta 3 archivos PDF, JPEG o PNG, de 5 MB cada uno.",
+      "files_max": "Adjunta como máximo 3 archivos."
     },
     "signup": {
       "loading": "Cargando el formulario de solicitud",
@@ -140,7 +157,8 @@
       "editor_title": "TackQuote Price Gate está activado",
       "editor_guests": "Los clientes que no hayan iniciado sesión no verán los precios. El editor de temas siempre los muestra.",
       "editor_tag": "Los clientes sin esta etiqueta de cliente no verán los precios:",
-      "editor_bad_selectors": "Se ignoraron los selectores de precio adicionales porque contienen llaves, puntos y coma o @."
+      "editor_bad_selectors": "Se ignoraron los selectores de precio adicionales porque contienen llaves, puntos y coma o @.",
+      "editor_quote_only": "Este producto tiene la etiqueta de solo presupuesto: los clientes no ven Añadir al carrito ni Comprar ahora."
     },
     "quick_order": {
       "help": "Un artículo por línea: SKU y después cantidad. Por ejemplo ABC-100, 12",

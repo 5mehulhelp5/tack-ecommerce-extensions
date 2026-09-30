@@ -51,7 +51,24 @@
       "required": "Please add your name and email.",
       "add_button": "Add to Quote",
       "request_button": "Request a Quote",
-      "helper": "Buying in volume? Ask us for a price."
+      "helper": "Buying in volume? Ask us for a price.",
+      "decrease": "Decrease quantity",
+      "increase": "Increase quantity",
+      "full": "Your quote request is full. Send it, or remove an item first.",
+      "view": "View quote",
+      "count": "Items in your quote: {count}",
+      "count_label": "{label}, {count} in quote",
+      "cart_request": "Request a quote for your cart",
+      "cart_added": "Your cart items are in your quote request.",
+      "cart_empty": "Your cart is empty.",
+      "cart_failed": "We could not read your cart. Please try again.",
+      "fab_label": "Quote",
+      "target_price": "Your target price (each)",
+      "editor_view": "View quote appears here once the quote has items.",
+      "card_failed": "We could not add that item. Please try again.",
+      "files": "Attach files (optional)",
+      "files_help": "Up to 3 PDF, JPEG or PNG files, 5 MB each.",
+      "files_max": "Please attach up to 3 files."
     },
     "signup": {
       "loading": "Loading the application form",
@@ -140,7 +157,8 @@
       "editor_title": "TackQuote Price Gate is on",
       "editor_guests": "Shoppers who are not signed in will not see prices. The theme editor always shows them.",
       "editor_tag": "Shoppers without this customer tag will not see prices:",
-      "editor_bad_selectors": "The extra price selectors were ignored because they contain braces, semicolons or @."
+      "editor_bad_selectors": "The extra price selectors were ignored because they contain braces, semicolons or @.",
+      "editor_quote_only": "This product has the quote-only tag, so shoppers see no add to cart or Buy it now."
     },
     "quick_order": {
       "help": "One item per line: SKU, then quantity. For example ABC-100, 12",

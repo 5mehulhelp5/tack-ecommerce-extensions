@@ -1,0 +1,81 @@
+{%- liquid
+  assign proxy_path = block.settings.proxy_path | strip | remove_last: '/'
+  assign show = false
+  case block.settings.pages
+    when 'grids'
+      if template.name == 'collection' or template.name == 'search' or template.name == 'index' or template.name == 'list-collections'
+        assign show = true
+      endif
+    when 'collection'
+      if template.name == 'collection'
+        assign show = true
+      endif
+    when 'all'
+      assign show = true
+  endcase
+  if proxy_path == blank
+    assign show = false
+  endif
+
+  assign label = block.settings.label | strip
+  if label == blank or label == 'Add to Quote'
+    assign label = 'tackquote.quote.add_button' | t
+  endif
+
+  assign selector = block.settings.card_selector | strip
+  if selector contains '{' or selector contains '}' or selector contains '<' or selector contains ';' or selector contains '@'
+    assign selector = ''
+  endif
+-%}
+
+{%- # README.md, Liquid design notes: quote-cards.liquid (1) -%}
+{%- if show -%}
+  {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
+  {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
+  {{ 'tackquote.css' | asset_url | stylesheet_tag }}
+  {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs, target_price: block.settings.target_price, message: block.settings.allow_message, files: block.settings.allow_files %}
+  <div
+    hidden
+  data-tackquote-cards
+  data-selector="{{ selector | escape }}"
+  data-msg-added="{{ 'tackquote.quote.added' | t | escape }}"
+  data-msg-full="{{ 'tackquote.quote.full' | t | escape }}"
+  data-msg-unavailable="{{ 'tackquote.quote.unavailable' | t | escape }}"
+  data-msg-failure="{{ 'tackquote.quote.card_failed' | t | escape }}"
+  >
+    <template>
+      <div class="tackquote-card-add" data-tq-root {{ tq_attrs }}>
+        <button type="button" class="tackquote-button tackquote-button--theme button button--primary btn" data-label="{{ label | escape }}">
+          {{- label -}}
+        </button>
+        <span class="tackquote-vh" role="status" data-tackquote-card-status></span>
+      </div>
+    </template>
+  </div>
+  <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
+  <script src="{{ 'tackquote-theme.js' | asset_url }}" async></script>
+  <script src="{{ 'tackquote-quote.js' | asset_url }}" defer></script>
+  <script src="{{ 'tackquote-quote-cart.js' | asset_url }}" defer></script>
+  <script src="{{ 'tackquote-cards.js' | asset_url }}" defer></script>
+{%- endif -%}
+
+{% schema %}
+{"name": "Quote on product cards", "target": "body","settings":[
+    {"type":"paragraph","content":"t:tq.p.quote_cards_1"},
+    {"type":"select","id":"pages","label":"Show on","options":[{"value":"grids","label":"Collection, search and home pages"},{"value":"collection","label":"Collection pages only"},{"value":"all","label":"All pages"}],"default":"grids"},
+    {"type":"text","id":"label","label":"Button text","default":"Add to Quote"},
+    {"type":"checkbox","id":"target_price","label":"t:tq.c.target","info":"t:tq.c.target_info","default":false},
+    {"type":"checkbox","id":"allow_message","label":"t:tq.c.message","default":false},
+    {"type":"checkbox","id":"allow_files","label":"t:tq.c.files","info":"t:tq.c.files_info","default":false},
+    {"type":"text","id":"card_selector","label":"Advanced: product card selector","info":"Only if your theme's cards are not found. A CSS selector such as .product-card. Braces, semicolons and @ are refused."},
+    {"type":"text","id":"proxy_path","label":"t:tq.c.proxy","default":"/apps/tackquote","info":"t:tq.c.proxy_info"},
+    {"type":"header","content":"t:tq.s.header","info":"t:tq.s.info"},
+    {"type":"select","id":"tq_size","label":"t:tq.s.size","options":[{"value":"0.875","label":"t:tq.s.smaller"},{"value":"1","label":"t:tq.s.match"},{"value":"1.125","label":"t:tq.s.larger"},{"value":"1.25","label":"t:tq.s.largest"}],"default":"1"},
+    {"type":"select","id":"tq_font","label":"t:tq.s.font","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"system","label":"t:tq.s.system"}],"default":"theme"},
+    {"type":"color","id":"tq_text","label":"t:tq.s.text"},
+    {"type":"color","id":"tq_bg","label":"t:tq.s.bg"},
+    {"type":"color","id":"tq_accent","label":"t:tq.s.accent"},
+    {"type":"color","id":"tq_accent_text","label":"t:tq.s.accent_text"},
+    {"type":"select","id":"tq_radius","label":"t:tq.s.radius","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"0","label":"t:tq.s.square"},{"value":"4","label":"t:tq.s.slight"},{"value":"8","label":"t:tq.s.rounded"},{"value":"12","label":"t:tq.s.more_rounded"},{"value":"999","label":"t:tq.s.pill"}],"default":"theme"}
+  ]}
+{% endschema %}

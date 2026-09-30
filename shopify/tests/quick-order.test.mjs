@@ -92,7 +92,7 @@ test('never prints a price when the currency does not match', () => {
 test('reuses the quote drawer instead of forking it', () => {
   assert.match(js, /ns\.quoteAdd\(lines, \{ proxy, currency: pageCurrency \}\)/);
   assert.match(read('assets/tackquote-quote.js'), /ns\.quoteAdd = \(lines, ctx\) =>/);
-  assert.match(liquid, /\{% render 'tackquote-drawer' %\}/);
+  assert.match(liquid, /\{% render 'tackquote-drawer', proxy: proxy_path/);
 });
 
 test('a signed-out shopper gets a sign-in link and the runtime never boots', () => {

@@ -2,33 +2,26 @@
   assign proxy_path = block.settings.proxy_path | strip | remove_last: '/'
 -%}
 
+{%- # README.md, Liquid design notes: quote-page.liquid (1) -%}
 {%- if proxy_path == blank -%}
   {% render 'tackquote-setup', attrs: block.shopify_attributes %}
 {%- else -%}
-  {%- # README.md, Liquid design notes: buyer-group-badge.liquid (1) -%}
   {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
   {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
-  <div
-    class="tackquote-block tackquote-badge"
-  data-tackquote-mode="badge"
-  data-tackquote-proxy="{{ proxy_path | escape }}"
-  data-tackquote-design="{% if request.design_mode %}true{% else %}false{% endif %}"
-  data-msg-label="{{ 'tackquote.badge.label' | t | escape }}"
-  data-msg-empty="{{ 'tackquote.badge.empty' | t | escape }}"
-    hidden
-  {{ tq_attrs }}
-  {{ block.shopify_attributes }}
-  >
-    <div class="tackquote-badge__body" data-tackquote-badge-body role="status" aria-live="polite"></div>
+  <div class="tackquote-block tackquote-quote-page" {{ tq_attrs }} {{ block.shopify_attributes }}>
+    {% render 'tackquote-drawer', proxy: proxy_path, inline: true, target_price: block.settings.target_price, message: block.settings.allow_message, files: block.settings.allow_files %}
   </div>
-
+  <script src="{{ 'tackquote-quote.js' | asset_url }}" defer></script>
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
   <script src="{{ 'tackquote-theme.js' | asset_url }}" async></script>
 {%- endif -%}
 
 {% schema %}
-{"name": "Buyer Group Badge", "target": "section", "enabled_on": {"templates": ["product", "collection", "index", "cart", "page"]}, "stylesheet": "tackquote.css", "javascript": "tackquote-badge.js","settings":[
-    {"type":"paragraph","content":"t:tq.p.buyer_group_badge_1"},
+{"name": "Quote page", "target": "section", "enabled_on": {"templates": ["page"]}, "stylesheet": "tackquote.css", "javascript": "tackquote-quote-cart.js","settings":[
+    {"type":"paragraph","content":"t:tq.p.quote_page_1"},
+    {"type":"checkbox","id":"target_price","label":"t:tq.c.target","info":"t:tq.c.target_info","default":false},
+    {"type":"checkbox","id":"allow_message","label":"t:tq.c.message","default":false},
+    {"type":"checkbox","id":"allow_files","label":"t:tq.c.files","info":"t:tq.c.files_info","default":false},
     {"type":"text","id":"proxy_path","label":"t:tq.c.proxy","default":"/apps/tackquote","info":"t:tq.c.proxy_info"},
     {"type":"header","content":"t:tq.s.header","info":"t:tq.s.info"},
     {"type":"select","id":"tq_size","label":"t:tq.s.size","options":[{"value":"0.875","label":"t:tq.s.smaller"},{"value":"1","label":"t:tq.s.match"},{"value":"1.125","label":"t:tq.s.larger"},{"value":"1.25","label":"t:tq.s.largest"}],"default":"1"},

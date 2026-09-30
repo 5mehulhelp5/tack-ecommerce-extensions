@@ -63,6 +63,7 @@
       wrap.appendChild(label);
 
       const control = document.createElement(opts.tag || 'input');
+      control.className = 'tackquote-field';
       control.id = id;
       control.name = opts.name;
       if (opts.tag !== 'textarea') control.type = opts.type || 'text';
@@ -152,7 +153,7 @@
 
       const submit = document.createElement('button');
       submit.type = 'submit';
-      submit.className = 'tackquote-credit__submit';
+      submit.className = 'tackquote-button tackquote-button--theme button button--primary btn tackquote-credit__submit';
       submit.textContent = msg('msgSubmit');
 
       form.appendChild(submit);

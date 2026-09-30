@@ -1,0 +1,53 @@
+{
+  "tq": {
+    "s": {
+      "header": "Stile",
+      "info": "Come il tema (o vuoto) usa font, colori, angoli e pulsanti del tuo tema.",
+      "size": "Dimensione del testo",
+      "smaller": "Più piccolo",
+      "match": "Come il tema",
+      "larger": "Più grande",
+      "largest": "Il più grande",
+      "font": "Font",
+      "system": "Font di sistema",
+      "text": "Colore del testo",
+      "bg": "Colore di sfondo",
+      "accent": "Colore del pulsante",
+      "accent_text": "Colore del testo del pulsante",
+      "radius": "Raggio degli angoli",
+      "square": "Squadrato",
+      "slight": "Leggero",
+      "rounded": "Arrotondato",
+      "more_rounded": "Più arrotondato",
+      "pill": "Pillola"
+    },
+    "c": {
+      "proxy": "Avanzate: prefisso URL dell’app",
+      "proxy_info": "Lascialo così. Cambialo solo se hai rinominato il proxy dell’app TackQuote in Shopify (Impostazioni, App e canali di vendita, TackQuote, Proxy app).",
+      "target": "Chiedi un prezzo target",
+      "target_info": "Aggiunge un campo facoltativo Il tuo prezzo target a ogni riga. Viene inviato solo ciò che scrive l’acquirente, mai il prezzo del negozio.",
+      "message": "Consenti agli acquirenti di aggiungere un messaggio",
+      "files": "Consenti agli acquirenti di allegare file",
+      "files_info": "Fino a 3 file PDF, JPEG o PNG da 5 MB ciascuno.",
+      "quote_page": "Pagina del preventivo (facoltativa)",
+      "quote_page_info": "Scegli la pagina con il blocco Pagina del preventivo per aprirla al posto del pop-up."
+    },
+    "p": {
+      "buyer_group_badge_1": "Mostra il gruppo acquirenti TackQuote del cliente connesso, per esempio “Livello 2”. Chi non è connesso, non è collegato a un acquirente TackQuote o non appartiene a nessun gruppo non vede nulla.",
+      "credit_application_1": "Permette a un cliente all’ingrosso connesso di richiedere il pagamento a termine. Le richieste arrivano in TackQuote per la revisione; nulla viene approvato in automatico.",
+      "order_limits_1": "Indica nella pagina prodotto le regole di ordine minimo (o massimo) valide. Sono mostrate qui e applicate quando TackQuote crea un preventivo o un ordine bozza. Se i prezzi al checkout sono attivi in TackQuote, valgono anche nel checkout Shopify e il blocco lo dice; altrimenti non sono applicate né nel carrello né al checkout. Gestisci le regole in TackQuote, in Limiti d’ordine.",
+      "order_limits_2": "Le regole generali sono mostrate a tutti i visitatori, perché valgono per tutti. Le regole di un acquirente o di un’azienda specifici compaiono solo dopo l’accesso di quel cliente e sono indicate come specifiche dell’account.",
+      "price_gate_1": "Nasconde i prezzi e il pulsante Aggiungi al carrello a chi non deve vederli e mostra invece un link Accedi per vedere i prezzi. Nasconde ciò che il negozio MOSTRA. Non è una regola del checkout e i dati prodotto pubblicati dal tuo tema restano pubblici.",
+      "price_gate_2": "I prodotti con questo tag nascondono Aggiungi al carrello e Acquista ora a tutti, quindi si comprano solo con un preventivo. Lascia vuoto per disattivare. Usalo con il blocco Richiedi un preventivo.",
+      "price_gate_3": "Solo se il tuo tema mostra prezzi in punti non coperti. Selettori CSS separati da virgole, per esempio .my-price. Graffe, punti e virgola e @ non sono accettati.",
+      "quantity_breaks_1": "Mostra la scala di prezzi all’ingrosso per quantità di questo prodotto. Se i prezzi al checkout sono attivi in TackQuote, la tabella dice che si applicano al checkout; altrimenti sono offerti con un preventivo. Ogni prezzo viene dal motore prezzi di TackQuote, quindi questa tabella e il blocco Prezzo all’ingrosso coincidono sempre.",
+      "quantity_breaks_2": "I clienti all’ingrosso connessi vedono la propria scala. I visitatori non connessi vedono un invito ad accedere, oppure la tua scala pubblica se ne hai pubblicata una in TackQuote — vedi la guida al connettore Shopify.",
+      "quick_order_1": "Permette a un acquirente professionale connesso di incollare SKU e quantità e aggiungere tutto al carrello o a un preventivo in una volta. Prezzi e limiti d’ordine arrivano da TackQuote. Chi non è connesso vede un link per accedere.",
+      "quote_cards_1": "Aggiunge un pulsante Aggiungi al preventivo su ogni scheda prodotto delle griglie di collezione e ricerca. I prodotti con opzioni aprono la loro pagina così l’acquirente può scegliere.",
+      "quote_cart_1": "Permette all’acquirente di trasformare il carrello in una richiesta di preventivo e di riaprirla. Aggiungilo dopo il carrello (il piè di pagina del carrello o una sezione App sotto).",
+      "quote_page_1": "Mostra il preventivo salvato dell’acquirente con modifica delle quantità e il modulo di richiesta. Mettilo in una pagina dedicata, poi sceglila come Pagina del preventivo nel carrello preventivi mobile o nel pulsante carrello preventivi.",
+      "wholesale_price_1": "Mostra il prezzo all’ingrosso del cliente connesso. Se i prezzi al checkout sono attivi in TackQuote, il blocco dice che il prezzo si applica al checkout; altrimenti lo offre con un preventivo. TackQuote ricava il prezzo dalla sessione Shopify del cliente, quindi non viene mai letto da questa pagina e non si può alterare.",
+      "wholesale_signup_1": "Lascia vuoto per mostrare il modulo di richiesta all’ingrosso predefinito di TackQuote. Per un altro modulo, incolla l’ultima parte del suo link negozio da TackQuote → Impostazioni → Ingrosso → Moduli."
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "tq": {
+    "s": {
+      "header": "Estilo",
+      "info": "Igual ao tema (ou vazio) usa as fontes, cores, cantos e botões do seu tema.",
+      "size": "Tamanho do texto",
+      "smaller": "Menor",
+      "match": "Igual ao tema",
+      "larger": "Maior",
+      "largest": "O maior",
+      "font": "Fonte",
+      "system": "Fonte do sistema",
+      "text": "Cor do texto",
+      "bg": "Cor de fundo",
+      "accent": "Cor do botão",
+      "accent_text": "Cor do texto do botão",
+      "radius": "Raio dos cantos",
+      "square": "Reto",
+      "slight": "Leve",
+      "rounded": "Arredondado",
+      "more_rounded": "Mais arredondado",
+      "pill": "Pílula"
+    },
+    "c": {
+      "proxy": "Avançado: prefixo de URL do app",
+      "proxy_info": "Deixe como está. Altere apenas se você renomeou o proxy do app TackQuote no Shopify (Configurações, Apps e canais de vendas, TackQuote, Proxy do app).",
+      "target": "Pedir um preço-alvo",
+      "target_info": "Adiciona um campo opcional Seu preço-alvo a cada linha. Só é enviado o que o comprador digitar, nunca o preço da loja.",
+      "message": "Permitir que compradores adicionem uma mensagem",
+      "files": "Permitir que compradores anexem arquivos",
+      "files_info": "Até 3 arquivos PDF, JPEG ou PNG de 5 MB cada.",
+      "quote_page": "Página de orçamento (opcional)",
+      "quote_page_info": "Escolha a página com o bloco Página de orçamento para abri-la em vez do pop-up."
+    },
+    "p": {
+      "buyer_group_badge_1": "Mostra o grupo de compradores TackQuote do cliente conectado, por exemplo “Nível 2”. Quem não está conectado, não está vinculado a um comprador TackQuote ou não pertence a nenhum grupo não vê nada.",
+      "credit_application_1": "Permite que um cliente atacadista conectado solicite prazo de pagamento. As solicitações chegam ao TackQuote para análise; nada é aprovado automaticamente.",
+      "order_limits_1": "Informa na página do produto as regras de pedido mínimo (ou máximo) aplicáveis. Elas são mostradas aqui e aplicadas quando o TackQuote cria um orçamento ou pedido preliminar. Com os preços no checkout ativos no TackQuote, também valem no checkout da Shopify e o bloco avisa; caso contrário, não são aplicadas no carrinho nem no checkout. Gerencie as regras no TackQuote, em Limites de pedido.",
+      "order_limits_2": "As regras gerais aparecem para todos os visitantes, porque valem para todos. Regras de um comprador ou empresa específicos só aparecem depois que esse cliente entra na conta e são marcadas como da conta.",
+      "price_gate_1": "Oculta preços e o botão Adicionar ao carrinho de quem não deve vê-los e mostra um link Entre para ver os preços. Oculta o que a loja EXIBE. Não é uma regra do checkout, e os dados de produto publicados pelo seu tema continuam públicos.",
+      "price_gate_2": "Produtos com esta tag ocultam Adicionar ao carrinho e Comprar agora para todos, então só podem ser comprados por orçamento. Deixe em branco para desativar. Use com o bloco Solicitar orçamento.",
+      "price_gate_3": "Só se o seu tema mostrar preços em algum lugar não coberto. Seletores CSS separados por vírgula, por exemplo .my-price. Chaves, ponto e vírgula e @ são recusados.",
+      "quantity_breaks_1": "Mostra a escala de preços de atacado por quantidade deste produto. Com os preços no checkout ativos no TackQuote, a tabela informa que são aplicados no checkout; caso contrário, são oferecidos em orçamento. Todo preço vem do motor de preços do TackQuote, então esta tabela e o bloco Preço de atacado nunca divergem.",
+      "quantity_breaks_2": "Clientes atacadistas conectados veem sua própria escala. Visitantes desconectados veem um convite para entrar, ou sua escala pública, se você publicou uma no TackQuote — veja o guia do conector Shopify.",
+      "quick_order_1": "Permite que um comprador profissional conectado cole SKUs e quantidades e adicione tudo ao carrinho ou a um orçamento de uma vez. Preços e limites de pedido vêm do TackQuote. Quem não está conectado vê um link para entrar.",
+      "quote_cards_1": "Adiciona um botão Adicionar ao orçamento em cada card de produto das grades de coleção e busca. Produtos com opções abrem sua página para o comprador escolher.",
+      "quote_cart_1": "Permite que o comprador transforme o carrinho em uma solicitação de orçamento e reabra seu orçamento. Adicione depois do carrinho (no rodapé do carrinho ou numa seção de apps abaixo).",
+      "quote_page_1": "Mostra o orçamento salvo do comprador com edição de quantidades e o formulário de solicitação. Coloque-o em uma página própria e escolha-a como Página de orçamento no carrinho de orçamento flutuante ou no botão do carrinho de orçamento.",
+      "wholesale_price_1": "Mostra o preço de atacado do cliente conectado. Com os preços no checkout ativos no TackQuote, o bloco informa que o preço é aplicado no checkout; caso contrário, oferece o preço em orçamento. O TackQuote obtém o preço da sessão Shopify do comprador, então ele nunca é lido desta página e não pode ser alterado.",
+      "wholesale_signup_1": "Deixe em branco para mostrar seu formulário padrão de solicitação de atacado do TackQuote. Para outro formulário, cole a última parte do link da loja em TackQuote → Configurações → Atacado → Formulários."
+    }
+  }
+}

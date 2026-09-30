@@ -1,7 +1,7 @@
 # TackQuote for Shopify — Theme App Extension
 
-Nine app blocks a merchant drags onto a page from the theme editor, one app embed switched on
-under *Theme settings, App embeds*, and one customer-account extension:
+Eleven app blocks a merchant drags onto a page from the theme editor, three app embeds switched
+on under *Theme settings, App embeds*, and one customer-account extension:
 
 | Block | Where | What it does |
 | --- | --- | --- |
@@ -14,7 +14,11 @@ under *Theme settings, App embeds*, and one customer-account extension:
 | **Quick Order** | product, page | A signed-in buyer pastes SKUs and quantities, then adds them all to the cart or to a quote. |
 | **Wholesale Application** | page, home | The merchant's application form: text, email, phone, number, choice, checkbox, long text, file upload, address and tax ID fields, with show-if conditions. |
 | **Net Terms Application** | page | A form for buyers to apply for net payment terms. |
-| **Price Gate** (app embed) | every page | Hides prices and add to cart from guests, or from customers without the wholesale tag, with a Log in to see prices link. |
+| **Quote cart button** | cart | "Request a quote for your cart" (reads the live cart) and "View quote (N)", after the cart. |
+| **Quote page** | page | The saved quote, with quantity editing and the request form, inline on its own page. |
+| **Price Gate** (app embed) | every page | Hides prices and add to cart from guests, or from customers without the wholesale tag, with a Log in to see prices link. Also hides add to cart and Buy it now on products carrying a quote-only tag. |
+| **Floating quote cart** (app embed) | chosen page types | A floating Quote button with a live count that opens the quote; optional header quote icon. |
+| **Quote on product cards** (app embed) | collection, search, home | Add to Quote under each product card; products with options open their page. |
 | **Net terms** (customer account) | Profile page | A signed-in customer on new customer accounts applies for net terms and sees the status. Lives in `customer-account-net-terms/`. |
 
 The first five are product-page furniture; the application form is not about a product at
@@ -24,6 +28,56 @@ statement about the *account* rather than the item, so it is equally at home in 
 This is the Shopify counterpart to the WooCommerce catalog-mode work — same intent,
 Shopify's extension model instead of PHP hooks. Licensed MIT, like every extension in
 this directory.
+
+Theme-editor deep links (not yet listed in the web app's `shopify-theme-blocks.ts`, which still names nine blocks and one embed):
+`…/admin/themes/current/editor?template=cart&addAppBlockId=<api_key>/quote-cart&target=newAppsSection`,
+`…?template=page&addAppBlockId=<api_key>/quote-page&target=newAppsSection`, and
+`…?context=apps&activateAppId=<api_key>/quote-fab` (or `/quote-cards`) for the embeds.
+
+---
+
+## Matching the merchant's theme
+
+Every block, the drawer and the embeds wear the theme's own type, colours, corners and
+buttons, in any Online Store 2.0 theme, with one CSS chain per property:
+
+1. the merchant's explicit style setting (`--tqm-*`, written by `snippets/tackquote-style.liquid`;
+   every setting defaults to *Match theme*, which writes nothing);
+2. what `assets/tackquote-theme.js` detected from the theme's own rendered elements
+   (`--tqd-*`, written on each TackQuote root, never `:root`): the section's background and
+   text colour, a heading, the theme's primary button (add to cart first, preferring an opaque
+   candidate, since Dawn's add to cart is an outline beside dynamic checkout) and an input;
+3. the theme's tokens: Horizon's full colours (`--color-primary-button-background`, …) before
+   Dawn's r,g,b triplets (`rgb(var(--color-button))`);
+4. `inherit` / `currentColor`.
+
+We never WRITE a theme token: Horizon holds full colours where Dawn holds triplets, and Dawn
+derives `--buttons-radius-outset` from `--buttons-radius`. Sizes are `em`, never `rem`
+(Dawn's `html{font-size:62.5%}` makes a rem 10px), and nothing defaults below the body size.
+Detected button colours must pass WCAG AA (4.5:1, 3:1 for large text); otherwise the theme's
+tokens are used, and if those fail too, the section's inverted foreground/background pair.
+No font is ever loaded. `tests/theme-detect.test.mjs` pins the decisions against Dawn, Horizon,
+a classic `.btn` theme and a dark section; `validate-theme-extension.mjs` pins the chain order.
+
+Repeated theme-editor labels (the Style group, the app URL prefix, target price,
+message and files) and the long help paragraphs are schema translations
+(`locales/*.schema.json`, `t:tq.*`), because Shopify enforces 100 KB of Liquid across the
+extension. All of it is translated in the eight languages.
+
+**Buyer message and attachments** (settings "Let buyers add a message" / "Let buyers attach
+files", off by default): `assets/tackquote-attach.js` uploads each file first to
+`POST {proxy}/quote-upload?name=…` as raw bytes, keeps a guest's `uploadToken` for the next
+uploads and the request, and sends `buyer.message`, `uploadIds` and `uploadToken` with
+`quote-request`. A 400 saying an attachment expired triggers one re-upload and resend.
+
+**Quote-only product tag (Price Gate) caveat:** it hides Add to cart and Buy it now on the
+product PAGE only. An embed has no per-card product on a collection grid, so a theme's own
+quick-add button on a card still shows for a tagged product; turn quick add off in the theme,
+or use the Quote on product cards embed alongside it.
+
+The drawer is a native `<dialog>` opened with `showModal()`: top layer, focus contained,
+Escape closes, focus returns to the trigger. It is moved under `<body>` on first open so it
+inherits the body type, and is painted from the OPENING block's section.
 
 ---
 
@@ -305,3 +359,364 @@ reports both **by name**, because `Unexpected token` from `JSON.parse` does not
 tell you which habit bit you.
 
 Doc: <https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/configuration>
+
+---
+
+## Liquid design notes
+
+Moved out of the Liquid on 2026-10-01: Shopify enforces 100 KB of Liquid across the whole
+extension, and comments count toward it. Each Liquid comment points here by file and number.
+
+### add-to-quote.liquid (1)
+
+```text
+Catalog visibility: a product restricted to TackQuote buyer groups offers
+no price, break, limit or quote control to a shopper who may not buy it.
+The rule, and why, is in snippets/tackquote-visibility.liquid.
+```
+
+### add-to-quote.liquid (2)
+
+```text
+The schema default is English. Left as it is (or blank), the
+      shopper's language is used instead; a merchant's own wording is kept.
+```
+
+### buyer-group-badge.liquid (1)
+
+```text
+Hidden until the proxy answers with a group. A badge that renders empty and
+then fills in is a layout shift on someone's product page; a badge that
+renders empty and STAYS empty is a broken-looking chip. Neither is worth the
+fraction of a second it would save.
+
+No `data-tackquote-customer` here, unlike the price and tier blocks: nothing
+on this block is cached, so there is no cache key to partition. Emitting the
+id anyway would be an identity-shaped attribute with no purpose, which is
+exactly the thing the other blocks have a comment apologising for.
+```
+
+### credit-application.liquid (1)
+
+```text
+Whether to draw the FORM or the sign-in prompt, and nothing more.
+
+The API refuses this route outright without a signed
+`logged_in_customer_id`, so a logged-out visitor must never be given a
+form to fill in — they would complete seven fields and be told to sign in.
+Liquid already knows, so the block decides here rather than spending one
+of the caller's three attempts per fifteen minutes discovering it.
+
+This is NOT identity. The identity is the customer id Shopify signs into
+the proxy request; a shopper editing this attribute gets a form whose
+submission the server then refuses.
+```
+
+### credit-application.liquid (2)
+
+```text
+The schema default is English. Left as it is (or blank), the
+      shopper's language is used instead; a merchant's own wording is kept.
+```
+
+### order-limits.liquid (1)
+
+```text
+Catalog visibility: a product restricted to TackQuote buyer groups offers
+no price, break, limit or quote control to a shopper who may not buy it.
+The rule, and why, is in snippets/tackquote-visibility.liquid.
+```
+
+### order-limits.liquid (2)
+
+```text
+Kept OUTSIDE the tag's attribute list (see b5a4158: a Liquid tag between
+attributes failed `shopify app deploy`'s theme check).
+
+The product ID is sent alongside the SKU because an order-limit rule may
+name either one. `data-tackquote-product-id`, deliberately distinct from
+`data-tackquote-product`, which is the product TITLE that `ns.label`
+reads — sending a title where the API expects an id would match no rule
+and look exactly like "this product has no minimum".
+```
+
+### price-gate.liquid (1)
+
+```text
+Quote-only products: a product carrying the merchant's tag loses Add to
+cart and Buy it now for EVERY shopper (quote is the only way to buy it),
+whoever is signed in. Product pages only: an embed sees `product` there.
+```
+
+### quantity-breaks.liquid (1)
+
+```text
+Catalog visibility: a product restricted to TackQuote buyer groups offers
+no price, break, limit or quote control to a shopper who may not buy it.
+The rule, and why, is in snippets/tackquote-visibility.liquid.
+```
+
+### quantity-breaks.liquid (2)
+
+```text
+Kept OUTSIDE the tag's attribute list (see b5a4158: a Liquid tag between
+attributes failed `shopify app deploy`'s theme check).
+
+`data-tackquote-customer` is NOT identity: it only partitions the per-tab
+cache. The identity that decides the ladder is `logged_in_customer_id`,
+which Shopify injects into the proxy request and signs.
+`data-tackquote-design` suspends the fail-quiet behaviour so a merchant in
+the theme editor sees every state; a shopper sees only the useful ones.
+```
+
+### quote-cards.liquid (1)
+
+```text
+"Add to Quote" on product cards, an app EMBED: a collection grid has no app
+block slot, so tackquote-cards.js finds the cards and adds the button after
+each one. It loads only on the page types chosen here.
+
+KNOWN LIMIT, stated to the merchant in the settings: an embed cannot read a
+card's TackQuote catalog-visibility metafield, so a product restricted to
+buyer groups still shows this button on a grid (its product page does not).
+Checkout still refuses it for a buyer who may not purchase it.
+```
+
+### quote-cart.liquid (1)
+
+```text
+Cart-page quote button: Dawn main-cart-footer / Horizon main-cart @app slot,
+or an Apps section. Cart drawers take no app block; quote-fab covers them.
+The cart import reads the live cart (tackquote-quote-cart.js); no price.
+```
+
+### quote-fab.liquid (1)
+
+```text
+Floating quote cart, an app embed: every theme, beside cart drawers that take
+no app block. Assets load only on the chosen page types. Placement logic:
+tackquote-fab.js. Attributes are captured, never Liquid tags in a tag.
+```
+
+### quote-page.liquid (1)
+
+```text
+The Quote page: the buyer's saved quote, with quantity editing and the
+request form, inline on a page of the merchant's choosing rather than in the
+pop-up. The floating quote cart, the cart-page button and the header icon can
+link here (their "Quote page" setting). Same runtime and endpoint as the
+drawer (tackquote-quote.js, `quote-request`).
+```
+
+### request-a-quote.liquid (1)
+
+```text
+Catalog visibility: a product restricted to TackQuote buyer groups offers
+no price, break, limit or quote control to a shopper who may not buy it.
+The rule, and why, is in snippets/tackquote-visibility.liquid.
+```
+
+### request-a-quote.liquid (2)
+
+```text
+The schema default is English. Left as it is (or blank), the
+      shopper's language is used instead; a merchant's own wording is kept.
+```
+
+### wholesale-price.liquid (1)
+
+```text
+Catalog visibility: a product restricted to TackQuote buyer groups offers
+no price, break, limit or quote control to a shopper who may not buy it.
+The rule, and why, is in snippets/tackquote-visibility.liquid.
+```
+
+### wholesale-price.liquid (2)
+
+```text
+Kept OUTSIDE the tag's attribute list: a Liquid tag between attributes
+failed `shopify app deploy`'s theme check on another block (b5a4158).
+
+Two attributes below are NOT identity and must never be read as such.
+`data-tackquote-customer` only partitions the per-tab price cache, so that
+logging out in the same tab cannot surface the price the previous session
+was entitled to see. The identity that decides the price is
+`logged_in_customer_id`, which Shopify injects into the proxy request and
+signs; anything emitted here is just markup a shopper can edit.
+`data-tackquote-design` suspends the fail-quiet behaviour: a merchant placing
+the block in the theme editor needs to see every state, a shopper does not.
+```
+
+### wholesale-signup.liquid (1)
+
+```text
+Works with ZERO configuration. With the form setting blank (the default) the
+server resolves the store's default wholesale form at request time: the form
+the seller marked as default in TackQuote, else the oldest form that is
+switched on. Every install creates a standard application form, so a
+merchant can drop this block onto a page and it shows a real form.
+
+The tenant is NOT carried in this markup, deliberately. Shopify signs `shop`
+on every App Proxy request and the server resolves that signed value to a
+tenant, so there is nothing tenant-shaped for a merchant to type or mistype.
+https://shopify.dev/docs/apps/build/online-store/app-proxies/authenticate-app-proxies
+```
+
+### wholesale-signup.liquid (2)
+
+```text
+Login-first: a signed-out shopper is asked to sign in (or create an account)
+before applying, so the application carries Shopify's signed customer id and
+approval can link the account without reading any customer data. The theme
+editor still shows the form, so the merchant can see it.
+```
+
+### wholesale-signup.liquid (3)
+
+```text
+The schema default is English. Left as it is (or blank), the
+      shopper's language is used instead; a merchant's own wording is kept.
+```
+
+### tackquote-diagnostics.liquid (1)
+
+```text
+Merchant-only diagnostics for the read blocks, as data attributes on the
+block's root element. Emitted ONLY in the theme editor, so a shopper's page
+never carries them. `ns.explain` in tackquote-shared.js picks one by the
+failure it saw; the price, quantity-breaks and order-limits blocks share it.
+
+In the theme editor Shopify wraps every rendered snippet in
+<!-- BEGIN app snippet --> / <!-- END app snippet --> comments. Placed inside an
+attribute list, the first "-->" closes the block's tag and every attribute after
+it prints as page text. So each block captures this snippet and outputs it
+through  split: '-->' | last | split: '<!--' | first , which leaves the bare
+attributes and is a no-op on the storefront, where there are no markers.
+
+@example
+<div {% render 'tackquote-diagnostics' %}></div>
+```
+
+### tackquote-drawer.liquid (1)
+
+```text
+The quote request form: a modal <dialog> for the button blocks, the cart-page
+button and the floating quote-cart button, or an inline section for the Quote
+page block. Static, already-translated markup: Liquid's `t` filter translates
+it, so no dictionary ships to the browser (Theme Check's 10 KB JS threshold).
+
+It carries its own proxy, currency and signed-in customer, so any trigger on
+the page can open it. tackquote-quote.js moves the dialog to <body> on first
+open, so it inherits the theme's body type and colours wherever it was
+rendered, and paints it from the theme's detected tokens (tackquote-theme.js).
+
+Accessibility: a native modal dialog (focus contained, Escape closes, focus
+returns to the trigger), labelled by its heading, every field labelled.
+
+Attributes are captured first and output whole, so no Liquid tag sits inside
+an HTML tag's attribute list (that failed deploy-time theme check, b5a4158).
+
+@param {string} proxy - The app proxy path, already stripped of a trailing slash.
+@param {boolean} [inline] - Render in the page instead of as a modal.
+@param {string} [attrs] - Style attributes from tackquote-style, markers stripped.
+@param {boolean} [target_price] - Offer an optional "Your target price" per line.
+@param {string} [id] - An id for the dialog, for a trigger's aria-controls.
+
+@example
+{% render 'tackquote-drawer', proxy: proxy_path %}
+```
+
+### tackquote-selection.liquid (1)
+
+```text
+The variant lookup every block's JavaScript needs, as a JSON script tag.
+
+Only the fields the quote payload actually uses are emitted. Price is
+deliberately absent: the API records a supplied per-line price as the buyer's
+REQUESTED price, so sending the storefront's retail figure would put a number in
+front of a sales rep as though the buyer had asked for it. TackQuote prices every
+line server-side regardless.
+
+KNOWN LIMIT — products with more than 250 variants.
+
+Shopify caps `product.variants` at 250 to stop themes over-fetching, while the
+merchant-facing variant limit has been 2,048 since October 2025. So on a
+high-variant product this list is TRUNCATED, and there is no loop bound to
+raise: the cap is on the object, not on the `for`.
+https://shopify.dev/docs/storefronts/themes/product-merchandising/variants/support-high-variant-products
+
+It fails closed, which is why it is recorded here rather than worked around.
+`ns.findVariant` returns null for a variant past the cap, so the SKU is empty
+and the price and quantity-break blocks report "unpriced" / hide themselves
+instead of pricing the wrong variant. Add to Quote still sends the line, with
+the product title and no SKU.
+
+The real fix is to stop shipping the variant table at all and resolve the
+selected variant on demand — the Section Rendering API with `option_values`, or
+a `?variant=` lookup — which is a larger change than this snippet. Do not
+"solve" it by raising a limit; there isn't one.
+
+@param {product} product - The product whose variants should be emitted.
+@example
+{% render 'tackquote-selection', product: product %}
+```
+
+### tackquote-style.liquid (1)
+
+```text
+The merchant's style overrides for one block or embed, as ATTRIBUTES for its
+root tag: a `style` of --tqm-* custom properties, plus `data-tqm-bg` when a
+background is set (so the root gets padding). Every setting defaults to
+"Match theme", which emits nothing.
+
+Only TackQuote's own --tqm-* properties are written, never a theme token
+(--color-foreground, --color-button, --buttons-radius, --inputs-radius):
+Horizon holds full colours where Dawn holds r,g,b triplets, and Dawn derives
+--buttons-radius-outset from --buttons-radius, so writing either breaks one.
+
+Rendered inside an attribute list, so every caller MUST strip the theme
+editor's snippet markers, as snippets/tackquote-diagnostics.liquid explains:
+output through  split: '-->' | last | split: '<!--' | first .
+
+@param {object} s - The block's settings (block.settings).
+
+@example
+{%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
+{%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
+<div {{ tq_attrs }}></div>
+```
+
+### tackquote-visibility.liquid (1)
+
+```text
+Catalog visibility (TackQuote metafield contract v2) for the product blocks.
+
+Outputs exactly one of:
+  `hidden`        a shopper who may not buy this product: the calling block
+                  renders nothing, so no price, quantity break, limit or quote
+                  control is offered for it;
+  the editor note in the theme editor, for a restricted product, so the
+                  merchant sees why shoppers may not see the block;
+  nothing         an unrestricted product, or one this shopper may buy.
+
+It reads the product's `$app:visibility` and the customer's `$app:groups`
+(the buyer-group codes of `$app:buyer` and nothing else: `$app:buyer` also
+carries confidential prices, so it is never exposed to the storefront),
+through the reserved-prefix syntax documented for theme app extensions
+(https://shopify.dev/docs/apps/build/online-store/theme-app-extensions/configuration,
+"Reserved prefixes for metafields and metaobjects"). The rule is the one the
+checkout validation Function enforces (`is_entitled` in
+shopify/functions/contract/contract.rs):
+  1. deny first: a linked buyer in any `d` audience may not buy;
+  2. then `a`: only a linked buyer in an `a` audience may; a guest never may;
+  3. `*` means any linked TackQuote buyer, never a guest.
+A value that is not a v2 document is not a restriction, exactly as the
+Function treats it. The Function is what enforces this at checkout; this
+snippet only stops the storefront from offering what checkout will refuse.
+
+@param {product} product - The product the calling block is rendered for.
+
+@example
+{%- capture tackquote_access -%}{% render 'tackquote-visibility', product: product %}{%- endcapture -%}
+```
+

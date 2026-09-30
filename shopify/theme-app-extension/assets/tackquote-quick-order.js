@@ -114,6 +114,7 @@
         const item = cell(tr, row.variantId ? row.title : d.msgNotFound);
         const qtyCell = document.createElement('td');
         const qty = document.createElement('input');
+        qty.className = 'tackquote-field tackquote-field--short';
         qty.type = 'number';
         qty.min = '1';
         qty.value = String(row.quantity);

@@ -23,6 +23,19 @@
     assign extra_ok = false
   endif
 
+  # README.md, Liquid design notes: price-gate.liquid (1).
+  assign quote_only = false
+  assign quote_tag = block.settings.quote_only_tag | strip | downcase
+  if quote_tag != blank and product != blank
+    for product_tag in product.tags
+      assign have_tag = product_tag | strip | downcase
+      if have_tag == quote_tag
+        assign quote_only = true
+        break
+      endif
+    endfor
+  endif
+
   assign login_url = routes.storefront_login_url | default: routes.account_login_url
   assign message = block.settings.message | strip
   if message == blank
@@ -35,14 +48,17 @@
     <strong>{{ 'tackquote.gate.editor_title' | t }}</strong>
     <span>
       {%- if block.settings.mode == 'tag' -%}
-        {{ 'tackquote.gate.editor_tag' | t }} {{ want_tag | escape }}
+  {{ 'tackquote.gate.editor_tag' | t }} {{ want_tag | escape }}
       {%- else -%}
-        {{ 'tackquote.gate.editor_guests' | t }}
+  {{ 'tackquote.gate.editor_guests' | t }}
       {%- endif -%}
     </span>
     {%- unless extra_ok -%}
       <span>{{ 'tackquote.gate.editor_bad_selectors' | t }}</span>
     {%- endunless -%}
+    {%- if quote_only -%}
+      <span>{{ 'tackquote.gate.editor_quote_only' | t }}</span>
+    {%- endif -%}
   </div>
   <style>
     .tackquote-gate-editor { position: fixed; bottom: 12px; left: 12px; z-index: 2147483000; max-width: 22rem; padding: 10px 12px; background: #fff; color: #111; border: 1px solid #111; font: 13px/1.4 system-ui, sans-serif; display: flex; flex-direction: column; gap: 4px; }
@@ -58,57 +74,27 @@
   <div
     id="tackquote-price-gate"
     hidden
-    data-login-url="{{ login_url | escape }}"
-    data-msg="{{ message | escape }}"
-    data-extra="{% if extra_ok %}{{ extra | escape }}{% endif %}"
+  data-login-url="{{ login_url | escape }}"
+  data-msg="{{ message | escape }}"
+  data-extra="{% if extra_ok %}{{ extra | escape }}{% endif %}"
   ></div>
+{%- endif -%}
+{%- if quote_only -%}
+  {%- unless request.design_mode -%}
+    <style>
+      form[action*="/cart/add"] [type="submit"]:not([class*="tackquote"]), form[action*="/cart/add"] button[name="add"], .product-form__submit, .shopify-payment-button { display: none !important; }
+    </style>
+  {%- endunless -%}
 {%- endif -%}
 
 {% schema %}
-{
-  "name": "Price Gate",
-  "target": "body",
-  "javascript": "tackquote-price-gate.js",
-  "settings": [
-    {
-      "type": "paragraph",
-      "content": "Hides prices and the add to cart button from shoppers who should not see them, and shows a Log in to see prices link instead. This hides what the storefront DISPLAYS. It is not a checkout rule, and product data your theme publishes stays public."
-    },
-    {
-      "type": "select",
-      "id": "mode",
-      "label": "Hide prices from",
-      "options": [
-        { "value": "guests", "label": "Shoppers who are not signed in" },
-        { "value": "tag", "label": "Anyone without the wholesale tag" }
-      ],
-      "default": "guests"
-    },
-    {
-      "type": "text",
-      "id": "tag",
-      "label": "Wholesale customer tag",
-      "default": "wholesale",
-      "info": "Used when hiding from anyone without the tag. TackQuote adds this tag when it approves a wholesale application."
-    },
-    {
-      "type": "checkbox",
-      "id": "hide_cart",
-      "label": "Also hide add to cart and buy buttons",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "message",
-      "label": "Link text",
-      "info": "Leave blank for: Log in to see prices"
-    },
-    {
-      "type": "text",
-      "id": "extra_selectors",
-      "label": "Advanced: extra price selectors",
-      "info": "Only if your theme shows prices somewhere this misses. Comma separated CSS selectors, for example .my-price. Braces, semicolons and @ are refused."
-    }
-  ]
-}
+{"name": "Price Gate", "target": "body", "javascript": "tackquote-price-gate.js","settings":[
+    {"type":"paragraph","content":"t:tq.p.price_gate_1"},
+    {"type":"select","id":"mode","label":"Hide prices from","options":[{"value":"guests","label":"Shoppers who are not signed in"},{"value":"tag","label":"Anyone without the wholesale tag"}],"default":"guests"},
+    {"type":"text","id":"tag","label":"Wholesale customer tag","default":"wholesale","info":"Used when hiding from anyone without the tag. TackQuote adds this tag when it approves a wholesale application."},
+    {"type":"checkbox","id":"hide_cart","label":"Also hide add to cart and buy buttons","default":true},
+    {"type":"text","id":"quote_only_tag","label":"Quote-only product tag","info":"t:tq.p.price_gate_2"},
+    {"type":"text","id":"message","label":"Link text","info":"Leave blank for: Log in to see prices"},
+    {"type":"text","id":"extra_selectors","label":"Advanced: extra price selectors","info":"t:tq.p.price_gate_3"}
+  ]}
 {% endschema %}

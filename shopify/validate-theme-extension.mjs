@@ -188,6 +188,12 @@ export const EXPECTED_TEMPLATES = {
   'credit-application.liquid': ['page'],
   // Wave 3. A buyer orders by SKU from a product page or a dedicated page.
   'quick-order.liquid': ['product', 'page'],
+  // 2026-10-01. Turns the CART into a quote request, so the cart template only;
+  // it lands in Dawn's main-cart-footer / Horizon's main-cart @app slot, or an
+  // Apps section (addAppBlockId=<api_key>/quote-cart&template=cart).
+  'quote-cart.liquid': ['cart'],
+  // 2026-10-01. The saved quote with the request form, inline on its own page.
+  'quote-page.liquid': ['page'],
 };
 
 /**
@@ -198,6 +204,11 @@ export const EXPECTED_TEMPLATES = {
  */
 export const EXPECTED_EMBEDS = {
   'price-gate.liquid': 'body',
+  // 2026-10-01. The floating quote cart: cart drawers take no app block, so an
+  // embed is the only surface that reaches every page and every theme.
+  'quote-fab.liquid': 'body',
+  // 2026-10-01. Add to Quote on product cards: grids have no app-block slot.
+  'quote-cards.liquid': 'body',
 };
 
 describe('the shipped blocks', () => {
@@ -560,8 +571,12 @@ export const SIZE_LIMITS = {
   jsGzipBytes: 10 * 1024,
   /** Per schema-referenced CSS asset, gzipped. Suggested, not enforced. */
   cssGzipBytes: 100 * 1024,
-  /** Every .liquid file in the extension, added together. ENFORCED. */
-  totalLiquidBytes: 100 * 1024,
+  /**
+   * Every .liquid file in the extension, added together. ENFORCED by Shopify at
+   * 100 KB; ratcheted to 100,000 B (2026-10-01) so the decimal reading of
+   * "100 KB" also passes, after the extension reached 98.5 KB.
+   */
+  totalLiquidBytes: 100_000,
 };
 
 export function gzipBytes(filePath) {
@@ -624,7 +639,7 @@ describe('the size guards can fail', () => {
     // without someone deliberately editing these three numbers.
     assert.equal(SIZE_LIMITS.jsGzipBytes, 10240);
     assert.equal(SIZE_LIMITS.cssGzipBytes, 102400);
-    assert.equal(SIZE_LIMITS.totalLiquidBytes, 102400);
+    assert.equal(SIZE_LIMITS.totalLiquidBytes, 100000);
   });
 
   test('finds every liquid file, snippets included', () => {
@@ -674,5 +689,127 @@ describe('Shopify size limits', () => {
   test('stays under the 30 app blocks Shopify enforces per extension', () => {
     // Raised from 25 to 30 on 2026-02-03 per the shopify.dev changelog.
     assert.ok(blockFiles().length <= 30, `${blockFiles().length} blocks, over the enforced 30`);
+  });
+});
+
+/*
+ * Theme matching (spec 2026-10-01). The CSS precedence is the contract every
+ * block relies on, and it is invisible to every other check here: a reordered
+ * var() chain still parses, still renders, and quietly lets a detected value
+ * beat the merchant's explicit setting, or a theme token beat detection.
+ */
+describe('theme matching', () => {
+  const css = fs.readFileSync(path.join(ASSETS_DIR, 'tackquote.css'), 'utf8');
+  const drawer = fs.readFileSync(path.join(ASSETS_DIR, 'tackquote-drawer.css'), 'utf8');
+  const style = fs.readFileSync(path.join(EXTENSION_DIR, 'snippets', 'tackquote-style.liquid'), 'utf8');
+  const order = (text, names) => names.map((n) => text.indexOf(n));
+
+  test('button accent: merchant > detected > Horizon token > Dawn triplet', () => {
+    const line = css.split('\n').find((l) => l.includes('--tq-accent:'));
+    assert.ok(line, 'no --tq-accent chain');
+    const at = order(line, ['--tqm-accent', '--tqd-accent', '--color-primary-button-background', 'rgb(var(--color-button']);
+    assert.ok(at.every((n) => n >= 0), `chain is missing a link: ${line}`);
+    assert.deepStrictEqual([...at].sort((a, b) => a - b), at, `chain order is wrong: ${line}`);
+  });
+
+  test('corner radius: merchant > detected > Horizon > Dawn', () => {
+    const line = css.split('\n').find((l) => l.includes('--tq-r:'));
+    const at = order(line, ['--tqm-radius', '--tqd-btn-radius', '--style-border-radius-buttons-primary', '--buttons-radius']);
+    assert.ok(at.every((n) => n >= 0), line);
+    assert.deepStrictEqual([...at].sort((a, b) => a - b), at, line);
+  });
+
+  test('drawer paint: merchant > detected, and never a theme --color-background', () => {
+    const line = drawer.split('\n').find((l) => /^\s*background: var\(--tqm-bg/.test(l));
+    assert.ok(line && line.indexOf('--tqm-bg') < line.indexOf('--tqd-bg'), line);
+    // Dawn holds r,g,b there and Horizon a full colour: neither reading is safe.
+    assert.ok(!line.includes('--color-background'), line);
+  });
+
+  test('the style snippet writes only TackQuote properties, never a theme token', () => {
+    const logic = style.slice(style.indexOf('{%- liquid'));
+    for (const token of ['--color-foreground', '--color-button', '--buttons-radius', '--inputs-radius', '--color-background']) {
+      assert.ok(!logic.includes(token), `tackquote-style.liquid writes ${token}`);
+    }
+    assert.ok(logic.includes('--tqm-accent') && logic.includes('--tqm-radius'));
+  });
+
+  test('theme-look button defaults stay at specificity 0, with no !important', () => {
+    assert.ok(css.includes(':where(.tackquote-button--theme)'));
+    const code = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '');
+    assert.ok(!/!important/.test(code(css)) && !/!important/.test(code(drawer)));
+  });
+
+  test('every caller of the style snippet strips the editor markers', () => {
+    for (const file of blockFiles()) {
+      const src = fs.readFileSync(path.join(BLOCKS_DIR, file), 'utf8');
+      if (!src.includes("render 'tackquote-style'")) continue;
+      assert.match(src, /tq_style \| split: '-->' \| last \| split: '<!--' \| first/, `${file} outputs the snippet unstripped`);
+    }
+  });
+
+  test('the detector writes --tqd-* on the root it was given, never :root', () => {
+    const js = fs.readFileSync(path.join(ASSETS_DIR, 'tackquote-theme.js'), 'utf8');
+    assert.ok(!/documentElement\.style/.test(js), 'writes to :root');
+    assert.match(js, /root\.style\.setProperty\(k, v\[k\]\)/);
+  });
+});
+
+/*
+ * The quote cannot outgrow the API: POST quote-request refuses more than 100
+ * lines (WIDGET_MAX_ITEMS) and fails the WHOLE body, so every path that adds
+ * lines must refuse before building a refused payload.
+ */
+describe('the 100-line quote cap', () => {
+  const quote = fs.readFileSync(path.join(ASSETS_DIR, 'tackquote-quote.js'), 'utf8');
+  test('the draft is capped at 100 lines and a merge past it adds nothing', () => {
+    assert.match(quote, /const MAX_ITEMS = 100;/);
+    assert.match(quote, /if \(items\.length \+ fresh\.length > MAX_ITEMS\) return null;/);
+  });
+  test('every add path goes through the capped merge and reports a full quote', () => {
+    const cart = fs.readFileSync(path.join(ASSETS_DIR, 'tackquote-quote-cart.js'), 'utf8');
+    const cards = fs.readFileSync(path.join(ASSETS_DIR, 'tackquote-cards.js'), 'utf8');
+    assert.match(quote, /ns\.quoteAdd = \(lines, ctx\) => \{[\s\S]*?mergeIntoDraft\(lines/);
+    assert.match(cart, /q\.merge\(\[item\]\)/);
+    assert.match(cart, /ns\.quoteAdd\(lines, \{ replace: true/);
+    assert.match(cards, /ns\.quoteAdd\(\[line\]/);
+    for (const src of [cart, cards]) assert.match(src, /msgFull/);
+  });
+  test('no storefront price is ever sent: only a price the buyer typed', () => {
+    assert.match(quote, /price: d\.tackquoteTargetPrice !== undefined && typeof i\.target === 'number' \? i\.target : undefined/);
+    assert.ok(!/variant\.price|\.price\b(?!:)/.test(quote.replace(/price: d\.tackquote/, '')), 'reads a catalog price');
+  });
+});
+
+/*
+ * Schema translations (2026-10-01). Repeated setting labels live in
+ * locales/*.schema.json as `t:` keys to keep the Liquid under Shopify's
+ * enforced total. A `t:` key with no default entry shows the raw key to the
+ * merchant in the theme editor.
+ */
+describe('schema translations', () => {
+  const LOC = path.join(EXTENSION_DIR, 'locales');
+  const load = (f) => JSON.parse(fs.readFileSync(path.join(LOC, f), 'utf8'));
+  const en = load('en.default.schema.json');
+  const get = (o, k) => k.split('.').reduce((n, p) => n?.[p], o);
+  const keys = new Set();
+  for (const file of blockFiles()) {
+    for (const m of schemaBodyOf(file).matchAll(/"t:([a-z0-9_.]+)"/g)) keys.add(m[1]);
+  }
+  test('the blocks do use schema keys (guards the regex)', () => {
+    assert.ok(keys.size >= 20, `found ${keys.size}`);
+  });
+  for (const k of keys) {
+    test(`t:${k} resolves in en.default.schema.json`, () => {
+      assert.equal(typeof get(en, k), 'string');
+    });
+  }
+  test('every schema label and help text is translated in every locale', () => {
+    for (const lang of ['de', 'es', 'fr', 'it', 'nl', 'pt-BR', 'ja']) {
+      const tr = load(`${lang}.schema.json`);
+      for (const g of ['s', 'c', 'p']) {
+        assert.deepStrictEqual(Object.keys(tr.tq[g]).sort(), Object.keys(en.tq[g]).sort(), `${lang} tq.${g}`);
+      }
+    }
   });
 });

@@ -1,22 +1,21 @@
 {%- comment -%}
-  The quote-request drawer: static, already-translated markup for the two button
-  blocks.
-
-  Rendered by Liquid rather than built in JavaScript on purpose. Shopify's Theme
-  Check caps a storefront JavaScript asset at 10 KB, and a runtime that also
-  carried this markup and a translation dictionary blew straight through it. Doing
-  it here is smaller AND better: the `t` filter translates directly, so the strings
-  live in locales/ like every other customer-facing string, instead of being
-  shipped to the browser as JSON and looked up again.
-
-  The handful of strings JavaScript sets at runtime ride along as data attributes.
-
-  @example
-  {% render 'tackquote-drawer' %}
+  README.md, Liquid design notes: tackquote-drawer.liquid (1).
+  @param {string} proxy - The app proxy path, already stripped of a trailing slash.
+  @param {boolean} [inline] - Render in the page instead of as a modal.
+  @param {string} [attrs] - Style attributes from tackquote-style, markers stripped.
+  @param {boolean} [target_price] - Offer an optional "Your target price" per line.
+  @param {string} [id] - An id for the dialog, for a trigger's aria-controls.
+  @param {boolean} [message] - Offer an optional buyer message.
+  @param {boolean} [files] - Offer up to 3 file attachments (quote-upload).
 {%- endcomment -%}
-<dialog
-  class="tackquote-drawer"
+{%- assign title = 'tackquote.quote.title' | t -%}
+{%- capture a -%}
   data-tackquote-drawer
+  {% if id != blank %}id="{{ id }}"{% endif %}
+  aria-label="{{ title | escape }}"
+  data-tackquote-proxy="{{ proxy | escape }}"
+  data-tackquote-currency="{{ cart.currency.iso_code | default: shop.currency }}"
+  {% if customer %}data-tackquote-customer-name="{{ customer.name | escape }}" data-tackquote-customer-email="{{ customer.email | escape }}"{% endif %}
   data-msg-added="{{ 'tackquote.quote.added' | t | escape }}"
   data-msg-already="{{ 'tackquote.quote.already' | t | escape }}"
   data-msg-unavailable="{{ 'tackquote.quote.unavailable' | t | escape }}"
@@ -26,35 +25,62 @@
   data-msg-failure="{{ 'tackquote.quote.failure' | t | escape }}"
   data-msg-remove="{{ 'tackquote.quote.remove' | t | escape }}"
   data-msg-quantity="{{ 'tackquote.quote.quantity' | t | escape }}"
->
-  <form method="dialog" class="tackquote-drawer__dismiss">
-    <button value="close" class="tackquote-drawer__close" aria-label="{{ 'tackquote.quote.close' | t }}">&times;</button>
-  </form>
-  <h2 class="tackquote-drawer__title">{{ 'tackquote.quote.title' | t }}</h2>
+  data-msg-decrease="{{ 'tackquote.quote.decrease' | t | escape }}"
+  data-msg-increase="{{ 'tackquote.quote.increase' | t | escape }}"
+  data-msg-full="{{ 'tackquote.quote.full' | t | escape }}"
+  {% if target_price %}data-tackquote-target-price data-msg-target="{{ 'tackquote.quote.target_price' | t | escape }}"{% endif %}
+  {% if target_price or message or files %}data-tackquote-rich{% endif %}
+  {% if files %}data-msg-files-max="{{ 'tackquote.quote.files_max' | t | escape }}" data-msg-file-type="{{ 'tackquote.signup.file_type' | t | escape }}" data-msg-file-size="{{ 'tackquote.signup.file_size' | t | escape }}" data-msg-uploading="{{ 'tackquote.signup.uploading' | t | escape }}"{% endif %}
+  {{ attrs }}
+{%- endcapture -%}
+{%- capture inner -%}
+  <div class="tackquote-drawer__head">
+    <h2 class="tackquote-drawer__title">{{ title }}</h2>
+    {%- unless inline -%}
+      <form method="dialog">
+        <button value="close" class="tackquote-icon-button" aria-label="{{ 'tackquote.quote.close' | t | escape }}">
+          <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+        </button>
+      </form>
+    {%- endunless -%}
+  </div>
   <ul class="tackquote-drawer__items" data-tackquote-items></ul>
   <p class="tackquote-drawer__empty" data-tackquote-empty>{{ 'tackquote.quote.empty' | t }}</p>
   <div class="tackquote-drawer__form">
-    <label>
+    <label class="tackquote-drawer__label">
       <span>{{ 'tackquote.quote.name' | t }}</span>
-      <input type="text" name="name" autocomplete="name" required>
+      <input class="tackquote-field" type="text" name="name" autocomplete="name" required>
     </label>
-    <label>
+    <label class="tackquote-drawer__label">
       <span>{{ 'tackquote.quote.email' | t }}</span>
-      <input type="email" name="email" autocomplete="email" required>
+      <input class="tackquote-field" type="email" name="email" autocomplete="email" required>
     </label>
-    <label>
+    <label class="tackquote-drawer__label">
       <span>{{ 'tackquote.quote.company' | t }}</span>
-      <input type="text" name="company" autocomplete="organization">
+      <input class="tackquote-field" type="text" name="company" autocomplete="organization">
     </label>
+    {%- if message -%}
+      <label class="tackquote-drawer__label"><span>{{ 'tackquote.quote.message' | t }}</span><textarea class="tackquote-field" name="message" rows="3" maxlength="2000"></textarea></label>
+    {%- endif -%}
+    {%- if files -%}
+      <label class="tackquote-drawer__label"><span>{{ 'tackquote.quote.files' | t }}</span><input class="tackquote-field" type="file" name="files" multiple accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"><small>{{ 'tackquote.quote.files_help' | t }}</small></label>
+    {%- endif -%}
     <div class="tackquote-hp" aria-hidden="true">
       <label>
         Do not fill this in
         <input type="text" name="hp" tabindex="-1" autocomplete="off">
       </label>
     </div>
-    <button type="button" class="tackquote-button tackquote-button--solid" data-tackquote-submit>
-      {{ 'tackquote.quote.submit' | t }}
+    <button type="button" class="tackquote-button tackquote-button--theme button button--primary btn" data-tackquote-submit>
+      {{- 'tackquote.quote.submit' | t -}}
     </button>
     <p class="tackquote-drawer__status" data-tackquote-drawer-status role="status" aria-live="polite"></p>
   </div>
-</dialog>
+{%- endcapture -%}
+{{ 'tackquote-drawer.css' | asset_url | stylesheet_tag }}
+{%- if message or files -%}<script src="{{ 'tackquote-attach.js' | asset_url }}" defer></script>{%- endif -%}
+{%- if inline -%}
+  <section class="tackquote-drawer tackquote-drawer--inline" data-tackquote-inline {{ a }}>{{ inner }}</section>
+{%- else -%}
+  <dialog class="tackquote-drawer" {{ a }}>{{ inner }}</dialog>
+{%- endif -%}

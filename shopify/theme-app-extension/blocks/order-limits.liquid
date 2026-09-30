@@ -3,57 +3,42 @@
   assign variant = product.selected_or_first_available_variant
 -%}
 
-{%- comment -%}
-  Catalog visibility: a product restricted to TackQuote buyer groups offers
-  no price, break, limit or quote control to a shopper who may not buy it.
-  The rule, and why, is in snippets/tackquote-visibility.liquid.
-{%- endcomment -%}
+{%- # README.md, Liquid design notes: order-limits.liquid (1) -%}
 {%- capture tackquote_access -%}{% render 'tackquote-visibility', product: product %}{%- endcapture -%}
 {%- assign tackquote_access = tackquote_access | strip -%}
 {%- unless tackquote_access == 'hidden' -%}
 {{ tackquote_access }}
 {%- if proxy_path == blank -%}
-  {%- if request.design_mode -%}
-    <div class="tackquote-setup" {{ block.shopify_attributes }}>
-      <strong>{{ 'tackquote.setup.title' | t }}</strong>
-      <p>{{ 'tackquote.setup.proxy' | t }}</p>
-    </div>
-  {%- endif -%}
+  {% render 'tackquote-setup', attrs: block.shopify_attributes %}
 {%- else -%}
-  {%- comment -%}
-    Kept OUTSIDE the tag's attribute list (see b5a4158: a Liquid tag between
-    attributes failed `shopify app deploy`'s theme check).
-
-    The product ID is sent alongside the SKU because an order-limit rule may
-    name either one. `data-tackquote-product-id`, deliberately distinct from
-    `data-tackquote-product`, which is the product TITLE that `ns.label`
-    reads — sending a title where the API expects an id would match no rule
-    and look exactly like "this product has no minimum".
-  {%- endcomment -%}
+  {%- # README.md, Liquid design notes: order-limits.liquid (2) -%}
   {%- capture tackquote_diagnostics -%}{% render 'tackquote-diagnostics' %}{%- endcapture -%}
+  {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
+  {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
   <div
     class="tackquote-block tackquote-limits"
-    data-tackquote-mode="order-limits"
-    data-tackquote-proxy="{{ proxy_path | escape }}"
-    data-tackquote-variant="{{ variant.id }}"
-    data-tackquote-product-id="{{ product.id }}"
-    data-tackquote-customer="{{ customer.id }}"
-    data-tackquote-design="{% if request.design_mode %}true{% else %}false{% endif %}"
-    data-msg-qty-min="{{ 'tackquote.order_limits.qty_min' | t | escape }}"
-    data-msg-qty-max="{{ 'tackquote.order_limits.qty_max' | t | escape }}"
-    data-msg-qty-range="{{ 'tackquote.order_limits.qty_range' | t | escape }}"
-    data-msg-total-min="{{ 'tackquote.order_limits.total_min' | t | escape }}"
-    data-msg-total-max="{{ 'tackquote.order_limits.total_max' | t | escape }}"
-    data-msg-total-range="{{ 'tackquote.order_limits.total_range' | t | escape }}"
-    data-msg-items-min="{{ 'tackquote.order_limits.items_min' | t | escape }}"
-    data-msg-items-max="{{ 'tackquote.order_limits.items_max' | t | escape }}"
-    data-msg-items-range="{{ 'tackquote.order_limits.items_range' | t | escape }}"
-    data-msg-account-note="{{ 'tackquote.order_limits.account_note' | t | escape }}"
-    data-msg-enforced-note="{{ 'tackquote.order_limits.enforced_note' | t | escape }}"
-    data-msg-empty="{{ 'tackquote.order_limits.empty' | t | escape }}"
-    data-msg-error="{{ 'tackquote.order_limits.error' | t | escape }}"
-    {{ tackquote_diagnostics | split: '-->' | last | split: '<!--' | first }}
-    {{ block.shopify_attributes }}
+  data-tackquote-mode="order-limits"
+  data-tackquote-proxy="{{ proxy_path | escape }}"
+  data-tackquote-variant="{{ variant.id }}"
+  data-tackquote-product-id="{{ product.id }}"
+  data-tackquote-customer="{{ customer.id }}"
+  data-tackquote-design="{% if request.design_mode %}true{% else %}false{% endif %}"
+  data-msg-qty-min="{{ 'tackquote.order_limits.qty_min' | t | escape }}"
+  data-msg-qty-max="{{ 'tackquote.order_limits.qty_max' | t | escape }}"
+  data-msg-qty-range="{{ 'tackquote.order_limits.qty_range' | t | escape }}"
+  data-msg-total-min="{{ 'tackquote.order_limits.total_min' | t | escape }}"
+  data-msg-total-max="{{ 'tackquote.order_limits.total_max' | t | escape }}"
+  data-msg-total-range="{{ 'tackquote.order_limits.total_range' | t | escape }}"
+  data-msg-items-min="{{ 'tackquote.order_limits.items_min' | t | escape }}"
+  data-msg-items-max="{{ 'tackquote.order_limits.items_max' | t | escape }}"
+  data-msg-items-range="{{ 'tackquote.order_limits.items_range' | t | escape }}"
+  data-msg-account-note="{{ 'tackquote.order_limits.account_note' | t | escape }}"
+  data-msg-enforced-note="{{ 'tackquote.order_limits.enforced_note' | t | escape }}"
+  data-msg-empty="{{ 'tackquote.order_limits.empty' | t | escape }}"
+  data-msg-error="{{ 'tackquote.order_limits.error' | t | escape }}"
+  {{ tackquote_diagnostics | split: '-->' | last | split: '<!--' | first }}
+  {{ tq_attrs }}
+  {{ block.shopify_attributes }}
   >
     {% render 'tackquote-selection', product: product %}
     <div class="tackquote-limits__body" data-tackquote-limits-body role="status" aria-live="polite">
@@ -64,36 +49,22 @@
   </div>
 
   <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
+  <script src="{{ 'tackquote-theme.js' | asset_url }}" async></script>
 {%- endif -%}
 {%- endunless -%}
 
 {% schema %}
-{
-  "name": "Order Minimums",
-  "target": "section",
-  "enabled_on": {
-    "templates": [
-      "product"
-    ]
-  },
-  "stylesheet": "tackquote.css",
-  "javascript": "tackquote-order-limits.js",
-  "settings": [
-    {
-      "type": "paragraph",
-      "content": "States the minimum (or maximum) order rules that apply to this product, on the product page. The rules are shown to shoppers here and applied when TackQuote builds a quote or draft order. When checkout pricing is on in TackQuote they are also enforced at Shopify checkout, and the block says so; otherwise they are not enforced in the storefront cart or at checkout. Rules are managed in TackQuote under Order Limits."
-    },
-    {
-      "type": "paragraph",
-      "content": "Blanket rules are shown to every visitor, because everyone is subject to them. Rules that apply only to a specific buyer or company are shown only after that customer signs in, and are labelled as account-specific."
-    },
-    {
-      "type": "text",
-      "id": "proxy_path",
-      "label": "Advanced: app URL prefix",
-      "default": "/apps/tackquote",
-      "info": "Leave this as it is. Change it only if you renamed the TackQuote app proxy in Shopify (Settings, Apps and sales channels, TackQuote, App proxy)."
-    }
-  ]
-}
+{"name": "Order Minimums", "target": "section", "enabled_on": {"templates": ["product"]}, "stylesheet": "tackquote.css", "javascript": "tackquote-order-limits.js","settings":[
+    {"type":"paragraph","content":"t:tq.p.order_limits_1"},
+    {"type":"paragraph","content":"t:tq.p.order_limits_2"},
+    {"type":"text","id":"proxy_path","label":"t:tq.c.proxy","default":"/apps/tackquote","info":"t:tq.c.proxy_info"},
+    {"type":"header","content":"t:tq.s.header","info":"t:tq.s.info"},
+    {"type":"select","id":"tq_size","label":"t:tq.s.size","options":[{"value":"0.875","label":"t:tq.s.smaller"},{"value":"1","label":"t:tq.s.match"},{"value":"1.125","label":"t:tq.s.larger"},{"value":"1.25","label":"t:tq.s.largest"}],"default":"1"},
+    {"type":"select","id":"tq_font","label":"t:tq.s.font","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"system","label":"t:tq.s.system"}],"default":"theme"},
+    {"type":"color","id":"tq_text","label":"t:tq.s.text"},
+    {"type":"color","id":"tq_bg","label":"t:tq.s.bg"},
+    {"type":"color","id":"tq_accent","label":"t:tq.s.accent"},
+    {"type":"color","id":"tq_accent_text","label":"t:tq.s.accent_text"},
+    {"type":"select","id":"tq_radius","label":"t:tq.s.radius","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"0","label":"t:tq.s.square"},{"value":"4","label":"t:tq.s.slight"},{"value":"8","label":"t:tq.s.rounded"},{"value":"12","label":"t:tq.s.more_rounded"},{"value":"999","label":"t:tq.s.pill"}],"default":"theme"}
+  ]}
 {% endschema %}

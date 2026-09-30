@@ -1,0 +1,53 @@
+{
+  "tq": {
+    "s": {
+      "header": "Style",
+      "info": "Comme le thème (ou vide) reprend les polices, couleurs, angles et boutons de votre thème.",
+      "size": "Taille du texte",
+      "smaller": "Plus petit",
+      "match": "Comme le thème",
+      "larger": "Plus grand",
+      "largest": "Le plus grand",
+      "font": "Police",
+      "system": "Police système",
+      "text": "Couleur du texte",
+      "bg": "Couleur de fond",
+      "accent": "Couleur du bouton",
+      "accent_text": "Couleur du texte du bouton",
+      "radius": "Arrondi des angles",
+      "square": "Carré",
+      "slight": "Léger",
+      "rounded": "Arrondi",
+      "more_rounded": "Plus arrondi",
+      "pill": "Pilule"
+    },
+    "c": {
+      "proxy": "Avancé : préfixe d’URL de l’app",
+      "proxy_info": "Laissez tel quel. Modifiez-le uniquement si vous avez renommé le proxy d’app TackQuote dans Shopify (Paramètres, Applications et canaux de vente, TackQuote, Proxy d’app).",
+      "target": "Demander un prix cible",
+      "target_info": "Ajoute un champ facultatif Votre prix cible à chaque ligne. Seule la saisie de l’acheteur est envoyée, jamais le prix de votre boutique.",
+      "message": "Permettre aux acheteurs d’ajouter un message",
+      "files": "Permettre aux acheteurs de joindre des fichiers",
+      "files_info": "Jusqu’à 3 fichiers PDF, JPEG ou PNG de 5 Mo chacun.",
+      "quote_page": "Page de devis (facultatif)",
+      "quote_page_info": "Choisissez la page contenant le bloc Page de devis pour l’ouvrir à la place de la fenêtre."
+    },
+    "p": {
+      "buyer_group_badge_1": "Affiche le groupe d’acheteurs TackQuote du client connecté, par exemple « Niveau 2 ». Un visiteur déconnecté, non lié à un acheteur TackQuote ou sans groupe ne voit rien.",
+      "credit_application_1": "Permet à un client grossiste connecté de demander des conditions de paiement différé. Les demandes arrivent dans TackQuote pour examen ; rien n’est approuvé automatiquement.",
+      "order_limits_1": "Indique sur la page produit les règles de commande minimale (ou maximale) applicables. Elles sont affichées ici et appliquées lorsque TackQuote crée un devis ou une commande provisoire. Si la tarification au paiement est activée dans TackQuote, elles sont aussi imposées au paiement Shopify et le bloc le précise ; sinon, elles ne sont imposées ni dans le panier ni au paiement. Les règles se gèrent dans TackQuote, sous Limites de commande.",
+      "order_limits_2": "Les règles générales sont affichées à tous les visiteurs, car elles s’appliquent à tous. Les règles propres à un acheteur ou une entreprise n’apparaissent qu’après sa connexion et sont signalées comme propres au compte.",
+      "price_gate_1": "Masque les prix et le bouton Ajouter au panier pour les visiteurs qui ne doivent pas les voir, et affiche à la place un lien Connectez-vous pour voir les prix. Seul l’AFFICHAGE de la boutique est concerné. Ce n’est pas une règle de paiement, et les données produit publiées par votre thème restent publiques.",
+      "price_gate_2": "Les produits portant cette étiquette masquent Ajouter au panier et Acheter maintenant pour tous : seul un devis permet de les acheter. Laissez vide pour désactiver. Associez-le au bloc Demander un devis.",
+      "price_gate_3": "Uniquement si votre thème affiche des prix à un endroit non couvert. Sélecteurs CSS séparés par des virgules, par exemple .my-price. Les accolades, points-virgules et @ sont refusés.",
+      "quantity_breaks_1": "Affiche le barème de prix de gros par quantité de ce produit. Si la tarification au paiement est activée dans TackQuote, le tableau indique que les prix s’appliquent au paiement ; sinon, ils sont proposés sur devis. Chaque prix vient du moteur de prix de TackQuote : ce tableau et le bloc Prix de gros ne peuvent pas se contredire.",
+      "quantity_breaks_2": "Les clients grossistes connectés voient leur propre barème. Les visiteurs déconnectés voient une invitation à se connecter, ou votre barème public si vous en avez publié un dans TackQuote — voir le guide du connecteur Shopify.",
+      "quick_order_1": "Permet à un acheteur professionnel connecté de coller des SKU et des quantités et de tout ajouter au panier ou à un devis en une fois. Les prix et limites de commande viennent de TackQuote. Les visiteurs non connectés voient un lien de connexion.",
+      "quote_cards_1": "Ajoute un bouton Ajouter au devis sur chaque fiche produit de vos grilles de collection et de recherche. Les produits avec options ouvrent leur page pour que l’acheteur choisisse.",
+      "quote_cart_1": "Permet à l’acheteur de transformer le panier en demande de devis et de rouvrir son devis. Ajoutez-le après le panier (pied du panier ou section Applications en dessous).",
+      "quote_page_1": "Affiche le devis enregistré de l’acheteur avec modification des quantités et le formulaire de demande. Placez-le sur sa propre page, puis choisissez-la comme Page de devis dans le panier de devis flottant ou le bouton du panier de devis.",
+      "wholesale_price_1": "Affiche le prix de gros du client connecté. Si la tarification au paiement est activée dans TackQuote, le bloc indique que le prix s’applique au paiement ; sinon, il le propose sur devis. TackQuote détermine le prix à partir de la session Shopify du client : il n’est jamais lu sur cette page et ne peut pas être modifié.",
+      "wholesale_signup_1": "Laissez vide pour afficher votre formulaire de candidature grossiste par défaut de TackQuote. Pour un autre formulaire, collez la dernière partie de son lien boutique depuis TackQuote → Paramètres → Vente en gros → Formulaires."
+    }
+  }
+}

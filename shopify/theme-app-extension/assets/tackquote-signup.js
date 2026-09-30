@@ -65,7 +65,7 @@
 
       const submit = document.createElement('button');
       submit.type = 'submit';
-      submit.className = 'tackquote-signup__submit';
+      submit.className = 'tackquote-button tackquote-button--theme button button--primary btn tackquote-signup__submit';
       submit.textContent = msg('msgSubmit') || 'Apply';
       form.appendChild(submit);
 

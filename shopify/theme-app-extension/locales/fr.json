@@ -51,7 +51,24 @@
       "required": "Veuillez indiquer votre nom et votre e-mail.",
       "add_button": "Ajouter au devis",
       "request_button": "Demander un devis",
-      "helper": "Vous achetez en volume ? Demandez-nous un prix."
+      "helper": "Vous achetez en volume ? Demandez-nous un prix.",
+      "decrease": "Diminuer la quantité",
+      "increase": "Augmenter la quantité",
+      "full": "Votre demande de devis est pleine. Veuillez l’envoyer ou retirer d’abord un article.",
+      "view": "Voir le devis",
+      "count": "Articles dans votre devis : {count}",
+      "count_label": "{label}, {count} dans le devis",
+      "cart_request": "Demander un devis pour votre panier",
+      "cart_added": "Les articles de votre panier sont dans votre demande de devis.",
+      "cart_empty": "Votre panier est vide.",
+      "cart_failed": "Votre panier n’a pas pu être lu. Veuillez réessayer.",
+      "fab_label": "Devis",
+      "target_price": "Votre prix cible (à l’unité)",
+      "editor_view": "Voir le devis s’affiche ici dès que le devis contient des articles.",
+      "card_failed": "Cet article n’a pas pu être ajouté. Veuillez réessayer.",
+      "files": "Joindre des fichiers (facultatif)",
+      "files_help": "Jusqu’à 3 fichiers PDF, JPEG ou PNG, 5 Mo chacun.",
+      "files_max": "Veuillez joindre 3 fichiers au maximum."
     },
     "signup": {
       "loading": "Chargement du formulaire de demande",
@@ -140,7 +157,8 @@
       "editor_title": "TackQuote Price Gate est activé",
       "editor_guests": "Les clients non connectés ne verront pas les prix. L’éditeur de thème les affiche toujours.",
       "editor_tag": "Les clients sans cette balise client ne verront pas les prix :",
-      "editor_bad_selectors": "Les sélecteurs de prix supplémentaires ont été ignorés, car ils contiennent des accolades, des points-virgules ou @."
+      "editor_bad_selectors": "Les sélecteurs de prix supplémentaires ont été ignorés, car ils contiennent des accolades, des points-virgules ou @.",
+      "editor_quote_only": "Ce produit porte l’étiquette devis uniquement : les clients ne voient ni Ajouter au panier ni Acheter maintenant."
     },
     "quick_order": {
       "help": "Un article par ligne : SKU, puis quantité. Par exemple ABC-100, 12",

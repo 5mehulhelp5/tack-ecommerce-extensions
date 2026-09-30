@@ -1,0 +1,43 @@
+{%- comment -%}
+  README.md, Liquid design notes: tackquote-style.liquid (1).
+  @param {object} s - The block's settings (block.settings).
+{%- endcomment -%}
+{%- liquid
+  assign st = ''
+  assign flags = ''
+  if s.tq_size != blank and s.tq_size != '1'
+    assign st = st | append: '--tqm-size:' | append: s.tq_size | append: ';'
+  endif
+  if s.tq_text != blank
+    assign hex = s.tq_text | color_to_hex
+    assign st = st | append: '--tqm-text:' | append: hex | append: ';'
+  endif
+  if s.tq_bg != blank
+    assign hex = s.tq_bg | color_to_hex
+    assign st = st | append: '--tqm-bg:' | append: hex | append: ';'
+    assign flags = ' data-tqm-bg'
+  endif
+  if s.tq_accent != blank
+    assign hex = s.tq_accent | color_to_hex
+    assign st = st | append: '--tqm-accent:' | append: hex | append: ';'
+    if s.tq_accent_text == blank
+      assign lum = s.tq_accent | color_brightness
+      if lum > 150
+        assign st = st | append: '--tqm-accent-text:#000000;'
+      else
+        assign st = st | append: '--tqm-accent-text:#ffffff;'
+      endif
+    endif
+  endif
+  if s.tq_accent_text != blank
+    assign hex = s.tq_accent_text | color_to_hex
+    assign st = st | append: '--tqm-accent-text:' | append: hex | append: ';'
+  endif
+  if s.tq_radius != blank and s.tq_radius != 'theme'
+    assign st = st | append: '--tqm-radius:' | append: s.tq_radius | append: 'px;'
+  endif
+  if s.tq_font == 'system'
+    assign st = st | append: "--tqm-font:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;"
+  endif
+-%}
+{%- if st != blank -%}style="{{ st | escape }}"{{ flags }}{%- endif -%}

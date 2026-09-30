@@ -1,0 +1,53 @@
+{
+  "tq": {
+    "s": {
+      "header": "Estilo",
+      "info": "Igual que el tema (o vacío) usa las fuentes, colores, esquinas y botones de tu tema.",
+      "size": "Tamaño del texto",
+      "smaller": "Más pequeño",
+      "match": "Igual que el tema",
+      "larger": "Más grande",
+      "largest": "El más grande",
+      "font": "Fuente",
+      "system": "Fuente del sistema",
+      "text": "Color del texto",
+      "bg": "Color de fondo",
+      "accent": "Color del botón",
+      "accent_text": "Color del texto del botón",
+      "radius": "Radio de las esquinas",
+      "square": "Recto",
+      "slight": "Ligero",
+      "rounded": "Redondeado",
+      "more_rounded": "Más redondeado",
+      "pill": "Píldora"
+    },
+    "c": {
+      "proxy": "Avanzado: prefijo de URL de la app",
+      "proxy_info": "Déjalo como está. Cámbialo solo si renombraste el proxy de la app TackQuote en Shopify (Configuración, Apps y canales de venta, TackQuote, Proxy de la app).",
+      "target": "Pedir un precio objetivo",
+      "target_info": "Añade un campo opcional Tu precio objetivo a cada línea. Solo se envía lo que escribe el comprador, nunca el precio de tu tienda.",
+      "message": "Permitir que los compradores añadan un mensaje",
+      "files": "Permitir que los compradores adjunten archivos",
+      "files_info": "Hasta 3 archivos PDF, JPEG o PNG de 5 MB cada uno.",
+      "quote_page": "Página de presupuesto (opcional)",
+      "quote_page_info": "Elige la página que contiene el bloque Página de presupuesto para abrirla en lugar de la ventana emergente."
+    },
+    "p": {
+      "buyer_group_badge_1": "Muestra el grupo de compradores de TackQuote del cliente con sesión iniciada, por ejemplo “Nivel 2”. Quien no ha iniciado sesión, no está vinculado a un comprador de TackQuote o no pertenece a ningún grupo no ve nada.",
+      "credit_application_1": "Permite que un cliente mayorista con sesión iniciada solicite condiciones de pago aplazado. Las solicitudes llegan a TackQuote para revisión; nada se aprueba automáticamente.",
+      "order_limits_1": "Indica en la página del producto las reglas de pedido mínimo (o máximo) que se aplican. Se muestran aquí y se aplican cuando TackQuote crea un presupuesto o un pedido preliminar. Si los precios en el checkout están activos en TackQuote, también se exigen en el checkout de Shopify y el bloque lo indica; si no, no se exigen en el carrito ni en el checkout. Gestiona las reglas en TackQuote, en Límites de pedido.",
+      "order_limits_2": "Las reglas generales se muestran a todos los visitantes, porque se aplican a todos. Las reglas de un comprador o empresa concretos solo aparecen cuando ese cliente inicia sesión y se marcan como propias de la cuenta.",
+      "price_gate_1": "Oculta precios y el botón Añadir al carrito a quien no debe verlos y muestra en su lugar un enlace Inicia sesión para ver precios. Oculta lo que la tienda MUESTRA. No es una regla del checkout y los datos de producto que publica tu tema siguen siendo públicos.",
+      "price_gate_2": "Los productos con esta etiqueta ocultan Añadir al carrito y Comprar ahora a todos, así que solo se pueden comprar con presupuesto. Déjalo vacío para desactivarlo. Combínalo con el bloque Pedir presupuesto.",
+      "price_gate_3": "Solo si tu tema muestra precios en algún sitio que esto no cubre. Selectores CSS separados por comas, por ejemplo .my-price. Se rechazan llaves, punto y coma y @.",
+      "quantity_breaks_1": "Muestra la escala de precios mayoristas por cantidad de este producto. Si los precios en el checkout están activos en TackQuote, la tabla indica que se aplican en el checkout; si no, se ofrecen en un presupuesto. Todos los precios salen del motor de precios de TackQuote, así que esta tabla y el bloque Precio mayorista siempre coinciden.",
+      "quantity_breaks_2": "Los clientes mayoristas con sesión iniciada ven su propia escala. Los visitantes sin sesión ven un aviso para iniciar sesión, o tu escala pública si publicaste una en TackQuote — consulta la guía del conector de Shopify.",
+      "quick_order_1": "Permite a un comprador profesional con sesión iniciada pegar SKU y cantidades y añadirlo todo al carrito o a un presupuesto de una vez. Los precios y los límites de pedido vienen de TackQuote. Quien no ha iniciado sesión ve un enlace para hacerlo.",
+      "quote_cards_1": "Añade un botón Añadir al presupuesto en cada tarjeta de producto de tus colecciones y búsquedas. Los productos con opciones abren su página para que el comprador elija.",
+      "quote_cart_1": "Permite al comprador convertir el carrito en una solicitud de presupuesto y volver a abrirla. Añádelo después del carrito (el pie del carrito o una sección de apps debajo).",
+      "quote_page_1": "Muestra el presupuesto guardado del comprador con edición de cantidades y el formulario de solicitud. Ponlo en su propia página y elígela como Página de presupuesto en el carrito flotante o en el botón del carrito de presupuesto.",
+      "wholesale_price_1": "Muestra el precio mayorista del cliente con sesión iniciada. Si los precios en el checkout están activos en TackQuote, el bloque indica que se aplica en el checkout; si no, lo ofrece en un presupuesto. TackQuote obtiene el precio de la sesión de Shopify del comprador, así que nunca se lee de esta página y no se puede alterar.",
+      "wholesale_signup_1": "Déjalo vacío para mostrar tu formulario de solicitud mayorista predeterminado de TackQuote. Para mostrar otro, pega la última parte de su enlace de tienda desde TackQuote → Configuración → Mayorista → Formularios."
+    }
+  }
+}

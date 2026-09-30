@@ -1,0 +1,86 @@
+{%- liquid
+  assign proxy_path = block.settings.proxy_path | strip | remove_last: '/'
+  assign label_request = block.settings.request_label | strip
+  if label_request == blank or label_request == 'Request a quote for your cart'
+    assign label_request = 'tackquote.quote.cart_request' | t
+  endif
+  assign label_view = block.settings.view_label | strip
+  if label_view == blank or label_view == 'View quote'
+    assign label_view = 'tackquote.quote.view' | t
+  endif
+  assign quote_page = ''
+  if block.settings.quote_page != blank
+    assign quote_page = block.settings.quote_page.url
+  endif
+-%}
+
+{%- # README.md, Liquid design notes: quote-cart.liquid (1) -%}
+{%- if proxy_path == blank -%}
+  {% render 'tackquote-setup', attrs: block.shopify_attributes %}
+{%- else -%}
+  {%- capture tq_style -%}{% render 'tackquote-style', s: block.settings %}{%- endcapture -%}
+  {%- assign tq_attrs = tq_style | split: '-->' | last | split: '<!--' | first -%}
+  <div
+    class="tackquote-qcart"
+  data-tq-root
+  data-placement="{{ block.settings.placement | escape }}"
+  data-msg-sending="{{ 'tackquote.quote.sending' | t | escape }}"
+  data-msg-cart-empty="{{ 'tackquote.quote.cart_empty' | t | escape }}"
+  data-msg-cart-added="{{ 'tackquote.quote.cart_added' | t | escape }}"
+  data-msg-cart-failed="{{ 'tackquote.quote.cart_failed' | t | escape }}"
+  data-msg-full="{{ 'tackquote.quote.full' | t | escape }}"
+  {{ tq_attrs }}
+  {{ block.shopify_attributes }}
+  >
+    {%- if cart.item_count > 0 or request.design_mode -%}
+      <button type="button" class="tackquote-button tackquote-button--theme button button--primary btn" data-tackquote-cart-import>
+        {{- label_request -}}
+      </button>
+    {%- endif -%}
+    <button
+      type="button"
+      class="tackquote-button tackquote-button--theme tackquote-hidden-empty button button--secondary btn btn--secondary"
+  data-tackquote-open
+  data-tackquote-page="{{ quote_page | escape }}"
+  data-tackquote-hide-empty
+  data-tackquote-label="{{ label_view | escape }}"
+  data-tackquote-count-label="{{ 'tackquote.quote.count_label' | t | escape }}"
+      aria-haspopup="dialog"
+      hidden
+    >
+      <span>{{ label_view }}</span>
+      <span class="tackquote-count" data-tackquote-count aria-hidden="true" hidden>0</span>
+    </button>
+    {%- if request.design_mode -%}
+      <p class="tackquote-qcart__placeholder">{{ 'tackquote.quote.editor_view' | t }}</p>
+    {%- endif -%}
+    <p class="tackquote-status" data-tackquote-status role="status" aria-live="polite"></p>
+  </div>
+
+  {% render 'tackquote-drawer', proxy: proxy_path, attrs: tq_attrs, target_price: block.settings.target_price, message: block.settings.allow_message, files: block.settings.allow_files %}
+  <script src="{{ 'tackquote-quote.js' | asset_url }}" defer></script>
+  <script src="{{ 'tackquote-shared.js' | asset_url }}" async></script>
+  <script src="{{ 'tackquote-theme.js' | asset_url }}" async></script>
+{%- endif -%}
+
+{% schema %}
+{"name": "Quote cart button", "target": "section", "enabled_on": {"templates": ["cart"]}, "stylesheet": "tackquote.css", "javascript": "tackquote-quote-cart.js","settings":[
+    {"type":"paragraph","content":"t:tq.p.quote_cart_1"},
+    {"type":"select","id":"placement","label":"Spacing","options":[{"value":"after","label":"After the cart (space above)"},{"value":"before","label":"Before checkout (space below)"}],"default":"after"},
+    {"type":"text","id":"request_label","label":"Request button text","default":"Request a quote for your cart"},
+    {"type":"text","id":"view_label","label":"View button text","default":"View quote"},
+    {"type":"page","id":"quote_page","label":"t:tq.c.quote_page","info":"t:tq.c.quote_page_info"},
+    {"type":"checkbox","id":"target_price","label":"t:tq.c.target","info":"t:tq.c.target_info","default":false},
+    {"type":"checkbox","id":"allow_message","label":"t:tq.c.message","default":false},
+    {"type":"checkbox","id":"allow_files","label":"t:tq.c.files","info":"t:tq.c.files_info","default":false},
+    {"type":"text","id":"proxy_path","label":"t:tq.c.proxy","default":"/apps/tackquote","info":"t:tq.c.proxy_info"},
+    {"type":"header","content":"t:tq.s.header","info":"t:tq.s.info"},
+    {"type":"select","id":"tq_size","label":"t:tq.s.size","options":[{"value":"0.875","label":"t:tq.s.smaller"},{"value":"1","label":"t:tq.s.match"},{"value":"1.125","label":"t:tq.s.larger"},{"value":"1.25","label":"t:tq.s.largest"}],"default":"1"},
+    {"type":"select","id":"tq_font","label":"t:tq.s.font","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"system","label":"t:tq.s.system"}],"default":"theme"},
+    {"type":"color","id":"tq_text","label":"t:tq.s.text"},
+    {"type":"color","id":"tq_bg","label":"t:tq.s.bg"},
+    {"type":"color","id":"tq_accent","label":"t:tq.s.accent"},
+    {"type":"color","id":"tq_accent_text","label":"t:tq.s.accent_text"},
+    {"type":"select","id":"tq_radius","label":"t:tq.s.radius","options":[{"value":"theme","label":"t:tq.s.match"},{"value":"0","label":"t:tq.s.square"},{"value":"4","label":"t:tq.s.slight"},{"value":"8","label":"t:tq.s.rounded"},{"value":"12","label":"t:tq.s.more_rounded"},{"value":"999","label":"t:tq.s.pill"}],"default":"theme"}
+  ]}
+{% endschema %}

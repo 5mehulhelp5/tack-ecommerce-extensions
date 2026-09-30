@@ -51,7 +51,24 @@
       "required": "Vul je naam en e-mailadres in.",
       "add_button": "Toevoegen aan offerte",
       "request_button": "Offerte aanvragen",
-      "helper": "Koop je in grote aantallen? Vraag ons om een prijs."
+      "helper": "Koop je in grote aantallen? Vraag ons om een prijs.",
+      "decrease": "Aantal verlagen",
+      "increase": "Aantal verhogen",
+      "full": "Je offerteaanvraag is vol. Verstuur hem of verwijder eerst een artikel.",
+      "view": "Offerte bekijken",
+      "count": "Artikelen in je offerte: {count}",
+      "count_label": "{label}, {count} in offerte",
+      "cart_request": "Vraag een offerte aan voor je winkelwagen",
+      "cart_added": "De artikelen uit je winkelwagen staan in je offerteaanvraag.",
+      "cart_empty": "Je winkelwagen is leeg.",
+      "cart_failed": "We konden je winkelwagen niet lezen. Probeer het opnieuw.",
+      "fab_label": "Offerte",
+      "target_price": "Je richtprijs (per stuk)",
+      "editor_view": "Offerte bekijken verschijnt hier zodra de offerte artikelen bevat.",
+      "card_failed": "We konden dat artikel niet toevoegen. Probeer het opnieuw.",
+      "files": "Bestanden bijvoegen (optioneel)",
+      "files_help": "Maximaal 3 PDF-, JPEG- of PNG-bestanden, elk 5 MB.",
+      "files_max": "Voeg maximaal 3 bestanden toe."
     },
     "signup": {
       "loading": "Aanvraagformulier wordt geladen",
@@ -140,7 +157,8 @@
       "editor_title": "TackQuote Price Gate staat aan",
       "editor_guests": "Klanten die niet zijn ingelogd, zien geen prijzen. De thema-editor toont ze altijd.",
       "editor_tag": "Klanten zonder deze klanttag zien geen prijzen:",
-      "editor_bad_selectors": "De extra prijsselectors zijn genegeerd omdat ze accolades, puntkomma’s of @ bevatten."
+      "editor_bad_selectors": "De extra prijsselectors zijn genegeerd omdat ze accolades, puntkomma’s of @ bevatten.",
+      "editor_quote_only": "Dit product heeft de tag alleen offerte, dus klanten zien geen In winkelwagen of Nu kopen."
     },
     "quick_order": {
       "help": "Eén artikel per regel: SKU, dan aantal. Bijvoorbeeld ABC-100, 12",

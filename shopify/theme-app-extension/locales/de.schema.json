@@ -1,0 +1,53 @@
+{
+  "tq": {
+    "s": {
+      "header": "Stil",
+      "info": "Wie Theme (oder leer) übernimmt Schriften, Farben, Ecken und Schaltflächen Ihres Themes.",
+      "size": "Textgröße",
+      "smaller": "Kleiner",
+      "match": "Wie Theme",
+      "larger": "Größer",
+      "largest": "Am größten",
+      "font": "Schrift",
+      "system": "Systemschrift",
+      "text": "Textfarbe",
+      "bg": "Hintergrundfarbe",
+      "accent": "Schaltflächenfarbe",
+      "accent_text": "Schaltflächen-Textfarbe",
+      "radius": "Eckenradius",
+      "square": "Eckig",
+      "slight": "Leicht",
+      "rounded": "Abgerundet",
+      "more_rounded": "Stärker abgerundet",
+      "pill": "Pille"
+    },
+    "c": {
+      "proxy": "Erweitert: App-URL-Präfix",
+      "proxy_info": "Bitte unverändert lassen. Ändern Sie es nur, wenn Sie den TackQuote-App-Proxy in Shopify umbenannt haben (Einstellungen, Apps und Vertriebskanäle, TackQuote, App-Proxy).",
+      "target": "Nach einem Wunschpreis fragen",
+      "target_info": "Fügt jeder Position ein optionales Feld Ihr Wunschpreis hinzu. Gesendet wird nur, was der Käufer eingibt, nie Ihr Shop-Preis.",
+      "message": "Käufern eine Nachricht erlauben",
+      "files": "Käufern Dateianhänge erlauben",
+      "files_info": "Bis zu 3 PDF-, JPEG- oder PNG-Dateien mit je 5 MB.",
+      "quote_page": "Angebotsseite (optional)",
+      "quote_page_info": "Wählen Sie die Seite mit dem Block Angebotsseite, um sie statt des Pop-ups zu öffnen."
+    },
+    "p": {
+      "buyer_group_badge_1": "Zeigt die TackQuote-Käufergruppe des angemeldeten Kunden, zum Beispiel „Stufe 2“. Wer abgemeldet ist, mit keinem TackQuote-Käufer verknüpft ist oder keiner Gruppe angehört, sieht nichts.",
+      "credit_application_1": "Angemeldete Großhandelskunden können Zahlungsziele beantragen. Anträge werden in TackQuote geprüft; nichts wird automatisch genehmigt.",
+      "order_limits_1": "Nennt auf der Produktseite die Mindest- (oder Höchst-)Bestellregeln für dieses Produkt. Sie werden hier angezeigt und angewendet, wenn TackQuote ein Angebot oder einen Bestellentwurf erstellt. Ist in TackQuote die Checkout-Preisgestaltung aktiv, gelten sie auch im Shopify-Checkout, und der Block weist darauf hin; andernfalls werden sie weder im Warenkorb noch im Checkout durchgesetzt. Die Regeln verwalten Sie in TackQuote unter Bestelllimits.",
+      "order_limits_2": "Allgemeine Regeln sehen alle Besucher, weil sie für alle gelten. Regeln für einen bestimmten Käufer oder ein Unternehmen erscheinen erst nach dessen Anmeldung und sind als kontospezifisch gekennzeichnet.",
+      "price_gate_1": "Blendet Preise und die Schaltfläche In den Warenkorb für Kunden aus, die sie nicht sehen sollen, und zeigt stattdessen einen Link Anmelden, um Preise zu sehen. Das betrifft nur die ANZEIGE im Shop. Es ist keine Checkout-Regel, und Produktdaten, die Ihr Theme veröffentlicht, bleiben öffentlich.",
+      "price_gate_2": "Produkte mit diesem Tag blenden In den Warenkorb und Jetzt kaufen für alle aus, sodass sie nur per Angebot gekauft werden können. Leer lassen zum Ausschalten. Kombinieren Sie es mit dem Block Angebot anfragen.",
+      "price_gate_3": "Nur wenn Ihr Theme Preise an Stellen zeigt, die hier fehlen. Kommagetrennte CSS-Selektoren, zum Beispiel .my-price. Klammern, Semikolons und @ werden abgelehnt.",
+      "quantity_breaks_1": "Zeigt die Großhandels-Mengenstaffel für dieses Produkt. Ist die Checkout-Preisgestaltung in TackQuote aktiv, nennt die Tabelle die Preise als im Checkout angewendet; andernfalls werden sie per Angebot angeboten. Alle Preise stammen aus der Preis-Engine von TackQuote, daher stimmen diese Tabelle und der Block Großhandelspreis immer überein.",
+      "quantity_breaks_2": "Angemeldete Großhandelskunden sehen ihre eigene Staffel. Abgemeldete Besucher sehen einen Anmeldehinweis oder Ihre öffentliche Staffel, falls Sie eine in TackQuote veröffentlicht haben — siehe Anleitung zum Shopify-Connector.",
+      "quick_order_1": "Angemeldete Geschäftskunden fügen SKUs und Mengen ein und legen alles auf einmal in den Warenkorb oder in ein Angebot. Preise und Bestelllimits kommen aus TackQuote. Nicht angemeldete Kunden sehen einen Anmeldelink.",
+      "quote_cards_1": "Fügt jeder Produktkarte in Kollektions- und Suchrastern eine Schaltfläche Zum Angebot hinzufügen hinzu. Produkte mit Optionen öffnen ihre Produktseite, damit der Käufer wählen kann.",
+      "quote_cart_1": "Käufer können den Warenkorb in eine Angebotsanfrage umwandeln und ihre Anfrage wieder öffnen. Fügen Sie es nach dem Warenkorb ein (Warenkorb-Fußbereich oder ein App-Abschnitt darunter).",
+      "quote_page_1": "Zeigt die gespeicherte Anfrage des Käufers mit Mengenbearbeitung und Anfrageformular. Legen Sie es auf eine eigene Seite und wählen Sie diese als Angebotsseite im schwebenden Angebotskorb oder in der Angebotskorb-Schaltfläche.",
+      "wholesale_price_1": "Zeigt den Großhandelspreis des angemeldeten Kunden. Ist die Checkout-Preisgestaltung in TackQuote aktiv, nennt der Block den Preis als im Checkout angewendet; andernfalls wird er per Angebot angeboten. TackQuote ermittelt den Preis aus der Shopify-Sitzung des Kunden, er wird also nie von dieser Seite gelesen und kann nicht verändert werden.",
+      "wholesale_signup_1": "Leer lassen, um Ihr Standard-Großhandelsformular aus TackQuote zu zeigen. Für ein anderes Formular fügen Sie den letzten Teil seines Shop-Links aus TackQuote → Einstellungen → Großhandel → Formulare ein."
+    }
+  }
+}
