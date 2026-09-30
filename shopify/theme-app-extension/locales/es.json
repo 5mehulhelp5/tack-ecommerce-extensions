@@ -65,7 +65,17 @@
       "heading": "Solicita una cuenta mayorista",
       "sign_in_first": "Inicia sesión en tu cuenta para enviar la solicitud. Así queda vinculada a tu cuenta y tus precios mayoristas aparecen en cuanto se apruebe.",
       "sign_in": "Iniciar sesión",
-      "create_account": "Crear una cuenta"
+      "create_account": "Crear una cuenta",
+      "choose": "Elige una opción",
+      "file_type": "{label}: adjunta un archivo PDF, JPEG o PNG.",
+      "file_size": "{label}: el archivo debe ocupar {max} MB o menos.",
+      "uploading": "Subiendo {label}",
+      "addr_line1": "Dirección",
+      "addr_line2": "Piso, oficina o local",
+      "addr_city": "Ciudad",
+      "addr_region": "Provincia o región",
+      "addr_postal_code": "Código postal",
+      "addr_country": "País"
     },
     "quantity_breaks": {
       "loading": "Cargando los precios mayoristas por cantidad",
@@ -120,6 +130,43 @@
       "too_large": "El texto es demasiado largo para enviarlo. Acorta las notas e inténtalo de nuevo.",
       "error": "No hemos podido enviar tu solicitud. Vuelve a intentarlo en unos momentos.",
       "heading": "Solicita pago aplazado"
+    },
+    "currency": {
+      "applied": "Tu precio mayorista se aplica en el pago.",
+      "quote": "Tu precio mayorista en tu moneda está disponible en un presupuesto."
+    },
+    "gate": {
+      "login": "Inicia sesión para ver los precios",
+      "editor_title": "TackQuote Price Gate está activado",
+      "editor_guests": "Los clientes que no hayan iniciado sesión no verán los precios. El editor de temas siempre los muestra.",
+      "editor_tag": "Los clientes sin esta etiqueta de cliente no verán los precios:",
+      "editor_bad_selectors": "Se ignoraron los selectores de precio adicionales porque contienen llaves, puntos y coma o @."
+    },
+    "quick_order": {
+      "help": "Un artículo por línea: SKU y después cantidad. Por ejemplo ABC-100, 12",
+      "placeholder": "ABC-100, 12",
+      "check": "Comprobar artículos",
+      "add_cart": "Añadir todo al carrito",
+      "add_quote": "Añadir todo al presupuesto",
+      "col_sku": "SKU",
+      "col_item": "Artículo",
+      "col_qty": "Cantidad",
+      "col_price": "Precio",
+      "not_found": "No se encuentra en esta tienda",
+      "price_at_checkout": "Tu precio se muestra en el pago",
+      "limit_min": "Mínimo {n} para este artículo",
+      "limit_max": "Máximo {n} para este artículo",
+      "empty": "Añade al menos un SKU.",
+      "too_many": "Hasta 50 artículos a la vez. Se han comprobado los 50 primeros.",
+      "bad_lines": "Algunas líneas no se pudieron leer y se omitieron: {lines}",
+      "loading": "Comprobando tus artículos",
+      "unlinked": "Tu cuenta aún no está vinculada a los pedidos mayoristas. Solicita un presupuesto y lo configuraremos.",
+      "sign_in": "Inicia sesión en tu cuenta mayorista para hacer pedidos por SKU.",
+      "login": "Iniciar sesión",
+      "error": "No hemos podido comprobar esos artículos en este momento. Inténtalo de nuevo.",
+      "added_cart": "Añadido a tu carrito.",
+      "cart_failed": "No se ha podido actualizar tu carrito. Inténtalo de nuevo.",
+      "quote_failed": "Tu solicitud de presupuesto está llena o el formulario de presupuesto no está disponible en esta página."
     },
     "visibility": {
       "editor_note": "Este producto está restringido a grupos de compradores de TackQuote. Solo los compradores que pueden adquirirlo ven este bloque; el resto de los clientes no ve nada aquí y el pago les rechaza el producto."

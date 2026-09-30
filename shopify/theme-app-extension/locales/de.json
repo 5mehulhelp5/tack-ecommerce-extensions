@@ -65,7 +65,17 @@
       "heading": "Großhandelskonto beantragen",
       "sign_in_first": "Melden Sie sich in Ihrem Konto an, um den Antrag zu stellen. Er wird dann mit Ihrem Konto verknüpft, und Ihre Großhandelspreise erscheinen, sobald er genehmigt ist.",
       "sign_in": "Anmelden",
-      "create_account": "Konto erstellen"
+      "create_account": "Konto erstellen",
+      "choose": "Bitte wählen",
+      "file_type": "{label}: Bitte hängen Sie eine PDF-, JPEG- oder PNG-Datei an.",
+      "file_size": "{label}: Die Datei darf höchstens {max} MB groß sein.",
+      "uploading": "{label} wird hochgeladen",
+      "addr_line1": "Straße und Hausnummer",
+      "addr_line2": "Adresszusatz (Gebäude, Etage, Einheit)",
+      "addr_city": "Ort",
+      "addr_region": "Bundesland oder Region",
+      "addr_postal_code": "Postleitzahl",
+      "addr_country": "Land"
     },
     "quantity_breaks": {
       "loading": "Großhandelsstaffelpreise werden geladen",
@@ -120,6 +130,43 @@
       "too_large": "Der Text ist zu lang zum Senden. Bitte kürzen Sie die Anmerkungen und versuchen Sie es erneut.",
       "error": "Ihr Antrag konnte nicht gesendet werden. Bitte versuchen Sie es gleich noch einmal.",
       "heading": "Zahlung auf Ziel beantragen"
+    },
+    "currency": {
+      "applied": "Ihr Großhandelspreis wird an der Kasse angewendet.",
+      "quote": "Ihr Großhandelspreis in Ihrer Währung ist per Angebot erhältlich."
+    },
+    "gate": {
+      "login": "Melden Sie sich an, um Preise zu sehen",
+      "editor_title": "TackQuote Price Gate ist aktiv",
+      "editor_guests": "Nicht angemeldete Kunden sehen keine Preise. Im Theme-Editor werden sie immer angezeigt.",
+      "editor_tag": "Kunden ohne diesen Kunden-Tag sehen keine Preise:",
+      "editor_bad_selectors": "Die zusätzlichen Preisselektoren wurden ignoriert, weil sie geschweifte Klammern, Semikolons oder @ enthalten."
+    },
+    "quick_order": {
+      "help": "Ein Artikel pro Zeile: SKU, dann Menge. Zum Beispiel ABC-100, 12",
+      "placeholder": "ABC-100, 12",
+      "check": "Artikel prüfen",
+      "add_cart": "Alle in den Warenkorb legen",
+      "add_quote": "Alle zum Angebot hinzufügen",
+      "col_sku": "SKU",
+      "col_item": "Artikel",
+      "col_qty": "Menge",
+      "col_price": "Preis",
+      "not_found": "In diesem Shop nicht gefunden",
+      "price_at_checkout": "Ihr Preis wird an der Kasse angezeigt",
+      "limit_min": "Mindestens {n} für diesen Artikel",
+      "limit_max": "Höchstens {n} für diesen Artikel",
+      "empty": "Geben Sie mindestens eine SKU ein.",
+      "too_many": "Bis zu 50 Artikel auf einmal. Die ersten 50 wurden geprüft.",
+      "bad_lines": "Einige Zeilen konnten nicht gelesen werden und wurden übersprungen: {lines}",
+      "loading": "Ihre Artikel werden geprüft",
+      "unlinked": "Ihr Konto ist noch nicht mit Großhandelsbestellungen verknüpft. Fordern Sie ein Angebot an, dann richten wir das ein.",
+      "sign_in": "Melden Sie sich in Ihrem Großhandelskonto an, um per SKU zu bestellen.",
+      "login": "Anmelden",
+      "error": "Die Artikel konnten gerade nicht geprüft werden. Bitte versuchen Sie es erneut.",
+      "added_cart": "Zu Ihrem Warenkorb hinzugefügt.",
+      "cart_failed": "Ihr Warenkorb konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
+      "quote_failed": "Ihre Angebotsanfrage ist voll, oder das Angebotsformular ist auf dieser Seite nicht verfügbar."
     },
     "visibility": {
       "editor_note": "Dieses Produkt ist auf TackQuote-Käufergruppen beschränkt. Nur Käufer, die es kaufen dürfen, sehen diesen Block; andere Kunden sehen hier nichts, und der Checkout lehnt das Produkt für sie ab."

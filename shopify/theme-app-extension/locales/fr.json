@@ -65,7 +65,17 @@
       "heading": "Demander un compte professionnel",
       "sign_in_first": "Connectez-vous à votre compte pour faire votre demande. Elle est alors associée à votre compte, et vos prix professionnels s’affichent dès son approbation.",
       "sign_in": "Se connecter",
-      "create_account": "Créer un compte"
+      "create_account": "Créer un compte",
+      "choose": "Choisissez une option",
+      "file_type": "{label} : veuillez joindre un fichier PDF, JPEG ou PNG.",
+      "file_size": "{label} : le fichier ne doit pas dépasser {max} Mo.",
+      "uploading": "Envoi de {label} en cours",
+      "addr_line1": "Adresse",
+      "addr_line2": "Complément d’adresse (bâtiment, étage, bureau)",
+      "addr_city": "Ville",
+      "addr_region": "État ou région",
+      "addr_postal_code": "Code postal",
+      "addr_country": "Pays"
     },
     "quantity_breaks": {
       "loading": "Chargement des prix professionnels par quantité",
@@ -120,6 +130,43 @@
       "too_large": "Le texte est trop long pour être envoyé. Raccourcissez les remarques et réessayez.",
       "error": "Impossible d’envoyer votre demande. Veuillez réessayer dans un instant.",
       "heading": "Demander un paiement à terme"
+    },
+    "currency": {
+      "applied": "Votre prix professionnel est appliqué au paiement.",
+      "quote": "Votre prix professionnel dans votre devise est disponible sur devis."
+    },
+    "gate": {
+      "login": "Connectez-vous pour voir les prix",
+      "editor_title": "TackQuote Price Gate est activé",
+      "editor_guests": "Les clients non connectés ne verront pas les prix. L’éditeur de thème les affiche toujours.",
+      "editor_tag": "Les clients sans cette balise client ne verront pas les prix :",
+      "editor_bad_selectors": "Les sélecteurs de prix supplémentaires ont été ignorés, car ils contiennent des accolades, des points-virgules ou @."
+    },
+    "quick_order": {
+      "help": "Un article par ligne : SKU, puis quantité. Par exemple ABC-100, 12",
+      "placeholder": "ABC-100, 12",
+      "check": "Vérifier les articles",
+      "add_cart": "Tout ajouter au panier",
+      "add_quote": "Tout ajouter au devis",
+      "col_sku": "SKU",
+      "col_item": "Article",
+      "col_qty": "Quantité",
+      "col_price": "Prix",
+      "not_found": "Introuvable dans cette boutique",
+      "price_at_checkout": "Votre prix s’affiche au paiement",
+      "limit_min": "Minimum {n} pour cet article",
+      "limit_max": "Maximum {n} pour cet article",
+      "empty": "Ajoutez au moins un SKU.",
+      "too_many": "50 articles maximum à la fois. Les 50 premiers ont été vérifiés.",
+      "bad_lines": "Certaines lignes n’ont pas pu être lues et ont été ignorées : {lines}",
+      "loading": "Vérification de vos articles",
+      "unlinked": "Votre compte n’est pas encore associé aux commandes professionnelles. Demandez un devis et nous nous en occupons.",
+      "sign_in": "Connectez-vous à votre compte professionnel pour commander par SKU.",
+      "login": "Se connecter",
+      "error": "Impossible de vérifier ces articles pour le moment. Veuillez réessayer.",
+      "added_cart": "Ajouté à votre panier.",
+      "cart_failed": "Impossible de mettre à jour votre panier. Veuillez réessayer.",
+      "quote_failed": "Votre demande de devis est pleine, ou le formulaire de devis n’est pas disponible sur cette page."
     },
     "visibility": {
       "editor_note": "Ce produit est réservé à des groupes d’acheteurs TackQuote. Seuls les acheteurs autorisés à l’acheter voient ce bloc ; les autres clients ne voient rien ici, et le paiement leur refuse ce produit."

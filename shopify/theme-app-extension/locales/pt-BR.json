@@ -65,7 +65,17 @@
       "heading": "Solicite uma conta de atacado",
       "sign_in_first": "Entre na sua conta para fazer a solicitação. Ela fica vinculada à sua conta, e seus preços de atacado aparecem assim que ela for aprovada.",
       "sign_in": "Entrar",
-      "create_account": "Criar uma conta"
+      "create_account": "Criar uma conta",
+      "choose": "Escolha uma opção",
+      "file_type": "{label}: anexe um arquivo PDF, JPEG ou PNG.",
+      "file_size": "{label}: o arquivo deve ter no máximo {max} MB.",
+      "uploading": "Enviando {label}",
+      "addr_line1": "Endereço",
+      "addr_line2": "Complemento (apartamento, sala ou unidade)",
+      "addr_city": "Cidade",
+      "addr_region": "Estado ou região",
+      "addr_postal_code": "CEP",
+      "addr_country": "País"
     },
     "quantity_breaks": {
       "loading": "Carregando os preços de atacado por quantidade",
@@ -120,6 +130,43 @@
       "too_large": "O texto é longo demais para enviar. Encurte as observações e tente novamente.",
       "error": "Não foi possível enviar sua solicitação. Tente novamente em instantes.",
       "heading": "Solicite pagamento a prazo"
+    },
+    "currency": {
+      "applied": "Seu preço de atacado é aplicado no checkout.",
+      "quote": "Seu preço de atacado na sua moeda está disponível em um orçamento."
+    },
+    "gate": {
+      "login": "Entre na sua conta para ver os preços",
+      "editor_title": "TackQuote Price Gate está ativado",
+      "editor_guests": "Clientes que não entraram na conta não verão os preços. O editor de temas sempre os mostra.",
+      "editor_tag": "Clientes sem esta tag de cliente não verão os preços:",
+      "editor_bad_selectors": "Os seletores de preço extras foram ignorados porque contêm chaves, ponto e vírgula ou @."
+    },
+    "quick_order": {
+      "help": "Um item por linha: SKU e depois a quantidade. Por exemplo ABC-100, 12",
+      "placeholder": "ABC-100, 12",
+      "check": "Verificar itens",
+      "add_cart": "Adicionar tudo ao carrinho",
+      "add_quote": "Adicionar tudo ao orçamento",
+      "col_sku": "SKU",
+      "col_item": "Item",
+      "col_qty": "Quantidade",
+      "col_price": "Preço",
+      "not_found": "Não encontrado nesta loja",
+      "price_at_checkout": "Seu preço aparece no checkout",
+      "limit_min": "Mínimo de {n} para este item",
+      "limit_max": "Máximo de {n} para este item",
+      "empty": "Adicione pelo menos um SKU.",
+      "too_many": "Até 50 itens por vez. Os primeiros 50 foram verificados.",
+      "bad_lines": "Algumas linhas não puderam ser lidas e foram ignoradas: {lines}",
+      "loading": "Verificando seus itens",
+      "unlinked": "Sua conta ainda não está vinculada aos pedidos de atacado. Solicite um orçamento e nós configuramos isso para você.",
+      "sign_in": "Entre na sua conta de atacado para fazer pedidos por SKU.",
+      "login": "Entrar",
+      "error": "Não foi possível verificar esses itens agora. Tente novamente.",
+      "added_cart": "Adicionado ao seu carrinho.",
+      "cart_failed": "Não foi possível atualizar seu carrinho. Tente novamente.",
+      "quote_failed": "Sua solicitação de orçamento está cheia, ou o formulário de orçamento não está disponível nesta página."
     },
     "visibility": {
       "editor_note": "Este produto é restrito a grupos de compradores do TackQuote. Somente compradores autorizados a comprá-lo veem este bloco; os demais clientes não veem nada aqui, e o checkout recusa o produto para eles."

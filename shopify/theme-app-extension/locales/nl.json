@@ -65,7 +65,17 @@
       "heading": "Een groothandelsaccount aanvragen",
       "sign_in_first": "Log in op je account om een aanvraag te doen. Die wordt dan aan je account gekoppeld, zodat je groothandelsprijzen verschijnen zodra hij is goedgekeurd.",
       "sign_in": "Inloggen",
-      "create_account": "Account aanmaken"
+      "create_account": "Account aanmaken",
+      "choose": "Kies een optie",
+      "file_type": "{label}: voeg een PDF-, JPEG- of PNG-bestand toe.",
+      "file_size": "{label}: het bestand mag maximaal {max} MB groot zijn.",
+      "uploading": "{label} wordt geüpload",
+      "addr_line1": "Straat en huisnummer",
+      "addr_line2": "Toevoeging, verdieping of unit",
+      "addr_city": "Plaats",
+      "addr_region": "Provincie of regio",
+      "addr_postal_code": "Postcode",
+      "addr_country": "Land"
     },
     "quantity_breaks": {
       "loading": "Staffelprijzen voor de groothandel worden geladen",
@@ -120,6 +130,43 @@
       "too_large": "Dat is te lang om te versturen. Maak de opmerkingen korter en probeer het opnieuw.",
       "error": "Je aanvraag kon niet worden verstuurd. Probeer het zo opnieuw.",
       "heading": "Betalen op rekening aanvragen"
+    },
+    "currency": {
+      "applied": "Je groothandelsprijs wordt toegepast bij het afrekenen.",
+      "quote": "Je groothandelsprijs in je valuta is beschikbaar via een offerte."
+    },
+    "gate": {
+      "login": "Log in om prijzen te zien",
+      "editor_title": "TackQuote Price Gate staat aan",
+      "editor_guests": "Klanten die niet zijn ingelogd, zien geen prijzen. De thema-editor toont ze altijd.",
+      "editor_tag": "Klanten zonder deze klanttag zien geen prijzen:",
+      "editor_bad_selectors": "De extra prijsselectors zijn genegeerd omdat ze accolades, puntkomma’s of @ bevatten."
+    },
+    "quick_order": {
+      "help": "Eén artikel per regel: SKU, dan aantal. Bijvoorbeeld ABC-100, 12",
+      "placeholder": "ABC-100, 12",
+      "check": "Artikelen controleren",
+      "add_cart": "Alles in winkelwagen",
+      "add_quote": "Alles aan offerte toevoegen",
+      "col_sku": "SKU",
+      "col_item": "Artikel",
+      "col_qty": "Aantal",
+      "col_price": "Prijs",
+      "not_found": "Niet gevonden in deze winkel",
+      "price_at_checkout": "Je prijs wordt getoond bij het afrekenen",
+      "limit_min": "Minimaal {n} voor dit artikel",
+      "limit_max": "Maximaal {n} voor dit artikel",
+      "empty": "Voeg minstens één SKU toe.",
+      "too_many": "Maximaal 50 artikelen tegelijk. De eerste 50 zijn gecontroleerd.",
+      "bad_lines": "Sommige regels konden niet worden gelezen en zijn overgeslagen: {lines}",
+      "loading": "Je artikelen worden gecontroleerd",
+      "unlinked": "Je account is nog niet gekoppeld aan groothandelsbestellingen. Vraag een offerte aan en wij regelen het.",
+      "sign_in": "Log in op je groothandelsaccount om op SKU te bestellen.",
+      "login": "Inloggen",
+      "error": "Die artikelen konden op dit moment niet worden gecontroleerd. Probeer het opnieuw.",
+      "added_cart": "Toegevoegd aan je winkelwagen.",
+      "cart_failed": "Je winkelwagen kon niet worden bijgewerkt. Probeer het opnieuw.",
+      "quote_failed": "Je offerteaanvraag is vol, of het offerteformulier is niet beschikbaar op deze pagina."
     },
     "visibility": {
       "editor_note": "Dit product is beperkt tot TackQuote-kopersgroepen. Alleen kopers die het mogen kopen, zien dit blok; andere klanten zien hier niets, en bij het afrekenen wordt het product voor hen geweigerd."

@@ -65,7 +65,17 @@
       "heading": "Richiedi un account all’ingrosso",
       "sign_in_first": "Accedi al tuo account per inviare la richiesta. Verrà collegata al tuo account e i tuoi prezzi all’ingrosso compariranno non appena sarà approvata.",
       "sign_in": "Accedi",
-      "create_account": "Crea un account"
+      "create_account": "Crea un account",
+      "choose": "Scegli un’opzione",
+      "file_type": "{label}: allega un file PDF, JPEG o PNG.",
+      "file_size": "{label}: il file non deve superare {max} MB.",
+      "uploading": "Caricamento di {label} in corso",
+      "addr_line1": "Indirizzo",
+      "addr_line2": "Interno, piano o unità",
+      "addr_city": "Città",
+      "addr_region": "Provincia o regione",
+      "addr_postal_code": "CAP",
+      "addr_country": "Paese"
     },
     "quantity_breaks": {
       "loading": "Caricamento dei prezzi all’ingrosso per quantità",
@@ -120,6 +130,43 @@
       "too_large": "Il testo è troppo lungo per essere inviato. Accorcia le note e riprova.",
       "error": "Non è stato possibile inviare la tua richiesta. Riprova tra poco.",
       "heading": "Richiedi il pagamento dilazionato"
+    },
+    "currency": {
+      "applied": "Il tuo prezzo all’ingrosso viene applicato al checkout.",
+      "quote": "Il tuo prezzo all’ingrosso nella tua valuta è disponibile su preventivo."
+    },
+    "gate": {
+      "login": "Accedi per vedere i prezzi",
+      "editor_title": "TackQuote Price Gate è attivo",
+      "editor_guests": "I clienti che non hanno effettuato l’accesso non vedranno i prezzi. L’editor del tema li mostra sempre.",
+      "editor_tag": "I clienti senza questo tag cliente non vedranno i prezzi:",
+      "editor_bad_selectors": "I selettori di prezzo aggiuntivi sono stati ignorati perché contengono parentesi graffe, punti e virgola o @."
+    },
+    "quick_order": {
+      "help": "Un articolo per riga: SKU, poi quantità. Ad esempio ABC-100, 12",
+      "placeholder": "ABC-100, 12",
+      "check": "Verifica articoli",
+      "add_cart": "Aggiungi tutto al carrello",
+      "add_quote": "Aggiungi tutto al preventivo",
+      "col_sku": "SKU",
+      "col_item": "Articolo",
+      "col_qty": "Quantità",
+      "col_price": "Prezzo",
+      "not_found": "Non trovato in questo negozio",
+      "price_at_checkout": "Il tuo prezzo viene mostrato al checkout",
+      "limit_min": "Minimo {n} per questo articolo",
+      "limit_max": "Massimo {n} per questo articolo",
+      "empty": "Aggiungi almeno uno SKU.",
+      "too_many": "Fino a 50 articoli alla volta. Sono stati verificati i primi 50.",
+      "bad_lines": "Alcune righe non sono state lette e sono state saltate: {lines}",
+      "loading": "Verifica dei tuoi articoli in corso",
+      "unlinked": "Il tuo account non è ancora collegato agli ordini all’ingrosso. Richiedi un preventivo e ce ne occuperemo noi.",
+      "sign_in": "Accedi al tuo account all’ingrosso per ordinare tramite SKU.",
+      "login": "Accedi",
+      "error": "Al momento non è stato possibile verificare questi articoli. Riprova.",
+      "added_cart": "Aggiunto al tuo carrello.",
+      "cart_failed": "Non è stato possibile aggiornare il tuo carrello. Riprova.",
+      "quote_failed": "La tua richiesta di preventivo è piena, oppure il modulo di preventivo non è disponibile in questa pagina."
     },
     "visibility": {
       "editor_note": "Questo prodotto è riservato a gruppi di acquirenti TackQuote. Solo gli acquirenti autorizzati ad acquistarlo vedono questo blocco; gli altri clienti qui non vedono nulla e il checkout rifiuta il prodotto."
